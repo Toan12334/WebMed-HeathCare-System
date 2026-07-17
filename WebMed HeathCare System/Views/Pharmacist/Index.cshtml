@@ -1,0 +1,173 @@
+@model IEnumerable<WebMed_HeathCare_System.Models.Order>
+
+@{
+    ViewData["Title"] = "Pharmacist Order Management";
+    string currentFilter = ViewBag.StatusFilter ?? "";
+}
+
+<div class="container-fluid mt-4 px-4 mb-5">
+    <h1 class="fw-extrabold mb-4 text-dark"><i class="bi bi-prescription2"></i> Pharmacist Order Dashboard</h1>
+
+    <!-- Summary Widgets -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-warning-subtle text-warning-emphasis">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1 text-uppercase fw-bold fs-8">Pending Orders</h6>
+                        <h3 class="fw-extrabold mb-0">@Model.Count(o => o.OrderStatus == "Pending" || o.OrderStatus == "Paid")</h3>
+                    </div>
+                    <i class="bi bi-clock-history fs-1"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-primary-subtle text-primary-emphasis">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1 text-uppercase fw-bold fs-8">Preparing</h6>
+                        <h3 class="fw-extrabold mb-0">@Model.Count(o => o.OrderStatus == "Preparing")</h3>
+                    </div>
+                    <i class="bi bi-box-seam fs-1"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-info-subtle text-info-emphasis">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1 text-uppercase fw-bold fs-8">Dispatched (Shipping)</h6>
+                        <h3 class="fw-extrabold mb-0">@Model.Count(o => o.OrderStatus == "Shipping")</h3>
+                    </div>
+                    <i class="bi bi-truck fs-1"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 bg-success-subtle text-success-emphasis">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1 text-uppercase fw-bold fs-8">Completed</h6>
+                        <h3 class="fw-extrabold mb-0">@Model.Count(o => o.OrderStatus == "Completed")</h3>
+                    </div>
+                    <i class="bi bi-check-circle-fill fs-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters Tabs -->
+    <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-header bg-white border-0 pt-3">
+            <ul class="nav nav-pills card-header-pills">
+                <li class="nav-item">
+                    <a class="nav-link @(currentFilter == "" ? "active" : "")" asp-action="Index">All Orders</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentFilter == "Paid" ? "active" : "")" asp-action="Index" asp-route-statusFilter="Paid">Paid</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentFilter == "Preparing" ? "active" : "")" asp-action="Index" asp-route-statusFilter="Preparing">Preparing</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentFilter == "Packed" ? "active" : "")" asp-action="Index" asp-route-statusFilter="Packed">Packed</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentFilter == "Shipping" ? "active" : "")" asp-action="Index" asp-route-statusFilter="Shipping">Shipping</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(currentFilter == "Completed" ? "active" : "")" asp-action="Index" asp-route-statusFilter="Completed">Completed</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Orders Table List -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-body p-0">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="p-3">Order ID</th>
+                                <th class="p-3">Patient Name</th>
+                                <th class="p-3">Date</th>
+                                <th class="p-3">Amount</th>
+                                <th class="p-3">Payment</th>
+                                <th class="p-3 text-center">Status</th>
+                                <th class="p-3 text-center" style="width: 150px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in Model)
+                            {
+                                <tr>
+                                    <td class="p-3 fw-bold">#@order.OrderId</td>
+                                    <td class="p-3">
+                                        <div class="fw-bold">@order.Patient.PatientNavigation.FullName</div>
+                                        <small class="text-muted">@order.ShippingPhone</small>
+                                    </td>
+                                    <td class="p-3 text-muted">@order.CreatedAt.ToString("g")</td>
+                                    <td class="p-3 fw-extrabold text-dark">@order.TotalAmount.ToString("N0") VND</td>
+                                    <td class="p-3">
+                                        <span class="badge bg-light text-dark border">@order.PaymentMethod</span>
+                                    </td>
+                                    <td class="p-3 text-center">
+                                        @if (order.OrderStatus == "Pending")
+                                        {
+                                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-1.5 rounded-pill">Pending</span>
+                                        }
+                                        else if (order.OrderStatus == "Paid")
+                                        {
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 rounded-pill">Paid</span>
+                                        }
+                                        else if (order.OrderStatus == "Preparing")
+                                        {
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1.5 rounded-pill">Preparing</span>
+                                        }
+                                        else if (order.OrderStatus == "Packed")
+                                        {
+                                            <span class="badge bg-info-subtle text-info border border-info-subtle px-3 py-1.5 rounded-pill">Packed</span>
+                                        }
+                                        else if (order.OrderStatus == "Shipping")
+                                        {
+                                            <span class="badge bg-info text-white px-3 py-1.5 rounded-pill"><i class="bi bi-truck animate-bounce"></i> Shipping</span>
+                                        }
+                                        else if (order.OrderStatus == "Completed")
+                                        {
+                                            <span class="badge bg-success text-white px-3 py-1.5 rounded-pill">Completed</span>
+                                        }
+                                    </td>
+                                    <td class="p-3 text-center">
+                                        <a asp-action="Details" asp-route-id="@order.OrderId" class="btn btn-outline-primary btn-sm rounded-3 fw-bold w-100">
+                                            <i class="bi bi-eye-fill"></i> View Order
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="py-5 text-center">
+                    <i class="bi bi-clipboard2-x text-muted" style="font-size: 4rem;"></i>
+                    <h3 class="fw-bold mt-3">No orders found</h3>
+                    <p class="text-muted">No orders match the current status filter.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .fw-extrabold {
+        font-weight: 800;
+    }
+    .fs-8 {
+        font-size: 0.78rem;
+    }
+</style>

@@ -1,0 +1,231 @@
+@model WebMed_HeathCare_System.Models.Order
+
+@{
+    ViewData["Title"] = "Track Order #" + Model.OrderId;
+}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<div class="container mt-5 mb-5">
+    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 mb-4"><i class="bi bi-arrow-left"></i> Back to Orders</a>
+
+    <div class="row g-4">
+        <!-- Status Timeline -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4 p-4">
+                <h4 class="fw-bold text-dark border-bottom pb-2 mb-4"><i class="bi bi-compass text-primary animate-spin"></i> Delivery Progress</h4>
+
+                <div class="tracking-timeline position-relative ps-4 py-2">
+                    <!-- Step 1: Pending (Order Placed) -->
+                    <div class="timeline-item position-relative pb-4" id="step-Pending">
+                        <div class="timeline-marker position-absolute top-0 start-0 translate-middle-x rounded-circle border d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; left: -12px; z-index: 2;">
+                            <i class="bi bi-circle-fill fs-9"></i>
+                        </div>
+                        <h6 class="fw-bold mb-0">Order Placed</h6>
+                        <small class="text-muted">Order received by WebMed systems</small>
+                    </div>
+
+                    <!-- Step 2: Paid -->
+                    <div class="timeline-item position-relative pb-4" id="step-Paid">
+                        <div class="timeline-marker position-absolute top-0 start-0 translate-middle-x rounded-circle border d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; left: -12px; z-index: 2;">
+                            <i class="bi bi-circle-fill fs-9"></i>
+                        </div>
+                        <h6 class="fw-bold mb-0">Payment Confirmed</h6>
+                        <small class="text-muted">Transaction completed successfully</small>
+                    </div>
+
+                    <!-- Step 3: Preparing -->
+                    <div class="timeline-item position-relative pb-4" id="step-Preparing">
+                        <div class="timeline-marker position-absolute top-0 start-0 translate-middle-x rounded-circle border d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; left: -12px; z-index: 2;">
+                            <i class="bi bi-circle-fill fs-9"></i>
+                        </div>
+                        <h6 class="fw-bold mb-0">Pharmacist Preparing</h6>
+                        <small class="text-muted">Medicines are being prepared & checked</small>
+                    </div>
+
+                    <!-- Step 4: Packed -->
+                    <div class="timeline-item position-relative pb-4" id="step-Packed">
+                        <div class="timeline-marker position-absolute top-0 start-0 translate-middle-x rounded-circle border d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; left: -12px; z-index: 2;">
+                            <i class="bi bi-circle-fill fs-9"></i>
+                        </div>
+                        <h6 class="fw-bold mb-0">Packed & Dispatched</h6>
+                        <small class="text-muted">Package handed over to courier service</small>
+                    </div>
+
+                    <!-- Step 5: Shipping -->
+                    <div class="timeline-item position-relative pb-4" id="step-Shipping">
+                        <div class="timeline-marker position-absolute top-0 start-0 translate-middle-x rounded-circle border d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; left: -12px; z-index: 2;">
+                            <i class="bi bi-circle-fill fs-9"></i>
+                        </div>
+                        <h6 class="fw-bold mb-0">In Transit</h6>
+                        <small class="text-muted">Courier is delivering package to your location</small>
+                    </div>
+
+                    <!-- Step 6: Completed -->
+                    <div class="timeline-item position-relative pb-0" id="step-Completed">
+                        <div class="timeline-marker position-absolute top-0 start-0 translate-middle-x rounded-circle border d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; left: -12px; z-index: 2;">
+                            <i class="bi bi-circle-fill fs-9"></i>
+                        </div>
+                        <h6 class="fw-bold mb-0">Delivered</h6>
+                        <small class="text-muted">Order successfully received</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Summary & Live Tracking Map Simulation -->
+        <div class="col-lg-5">
+            <!-- Order Details -->
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Order Details</h5>
+                <p class="mb-1 fs-7"><strong>Order ID:</strong> #@Model.OrderId</p>
+                <p class="mb-1 fs-7"><strong>Shipping Address:</strong> @Model.ShippingAddress</p>
+                <p class="mb-1 fs-7"><strong>Contact Phone:</strong> @Model.ShippingPhone</p>
+                <p class="mb-3 fs-7"><strong>Payment Method:</strong> @Model.PaymentMethod</p>
+                
+                <div class="alert alert-info rounded-3 text-center mb-0">
+                    <h6 class="alert-heading text-uppercase fw-bold fs-8 mb-1">Estimated Arrival</h6>
+                    <h3 class="display-6 fw-extrabold m-0 text-primary" id="etaDisplay">Checking...</h3>
+                </div>
+            </div>
+
+            <!-- Live GPS map -->
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden" id="gpsCard" style="display: none;">
+                <div class="bg-primary text-white p-3 d-flex align-items-center">
+                    <i class="bi bi-geo-alt-fill me-2"></i> <h6 class="fw-bold mb-0">Live Delivery Courier Tracking</h6>
+                </div>
+                <div class="p-0 position-relative" style="height: 350px;">
+                    <div id="map" style="height: 100%; width: 100%; z-index: 1;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let map = null;
+        let courierMarker = null;
+        let hospitalMarker = null;
+
+        function initMap(lat, lng) {
+            if (map !== null) return;
+            
+            // Initialize map centered on HCMC coordinates
+            map = L.map('map').setView([lat, lng], 14);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Add Hospital Origin Marker
+            hospitalMarker = L.marker([10.762622, 106.660172]).addTo(map)
+                .bindPopup('<b>WebMed Central Pharmacy</b><br>Shipment dispatched from here.').openPopup();
+
+            // Add Courier Live Marker
+            courierMarker = L.marker([lat, lng]).addTo(map)
+                .bindPopup('<b>Delivery Courier</b><br>In transit to destination.').openPopup();
+        }
+
+        function updateCourierLocation(lat, lng) {
+            if (map === null) {
+                initMap(lat, lng);
+            } else {
+                courierMarker.setLatLng([lat, lng]);
+                map.panTo([lat, lng]);
+            }
+        }
+
+        $(document).ready(function () {
+            updateStatusTimeline("@Model.OrderStatus");
+
+            // Live status updates polling every 3 seconds
+            setInterval(function () {
+                $.ajax({
+                    url: '/OrderTracking/GetLiveStatus/@Model.OrderId',
+                    type: 'GET',
+                    success: function (data) {
+                        updateStatusTimeline(data.status);
+                        $('#etaDisplay').text(data.eta);
+
+                        if (data.status === "Shipping") {
+                            $('#gpsCard').slideDown(400, function() {
+                                // Trigger map resize and update marker
+                                updateCourierLocation(data.latitude, data.longitude);
+                                if (map) {
+                                    map.invalidateSize();
+                                }
+                            });
+                        } else {
+                            $('#gpsCard').slideUp();
+                        }
+                    }
+                });
+            }, 3000);
+        });
+
+        function updateStatusTimeline(status) {
+            // Reset all markers
+            $('.timeline-item').removeClass('active-step complete-step');
+            $('.timeline-marker').removeClass('bg-primary text-white border-primary bg-success border-success');
+
+            let steps = ["Pending", "Paid", "Preparing", "Packed", "Shipping", "Completed"];
+            let currentIndex = steps.indexOf(status);
+
+            if (currentIndex === -1) {
+                // Delayed or unknown fallback
+                $('#step-Pending').addClass('active-step');
+                return;
+            }
+
+            for (let i = 0; i <= currentIndex; i++) {
+                let stepId = "#step-" + steps[i];
+                if (i === currentIndex) {
+                    $(stepId).addClass('active-step');
+                    $(stepId + ' .timeline-marker').addClass('bg-primary text-white border-primary');
+                } else {
+                    $(stepId).addClass('complete-step');
+                    $(stepId + ' .timeline-marker').addClass('bg-success text-white border-success').html('<i class="bi bi-check-lg fs-9"></i>');
+                }
+            }
+        }
+    </script>
+}
+
+<style>
+    .tracking-timeline::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 2px;
+        background-color: #dee2e6;
+        z-index: 1;
+    }
+    .timeline-item.complete-step h6 {
+        color: #198754 !important;
+    }
+    .timeline-item.active-step h6 {
+        color: #0d6efd !important;
+    }
+    .animate-spin {
+        animation: spin 3s linear infinite;
+    }
+    @@keyframes spin {
+        100% { transform: rotate(360deg); }
+    }
+    .fs-9 {
+        font-size: 0.65rem;
+    }
+    .fs-8 {
+        font-size: 0.78rem;
+    }
+    .fs-7 {
+        font-size: 0.88rem;
+    }
+    .fw-extrabold {
+        font-weight: 800;
+    }
+</style>

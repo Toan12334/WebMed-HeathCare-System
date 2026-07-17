@@ -4,6 +4,8 @@
     ViewData["Title"] = "Track Ambulance";
 }
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
 <div class="container mt-4">
     <h2>Ambulance Tracking</h2>
     <hr />
@@ -26,13 +28,10 @@
         </div>
         
         <div class="col-md-7">
-            <!-- Mock Map Area -->
+            <!-- Leaflet Live Map -->
             <div class="card shadow-sm">
-                <div class="card-body p-0 position-relative" style="height: 400px; background-color: #e9ecef; overflow: hidden;">
-                    <div class="position-absolute top-50 start-50 translate-middle text-center w-100">
-                        <p class="text-muted"><i class="bi bi-map" style="font-size: 2rem;"></i><br/>Map simulation</p>
-                        <p>Live coordinates: <br/> <strong id="coordsDisplay" class="text-danger">Lat: @Model.AmbulanceLatitude | Lng: @Model.AmbulanceLongitude</strong></p>
-                    </div>
+                <div class="card-body p-0" style="height: 400px; position: relative;">
+                    <div id="map" style="height: 100%; width: 100%; z-index: 1;"></div>
                 </div>
             </div>
         </div>
@@ -40,19 +39,89 @@
 </div>
 
 @section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
+        let map = null;
+        let ambulanceMarker = null;
+        let patientMarker = null;
+        let routeLine = null;
+
+        // Patient coordinates
+        const patientLat = @(Model.Latitude ?? 10.776m);
+        const patientLng = @(Model.Longitude ?? 106.700m);
+
+        // Define custom HTML/CSS icons using Bootstrap Icons
+        const patientIcon = L.divIcon({
+            html: '<div class="d-flex align-items-center justify-content-center bg-success text-white rounded-circle shadow-lg" style="width: 36px; height: 36px; border: 2px solid white;"><i class="bi bi-person-fill fs-5"></i></div>',
+            className: 'custom-leaflet-icon',
+            iconSize: [36, 36],
+            iconAnchor: [18, 18]
+        });
+
+        const ambulanceIcon = L.divIcon({
+            html: '<div class="d-flex align-items-center justify-content-center bg-danger text-white rounded-circle shadow-lg animate-pulse" style="width: 40px; height: 40px; border: 2px solid white; animation: pulse 1.5s infinite;"><i class="bi bi-ambulance fs-5"></i></div>',
+            className: 'custom-leaflet-icon',
+            iconSize: [40, 40],
+            iconAnchor: [20, 20]
+        });
+
+        function initMap(ambLat, ambLng) {
+            if (map !== null) return;
+            map = L.map('map').setView([patientLat, patientLng], 14);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Add Patient Pickup Marker with custom green icon
+            patientMarker = L.marker([patientLat, patientLng], { icon: patientIcon }).addTo(map)
+                .bindPopup('<b>Patient Pickup Location</b><br>@Model.PickupLocation').openPopup();
+
+            // Add Ambulance Marker with custom ambulance icon
+            ambulanceMarker = L.marker([ambLat, ambLng], { icon: ambulanceIcon }).addTo(map)
+                .bindPopup('<b>Ambulance @Model.AssignedAmbulanceVehicle</b><br>Currently en route.');
+
+            // Draw line connecting them
+            routeLine = L.polyline([[ambLat, ambLng], [patientLat, patientLng]], {
+                color: 'red',
+                dashArray: '5, 10',
+                weight: 3
+            }).addTo(map);
+
+            // Fit bounds to show both markers
+            const bounds = L.latLngBounds([[ambLat, ambLng], [patientLat, patientLng]]);
+            map.fitBounds(bounds, { padding: [50, 50] });
+        }
+
+        function updateAmbulanceLocation(ambLat, ambLng) {
+            if (map === null) {
+                initMap(ambLat, ambLng);
+            } else {
+                ambulanceMarker.setLatLng([ambLat, ambLng]);
+                routeLine.setLatLngs([[ambLat, ambLng], [patientLat, patientLng]]);
+            }
+        }
+
         $(document).ready(function () {
-            // Polling GPSService every 3 seconds as per sequence diagram loop
+            // Initial map setup with initial ambulance position
+            let initialAmbLat = @(Model.AmbulanceLatitude ?? 10.762622m);
+            let initialAmbLng = @(Model.AmbulanceLongitude ?? 106.660172m);
+            initMap(initialAmbLat, initialAmbLng);
+
+            // Polling GPSService every 3 seconds
             setInterval(function () {
                 $.ajax({
                     url: '/EmergencyRequest/GetTrackingData',
                     type: 'GET',
                     data: { requestId: @Model.RequestId },
                     success: function (data) {
-                        $('#coordsDisplay').text('Lat: ' + data.latitude.toFixed(6) + ' | Lng: ' + data.longitude.toFixed(6));
                         $('#statusBadge').text(data.status);
                         $('#etaDisplay').text(data.eta);
                         $('#vehicleNo').text(data.vehicle);
+                        
+                        if (data.latitude && data.longitude) {
+                            updateAmbulanceLocation(data.latitude, data.longitude);
+                        }
                     },
                     error: function (err) {
                         console.error("Tracking unavailable or disconnected.");

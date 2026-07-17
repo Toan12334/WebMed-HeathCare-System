@@ -1,0 +1,152 @@
+@model IEnumerable<WebMed_HeathCare_System.Models.Appointment>
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "My Appointments - WebMed";
+    var userRole = User.FindFirstValue(ClaimTypes.Role);
+}
+
+<div class="container mt-5 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-extrabold mb-0"><i class="bi bi-calendar-event"></i> Consultation Appointments</h1>
+        @if (userRole == "Patient")
+        {
+            <a asp-controller="FindDoctor" asp-action="Index" class="btn btn-emerald rounded-pill px-4" style="background-color: #059669; color: white;">
+                <i class="bi bi-plus-lg"></i> Book New Appointment
+            </a>
+        }
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-body p-0">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="p-3">@(userRole == "Doctor" ? "Patient" : "Doctor")</th>
+                                <th class="p-3">Appointment Date & Time</th>
+                                <th class="p-3">Type</th>
+                                <th class="p-3 text-center">Status</th>
+                                <th class="p-3 text-center" style="width: 220px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var app in Model)
+                            {
+                                <tr>
+                                    <td class="p-3">
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-primary-subtle text-primary rounded-circle p-2 me-3"><i class="bi bi-person-fill"></i></div>
+                                            <div>
+                                                <h6 class="fw-bold mb-0">@(userRole == "Doctor" ? app.Patient.PatientNavigation.FullName : app.Doctor.DoctorNavigation.FullName)</h6>
+                                                @if (userRole == "Patient")
+                                                {
+                                                    <small class="text-muted">@app.Doctor.Specialty</small>
+                                                }
+                                                else
+                                                {
+                                                    <small class="text-muted">Patient Profile</small>
+                                                }
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="p-3">
+                                        <div class="fw-semibold">@app.AppointmentDateTime.ToString("f")</div>
+                                        <small class="text-muted">Duration: 30 mins</small>
+                                    </td>
+                                    <td class="p-3">
+                                        <span class="badge bg-light text-dark border"><i class="bi bi-laptop"></i> @app.ConsultationType</span>
+                                    </td>
+                                    <td class="p-3 text-center">
+                                        @if (app.Status == "Scheduled")
+                                        {
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill">Scheduled</span>
+                                        }
+                                        else if (app.Status == "Completed")
+                                        {
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill">Completed</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-2 rounded-pill">@app.Status</span>
+                                        }
+                                    </td>
+                                    <td class="p-3 text-center">
+                                        @if (app.Status == "Scheduled")
+                                        {
+                                            <a asp-controller="Consultation" asp-action="Session" asp-route-appointmentId="@app.AppointmentId" class="btn btn-primary rounded-3 w-100 fw-bold">
+                                                <i class="bi bi-camera-video-fill me-1"></i> @(userRole == "Doctor" ? "Start Consult" : "Join Consult")
+                                            </a>
+                                        }
+                                        else if (app.Status == "Completed")
+                                        {
+                                            <div class="d-grid gap-1">
+                                                <a asp-controller="Consultation" asp-action="Receipt" asp-route-appointmentId="@app.AppointmentId" class="btn btn-outline-secondary btn-sm rounded-3 fw-semibold">
+                                                    <i class="bi bi-file-earmark-medical"></i> View Record
+                                                </a>
+                                                @if (userRole == "Patient")
+                                                {
+                                                    <a asp-controller="DoctorReview" asp-action="Create" asp-route-appointmentId="@app.AppointmentId" class="btn btn-outline-warning btn-sm rounded-3 fw-bold text-dark">
+                                                        <i class="bi bi-star-fill text-warning"></i> Write Review
+                                                    </a>
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-secondary btn-sm w-100 rounded-3" disabled>No Action</button>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="py-5 text-center">
+                    <i class="bi bi-calendar-x text-muted" style="font-size: 4rem;"></i>
+                    <h3 class="fw-bold mt-3">No appointments found</h3>
+                    <p class="text-muted">You do not have any appointments scheduled.</p>
+                    @if (userRole == "Patient")
+                    {
+                        <a asp-controller="FindDoctor" asp-action="Index" class="btn btn-emerald rounded-pill px-4 mt-2" style="background-color: #059669; color: white;">Find a Specialist</a>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .fw-extrabold {
+        font-weight: 800;
+    }
+    .btn-emerald {
+        background-color: #059669;
+        color: white;
+    }
+    .btn-emerald:hover {
+        background-color: #047857;
+        color: white;
+    }
+</style>

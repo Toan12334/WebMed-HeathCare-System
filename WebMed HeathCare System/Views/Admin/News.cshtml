@@ -1,0 +1,90 @@
+@model IEnumerable<WebMed_HeathCare_System.Models.Article>
+
+@{
+    ViewData["Title"] = "Health News Articles - Admin Console";
+}
+
+<div class="container-fluid mt-4 px-4 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-extrabold mb-0 text-dark"><i class="bi bi-newspaper"></i> Health News Management</h1>
+        <a asp-action="CreateNews" class="btn btn-primary rounded-pill px-4 fw-bold"><i class="bi bi-plus-lg"></i> Create News Article</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Navigation Buttons -->
+    <div class="d-flex justify-content-end mb-4">
+        <div class="btn-group shadow-sm">
+            <a asp-action="Users" class="btn btn-outline-primary">Users</a>
+            <a asp-action="Doctors" class="btn btn-outline-primary">Doctor Verification</a>
+            <a asp-action="Reviews" class="btn btn-outline-primary">Review Moderation</a>
+            <a asp-action="News" class="btn btn-primary active">Health News</a>
+        </div>
+    </div>
+
+    <!-- Health News List -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-body p-0">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="p-3">ID</th>
+                                <th class="p-3">Article Title</th>
+                                <th class="p-3">Category</th>
+                                <th class="p-3">Author</th>
+                                <th class="p-3 text-center">Published Date</th>
+                                <th class="p-3 text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var article in Model)
+                            {
+                                <tr>
+                                    <td class="p-3 fw-bold">#@article.ArticleId</td>
+                                    <td class="p-3 fw-bold text-dark">@article.Title</td>
+                                    <td class="p-3"><span class="badge bg-light text-primary border">@article.Category</span></td>
+                                    <td class="p-3">@article.Author.FullName</td>
+                                    <td class="p-3 text-center text-muted">@article.PublishedAt.ToString("g")</td>
+                                    <td class="p-3 text-center">
+                                        @if (article.IsPublished)
+                                        {
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 rounded-pill fw-bold">Published</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-1.5 rounded-pill fw-bold">Draft</span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="py-5 text-center">
+                    <i class="bi bi-file-earmark-medical text-muted" style="font-size: 4rem;"></i>
+                    <h3 class="fw-bold mt-3">No articles found</h3>
+                    <p class="text-muted">You haven't written or published any health articles yet.</p>
+                    <a asp-action="CreateNews" class="btn btn-primary rounded-pill px-4 mt-2">Write Article</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .fw-extrabold {
+        font-weight: 800;
+    }
+</style>

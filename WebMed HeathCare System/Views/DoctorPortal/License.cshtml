@@ -1,0 +1,146 @@
+@{
+    ViewData["Title"] = "Professional Doctor License";
+    var license = (WebMed_HeathCare_System.Models.DoctorLicense?)ViewBag.License;
+}
+
+<div class="container mt-5 mb-5">
+    <h1 class="fw-extrabold mb-4"><i class="bi bi-patch-check"></i> Professional Licensing</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- License info / status -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <h4 class="fw-bold text-dark border-bottom pb-2 mb-4">Verification Status</h4>
+                
+                @if (license != null)
+                {
+                    <div class="bg-light p-4 rounded-4 mb-4">
+                        <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                            <span class="text-muted">License Number:</span>
+                            <span class="fw-bold">@license.LicenseNumber</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                            <span class="text-muted">Verification Status:</span>
+                            @if (license.VerificationStatus == "Approved")
+                            {
+                                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill fw-bold">Approved</span>
+                            }
+                            else if (license.VerificationStatus == "Pending")
+                            {
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-1 rounded-pill fw-bold">Pending Review</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 rounded-pill fw-bold">@license.VerificationStatus</span>
+                            }
+                        </div>
+                        <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
+                            <span class="text-muted">Payment:</span>
+                            @if (license.PaymentStatus == "Paid")
+                            {
+                                <span class="badge bg-success text-white px-3 py-1 rounded-pill fw-bold">Paid</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger text-white px-3 py-1 rounded-pill fw-bold">Pending</span>
+                            }
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted">Submitted Date:</span>
+                            <span class="fw-semibold text-dark">@license.SubmittedAt.ToString("d")</span>
+                        </div>
+                    </div>
+
+                    @if (license.PaymentStatus == "Pending")
+                    {
+                        <div class="alert alert-warning rounded-3">
+                            <i class="bi bi-info-circle-fill"></i> Please complete payment for the licensing review fee to start the verification process.
+                        </div>
+                        <a asp-action="PaymentLicense" asp-route-licenseId="@license.LicenseId" class="btn btn-warning btn-lg w-100 rounded-3 fw-bold py-3"><i class="bi bi-credit-card"></i> Pay License Fee (@license.FeeAmount.ToString("N0") VND)</a>
+                    }
+                    else
+                    {
+                        <div class="alert alert-success rounded-3 text-center mb-0">
+                            <i class="bi bi-shield-fill-check"></i> Verification complete. You can now configure your schedule availability and take online sessions.
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="alert alert-info rounded-3 text-center">
+                        <i class="bi bi-info-circle-fill"></i> You have not submitted professional license details yet. Please fill the form to register.
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Submission Form -->
+        <div class="col-lg-6">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <h4 class="fw-bold text-dark border-bottom pb-2 mb-4">Submit Credentials</h4>
+                
+                @if (license == null)
+                {
+                    <form asp-action="SubmitLicense" method="post">
+                        <!-- License No -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-secondary">Medical License Number (ID)</label>
+                            <input type="text" name="licenseNumber" class="form-control rounded-3" required placeholder="e.g. LIC-12345678" />
+                        </div>
+
+                        <!-- Supporting document upload mock -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-secondary">Supporting Certificate Documents (.pdf)</label>
+                            <input type="file" class="form-control rounded-3" disabled />
+                            <small class="text-muted">Mock File Uploader. Will automatically upload simulated file.</small>
+                        </div>
+
+                        <!-- Fee mock -->
+                        <div class="mb-4 bg-light p-3 rounded-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted">Processing Verification Fee:</span>
+                                <strong class="text-success fs-5">150,000 VND</strong>
+                            </div>
+                            <input type="hidden" name="feeAmount" value="150000" />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 fw-bold py-3"><i class="bi bi-file-earmark-arrow-up-fill"></i> Submit License Details</button>
+                    </form>
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <i class="bi bi-file-earmark-check text-muted" style="font-size: 4rem;"></i>
+                        <h5 class="fw-bold mt-3">Credentials submitted</h5>
+                        <p class="text-muted">Licensing credentials have already been registered. Contact administration to modify details.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fw-extrabold {
+        font-weight: 800;
+    }
+    .fs-8 {
+        font-size: 0.8rem;
+    }
+</style>

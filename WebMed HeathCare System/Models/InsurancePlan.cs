@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace WebMed_HeathCare_System.Models;
@@ -9,15 +9,15 @@ public partial class InsurancePlan
 
     public string PlanName { get; set; } = null!;
 
-    public string CoverageDetails { get; set; } = null!;
-
-    public string Benefits { get; set; } = null!;
-
-    public decimal Price { get; set; }
+    public string? Description { get; set; }
 
     public int DurationMonths { get; set; }
 
     public bool IsActive { get; set; }
 
     public virtual ICollection<PatientInsurance> PatientInsurances { get; set; } = new List<PatientInsurance>();
+    
+    public virtual Coverage? Coverage { get; set; }
+    public virtual Pricing? Pricing { get; set; }
+    public virtual ICollection<Benefit> Benefits { get; set; } = new List<Benefit>();
 }

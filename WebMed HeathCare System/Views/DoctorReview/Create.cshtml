@@ -1,0 +1,99 @@
+@{
+    ViewData["Title"] = "Write Doctor Review";
+    var appointment = (WebMed_HeathCare_System.Models.Appointment)ViewBag.Appointment;
+    int consultationId = ViewBag.ConsultationId;
+}
+
+<div class="container mt-5 mb-5">
+    <a asp-controller="Appointment" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 mb-4"><i class="bi bi-arrow-left"></i> Back to Appointments</a>
+
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="bg-gradient text-white p-4 text-center" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
+                    <i class="bi bi-star-fill text-warning" style="font-size: 3rem;"></i>
+                    <h3 class="fw-bold mt-2">Rate Your Specialist</h3>
+                    <p class="mb-0 text-white-50">Share your consultation experience to help other patients.</p>
+                </div>
+                <div class="card-body p-4">
+                    <div class="bg-light p-3 rounded-3 mb-4 text-center">
+                        <small class="text-muted d-block text-uppercase fw-bold fs-8">Medical Doctor</small>
+                        <h4 class="fw-bold mb-1">@appointment.Doctor.DoctorNavigation.FullName</h4>
+                        <span class="badge bg-primary-subtle text-primary border px-3 py-1 rounded-pill fw-bold text-uppercase">@appointment.Doctor.Specialty</span>
+                    </div>
+
+                    <form asp-action="Create" method="post">
+                        <input type="hidden" name="appointmentId" value="@appointment.AppointmentId" />
+                        <input type="hidden" name="consultationId" value="@consultationId" />
+
+                        <!-- Interactive Star Selector -->
+                        <div class="mb-4 text-center">
+                            <label class="form-label d-block fw-bold text-secondary mb-3">Overall Satisfaction Rating</label>
+                            <div class="star-rating d-inline-flex flex-row-reverse">
+                                <input type="radio" id="star5" name="rating" value="5" class="d-none" required />
+                                <label for="star5" class="bi bi-star fs-1 px-1 cursor-pointer text-muted hover-star"></label>
+
+                                <input type="radio" id="star4" name="rating" value="4" class="d-none" />
+                                <label for="star4" class="bi bi-star fs-1 px-1 cursor-pointer text-muted hover-star"></label>
+
+                                <input type="radio" id="star3" name="rating" value="3" class="d-none" />
+                                <label for="star3" class="bi bi-star fs-1 px-1 cursor-pointer text-muted hover-star"></label>
+
+                                <input type="radio" id="star2" name="rating" value="2" class="d-none" />
+                                <label for="star2" class="bi bi-star fs-1 px-1 cursor-pointer text-muted hover-star"></label>
+
+                                <input type="radio" id="star1" name="rating" value="1" class="d-none" />
+                                <label for="star1" class="bi bi-star fs-1 px-1 cursor-pointer text-muted hover-star"></label>
+                            </div>
+                        </div>
+
+                        <!-- Feedback Comment -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-secondary">Your Feedback & Comments</label>
+                            <textarea name="comment" class="form-control rounded-3" rows="4" placeholder="How was the communication? Did the doctor address your concerns clearly?..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 fw-bold py-3"><i class="bi bi-send-fill"></i> Submit Review</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // JS to handle active star styling based on checked input
+            $('.star-rating input').change(function () {
+                let rating = $(this).val();
+                $('.star-rating label').removeClass('bi-star-fill text-warning').addClass('bi-star text-muted');
+                
+                // Active stars logic (flex-row-reverse allows sibling CSS hacks, or we can do it via JS)
+                $(this).nextAll('label').addBack().prevAll('label').removeClass('bi-star text-muted').addClass('bi-star-fill text-warning');
+            });
+            
+            // Hover logic to wow the user
+            $('.star-rating label').hover(function() {
+                $(this).prevAll('label').addBack().removeClass('bi-star text-muted').addClass('bi-star-fill text-warning');
+            }, function() {
+                let checkedInput = $('.star-rating input:checked');
+                if (checkedInput.length === 0) {
+                    $('.star-rating label').removeClass('bi-star-fill text-warning').addClass('bi-star text-muted');
+                } else {
+                    $('.star-rating label').removeClass('bi-star-fill text-warning').addClass('bi-star text-muted');
+                    checkedInput.prevAll('label').addBack().removeClass('bi-star text-muted').addClass('bi-star-fill text-warning');
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .cursor-pointer {
+        cursor: pointer;
+    }
+    .fs-8 {
+        font-size: 0.8rem;
+    }
+</style>

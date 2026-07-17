@@ -1,0 +1,124 @@
+@model IEnumerable<WebMed_HeathCare_System.Models.AvailabilitySlot>
+
+@{
+    ViewData["Title"] = "Configure Availability - Doctor Portal";
+}
+
+<div class="container mt-5 mb-5">
+    <h1 class="fw-extrabold mb-4"><i class="bi bi-calendar-check-fill text-emerald"></i> Configure Availability Schedule</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        <!-- Availability Slots List -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <h4 class="fw-bold text-dark border-bottom pb-2 mb-3">Your Availability Slots</h4>
+                
+                @if (Model != null && Model.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="table-light">
+                                <tr class="fs-8 text-muted">
+                                    <th>Date</th>
+                                    <th>Time Range</th>
+                                    <th class="text-center">Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var slot in Model)
+                                {
+                                    <tr>
+                                        <td><strong>@slot.StartDateTime.ToString("MMMM dd, yyyy")</strong></td>
+                                        <td class="text-muted">@slot.StartDateTime.ToString("hh:mm tt") - @slot.EndDateTime.ToString("hh:mm tt")</td>
+                                        <td class="text-center">
+                                            @if (slot.IsBooked)
+                                            {
+                                                <span class="badge bg-danger-subtle text-danger px-3 py-1 rounded-pill fw-bold">Booked</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-success-subtle text-success px-3 py-1 rounded-pill fw-bold">Available</span>
+                                            }
+                                        </td>
+                                        <td class="text-end">
+                                            @if (!slot.IsBooked)
+                                            {
+                                                <form asp-action="DeleteSlot" method="post" class="d-inline">
+                                                    <input type="hidden" name="slotId" value="@slot.SlotId" />
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm border-0"><i class="bi bi-trash-fill"></i> Delete</button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted fs-8">In Appointment</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <i class="bi bi-calendar-x text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-2">You haven't configured any availability slots yet.</p>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Add Slot Form -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                <h4 class="fw-bold text-dark border-bottom pb-2 mb-4">Add Time Slot</h4>
+                
+                <form asp-action="AddSlot" method="post">
+                    <!-- Start DateTime -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary">Start Date & Time</label>
+                        <input type="datetime-local" name="startDateTime" class="form-control rounded-3" required />
+                    </div>
+
+                    <!-- End DateTime -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-secondary">End Date & Time</label>
+                        <input type="datetime-local" name="endDateTime" class="form-control rounded-3" required />
+                    </div>
+
+                    <button type="submit" class="btn btn-emerald btn-lg w-100 rounded-3 fw-bold py-3" style="background-color: #059669; color: white;"><i class="bi bi-calendar-plus"></i> Add Availability Slot</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fw-extrabold {
+        font-weight: 800;
+    }
+    .text-emerald {
+        color: #059669 !important;
+    }
+    .fs-8 {
+        font-size: 0.8rem;
+    }
+</style>

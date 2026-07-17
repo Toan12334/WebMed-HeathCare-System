@@ -1,0 +1,123 @@
+@model WebMed_HeathCare_System.Models.Medicine
+
+@{
+    ViewData["Title"] = Model.Name + " - Medicine Details";
+}
+
+<div class="container mt-5">
+    <!-- Back Navigation -->
+    <a asp-action="Index" class="btn btn-link text-decoration-none text-muted mb-4"><i class="bi bi-arrow-left"></i> Back to Pharmacy</a>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-5">
+        <div class="row g-0">
+            <!-- Left Side Mock Product Image / Branding -->
+            <div class="col-md-5 bg-gradient text-white d-flex align-items-center justify-content-center p-5 text-center" style="background: linear-gradient(135deg, #198754 0%, #157347 100%);">
+                <div>
+                    <i class="bi bi-capsule" style="font-size: 6rem;"></i>
+                    <h2 class="fw-bold mt-4">@Model.Name</h2>
+                    <span class="badge bg-white text-success rounded-pill px-3 py-2 mt-2 fw-bold text-uppercase">@Model.Category</span>
+                </div>
+            </div>
+            
+            <!-- Right Side Product Info & Purchase controls -->
+            <div class="col-md-7 p-5 d-flex flex-column justify-content-between">
+                <div>
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h1 class="fw-extrabold text-dark m-0">@Model.Name</h1>
+                        
+                        @if (Model.IsPrescriptionRequired)
+                        {
+                            <span class="badge bg-danger text-white px-3 py-2 rounded-pill fw-bold"><i class="bi bi-file-earmark-medical"></i> Requires Prescription</span>
+                        }
+                    </div>
+                    
+                    <h3 class="text-success fw-extrabold mb-4">@Model.Price.ToString("N0") <span class="fs-5 fw-normal">VND</span></h3>
+                    
+                    <h5 class="fw-bold text-secondary mb-2">Description</h5>
+                    <p class="text-muted mb-4" style="line-height: 1.6;">
+                        @Model.Description
+                    </p>
+
+                    <div class="row mb-4 bg-light p-3 rounded-3 g-2">
+                        <div class="col-6">
+                            <small class="text-muted d-block">Stock Available</small>
+                            @if (Model.StockQuantity > 0)
+                            {
+                                <strong class="text-dark"><i class="bi bi-box-seam text-success"></i> @Model.StockQuantity units</strong>
+                            }
+                            else
+                            {
+                                <strong class="text-danger"><i class="bi bi-x-circle"></i> Out of stock</strong>
+                            }
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted d-block">Type</small>
+                            <strong class="text-dark">OTC / Pharmacy</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Purchase Forms -->
+                <div>
+                    @if (Model.StockQuantity > 0)
+                    {
+                        <form asp-action="AddToCart" method="post" class="row g-3 align-items-end">
+                            <input type="hidden" name="medicineId" value="@Model.MedicineId" />
+                            
+                            <div class="col-sm-4">
+                                <label class="form-label fw-bold text-secondary">Quantity</label>
+                                <div class="input-group">
+                                    <button type="button" class="btn btn-outline-secondary" onclick="decrement()">-</button>
+                                    <input type="number" id="qtyInput" name="quantity" class="form-control text-center" value="1" min="1" max="@Model.StockQuantity" required />
+                                    <button type="button" class="btn btn-outline-secondary" onclick="increment()">+</button>
+                                </div>
+                            </div>
+                            
+                            <div class="col-sm-8">
+                                <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 fw-bold py-3"><i class="bi bi-cart-plus"></i> Add to Cart</button>
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning text-center rounded-3">
+                            <i class="bi bi-bell-fill me-2"></i> This medicine is currently out of stock. We will restock it soon.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function increment() {
+        var input = document.getElementById('qtyInput');
+        var max = parseInt(input.getAttribute('max'));
+        var val = parseInt(input.value);
+        if (val < max) {
+            input.value = val + 1;
+        }
+    }
+    function decrement() {
+        var input = document.getElementById('qtyInput');
+        var val = parseInt(input.value);
+        if (val > 1) {
+            input.value = val - 1;
+        }
+    }
+</script>
+
+<style>
+    .fw-extrabold {
+        font-weight: 800;
+    }
+</style>

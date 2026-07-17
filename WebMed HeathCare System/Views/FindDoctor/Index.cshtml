@@ -1,0 +1,107 @@
+@model IEnumerable<WebMed_HeathCare_System.Models.Doctor>
+
+@{
+    ViewData["Title"] = "Find a Doctor - WebMed";
+}
+
+<div class="container mt-4">
+    <!-- Header Block -->
+    <div class="bg-gradient text-white p-5 rounded-4 shadow-sm mb-5 text-center" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+        <h1 class="display-5 fw-bold mb-2">Find a Medical Specialist</h1>
+        <p class="lead mb-4">Connect with verified experts and book online consultations in seconds.</p>
+
+        <!-- Search / Filter form -->
+        <form asp-action="Index" method="get" class="row g-2 justify-content-center">
+            <div class="col-md-4">
+                <select name="specialty" class="form-select form-select-lg rounded-pill border-0 shadow-sm px-4">
+                    <option value="">All Specialties</option>
+                    @foreach (var spec in (List<string>)ViewBag.Specialties)
+                    {
+                        <!option value="@spec" @(ViewBag.SelectedSpecialty == spec ? "selected" : "")>@spec</!option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select name="location" class="form-select form-select-lg rounded-pill border-0 shadow-sm px-4">
+                    <option value="">All Locations</option>
+                    @foreach (var loc in (List<string>)ViewBag.Locations)
+                    {
+                        <!option value="@loc" @(ViewBag.SelectedLocation == loc ? "selected" : "")>@loc</!option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-dark btn-lg w-100 rounded-pill fw-bold"><i class="bi bi-filter"></i> Filter</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Doctor Grid -->
+    <div class="row">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var doctor in Model)
+            {
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative hover-lift transition-all">
+                        <div class="card-body p-4 d-flex flex-column">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-emerald-100 text-emerald-800 rounded-circle p-3 me-3" style="background-color: #d1fae5; color: #065f46;">
+                                    <i class="bi bi-person-heart-fill fs-3"></i>
+                                </div>
+                                <div>
+                                    <h5 class="card-title fw-bold text-dark mb-0">@doctor.DoctorNavigation.FullName</h5>
+                                    <span class="badge bg-light text-emerald px-2 py-1 mt-1 fw-bold text-uppercase" style="color: #059669; border: 1px solid #a7f3d0;">@doctor.Specialty</span>
+                                </div>
+                            </div>
+
+                            <p class="text-muted flex-grow-1 fs-7">
+                                @(doctor.Bio?.Length > 150 ? doctor.Bio.Substring(0, 147) + "..." : doctor.Bio ?? "No bio available.")
+                            </p>
+
+                            <div class="bg-light p-3 rounded-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2 fs-7">
+                                    <span class="text-muted"><i class="bi bi-geo-alt-fill text-danger"></i> Location:</span>
+                                    <strong class="text-dark">@doctor.Location</strong>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center fs-7">
+                                    <span class="text-muted"><i class="bi bi-star-fill text-warning"></i> Rating:</span>
+                                    <strong class="text-dark">@doctor.AverageRating.ToString("F1") / 5.0</strong>
+                                </div>
+                            </div>
+
+                            <a asp-action="Details" asp-route-id="@doctor.DoctorId" class="btn btn-emerald w-100 rounded-3 fw-bold py-2 mt-auto" style="background-color: #059669; color: white;">
+                                <i class="bi bi-calendar-event-fill me-1"></i> View Profile & Book
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-people text-muted mb-3" style="font-size: 3rem;"></i>
+                <h3 class="fw-bold">No doctors found</h3>
+                <p class="text-muted">Modify your filters or search criteria to find available specialists.</p>
+                <a asp-action="Index" class="btn btn-emerald rounded-pill px-4 mt-2" style="background-color: #059669; color: white;">Reset Filters</a>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+    }
+    .transition-all {
+        transition: all 0.25s ease;
+    }
+    .fs-7 {
+        font-size: 0.88rem;
+    }
+    .text-emerald {
+        color: #059669 !important;
+    }
+</style>

@@ -1,7 +1,9 @@
+@model WebMed_HeathCare_System.Models.InsurancePlanCompareViewModel
+
 @{
     ViewData["Title"] = "Compare Plans";
-    var p1 = (WebMed_HeathCare_System.Models.InsurancePlanDetailsViewModel)ViewBag.Plan1;
-    var p2 = (WebMed_HeathCare_System.Models.InsurancePlanDetailsViewModel)ViewBag.Plan2;
+    var p1 = Model.Plan1;
+    var p2 = Model.Plan2;
 }
 
 <div class="container mt-4">
@@ -20,8 +22,8 @@
             <tbody>
                 <tr>
                     <td class="fw-bold text-start">Price</td>
-                    <td class="fs-5 text-success fw-bold">@p1.Plan.Price.ToString("N0") VND</td>
-                    <td class="fs-5 text-success fw-bold">@p2.Plan.Price.ToString("N0") VND</td>
+                    <td class="fs-5 text-success fw-bold">@(p1.Pricing != null ? p1.Pricing.Premium.ToString("N0") : "N/A") VND</td>
+                    <td class="fs-5 text-success fw-bold">@(p2.Pricing != null ? p2.Pricing.Premium.ToString("N0") : "N/A") VND</td>
                 </tr>
                 <tr>
                     <td class="fw-bold text-start">Duration</td>
@@ -29,50 +31,46 @@
                     <td>@p2.Plan.DurationMonths months</td>
                 </tr>
                 <tr>
-                    <td class="fw-bold text-start">Network Type</td>
-                    <td>@p1.NetworkType</td>
-                    <td>@p2.NetworkType</td>
+                    <td class="fw-bold text-start">Description</td>
+                    <td>@(p1.Plan.Description ?? "N/A")</td>
+                    <td>@(p2.Plan.Description ?? "N/A")</td>
                 </tr>
                 <tr>
                     <td class="fw-bold text-start">Deductible</td>
-                    <td>@p1.Deductible</td>
-                    <td>@p2.Deductible</td>
+                    <td>@(p1.Pricing?.Deductible != null ? p1.Pricing.Deductible.Value.ToString("N0") + " VND" : "N/A")</td>
+                    <td>@(p2.Pricing?.Deductible != null ? p2.Pricing.Deductible.Value.ToString("N0") + " VND" : "N/A")</td>
                 </tr>
                 <tr>
                     <td class="fw-bold text-start">Copay</td>
-                    <td>@p1.Copay</td>
-                    <td>@p2.Copay</td>
+                    <td>@(p1.Pricing?.Copay != null ? p1.Pricing.Copay.Value.ToString("N0") + " VND" : "N/A")</td>
+                    <td>@(p2.Pricing?.Copay != null ? p2.Pricing.Copay.Value.ToString("N0") + " VND" : "N/A")</td>
                 </tr>
                 <tr>
                     <td class="fw-bold text-start">Coverage</td>
                     <td>
-                        <ul class="list-unstyled mb-0 text-start">
-                            @foreach(var c in p1.Coverages) { <li><i class="bi bi-check text-success"></i> @c</li> }
-                        </ul>
+                        <p class="text-start">@(p1.Coverage?.CoverageDetails ?? "N/A")</p>
                     </td>
                     <td>
-                        <ul class="list-unstyled mb-0 text-start">
-                            @foreach(var c in p2.Coverages) { <li><i class="bi bi-check text-success"></i> @c</li> }
-                        </ul>
+                        <p class="text-start">@(p2.Coverage?.CoverageDetails ?? "N/A")</p>
                     </td>
                 </tr>
                 <tr>
                     <td class="fw-bold text-start">Benefits</td>
                     <td>
                         <ul class="list-unstyled mb-0 text-start">
-                            @foreach(var b in p1.Benefits) { <li><i class="bi bi-star-fill text-warning"></i> @b</li> }
+                            @if(p1.Benefits != null) { foreach(var b in p1.Benefits) { <li><i class="bi bi-star-fill text-warning"></i> @b.BenefitName</li> } }
                         </ul>
                     </td>
                     <td>
                         <ul class="list-unstyled mb-0 text-start">
-                            @foreach(var b in p2.Benefits) { <li><i class="bi bi-star-fill text-warning"></i> @b</li> }
+                            @if(p2.Benefits != null) { foreach(var b in p2.Benefits) { <li><i class="bi bi-star-fill text-warning"></i> @b.BenefitName</li> } }
                         </ul>
                     </td>
                 </tr>
                 <tr>
                     <td></td>
-                    <td><button class="btn btn-primary w-50">Select</button></td>
-                    <td><button class="btn btn-primary w-50">Select</button></td>
+                    <td><a asp-action="Enroll" asp-route-planId="@p1.Plan.PlanId" class="btn btn-primary w-50">Select</a></td>
+                    <td><a asp-action="Enroll" asp-route-planId="@p2.Plan.PlanId" class="btn btn-primary w-50">Select</a></td>
                 </tr>
             </tbody>
         </table>

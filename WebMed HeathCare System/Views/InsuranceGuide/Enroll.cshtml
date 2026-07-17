@@ -1,0 +1,133 @@
+@model WebMed_HeathCare_System.Models.InsurancePlanDetailsViewModel
+
+@{
+    ViewData["Title"] = "Enroll in Insurance Plan";
+}
+
+<div class="container mt-5 mb-5">
+    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 mb-4"><i class="bi bi-arrow-left"></i> Back to Insurance Plans</a>
+
+    <div class="row justify-content-center">
+        <!-- Billing Details Form -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-0 shadow-lg rounded-4 p-4">
+                <h3 class="fw-bold text-dark border-bottom pb-2 mb-4"><i class="bi bi-credit-card-2-front text-primary"></i> Secure Payment Gateway</h3>
+
+                <form asp-action="ProcessEnrollment" method="post">
+                    <input type="hidden" name="planId" value="@Model.Plan.PlanId" />
+
+                    <!-- Payment Method Options -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-secondary">Choose Payment Method</label>
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <input type="radio" class="btn-check" name="paymentMethod" id="payCredit" value="CreditCard" checked autocomplete="off">
+                                <label class="btn btn-outline-primary w-100 py-3 rounded-3 fw-semibold text-center" for="payCredit">
+                                    <i class="bi bi-credit-card fs-4 d-block mb-1"></i> Credit Card
+                                </label>
+                            </div>
+                            <div class="col-6">
+                                <input type="radio" class="btn-check" name="paymentMethod" id="payEWallet" value="E-Wallet" autocomplete="off">
+                                <label class="btn btn-outline-primary w-100 py-3 rounded-3 fw-semibold text-center" for="payEWallet">
+                                    <i class="bi bi-wallet2 fs-4 d-block mb-1"></i> E-Wallet (Momo)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Credit Card Mock Inputs -->
+                    <div id="creditCardInputs">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-secondary">Cardholder Name</label>
+                            <input type="text" class="form-control rounded-3" placeholder="e.g. NGUYEN VAN A" value="ALEX RIVERA" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-secondary">Card Number</label>
+                            <input type="text" class="form-control rounded-3" placeholder="4111 2222 3333 4444" value="4111 2222 3333 4444" />
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label fw-bold text-secondary">Expiry Date</label>
+                                <input type="text" class="form-control rounded-3" placeholder="MM/YY" value="12/28" />
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label fw-bold text-secondary">CVV</label>
+                                <input type="password" class="form-control rounded-3" placeholder="123" value="123" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- E-wallet mock -->
+                    <div id="walletInputs" class="d-none bg-light p-3 rounded-3 mb-4 text-center">
+                        <i class="bi bi-qr-code fs-1 text-primary"></i>
+                        <p class="text-muted mt-2 fs-7 mb-0">A QR code will be generated to scan & pay with Momo after confirming.</p>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill py-3 fw-bold mt-3"><i class="bi bi-shield-check"></i> Complete Secure Enrollment</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Plan Summary Panel -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                <div class="bg-primary text-white p-4 text-center">
+                    <h5 class="fw-bold mb-1">Plan Summary</h5>
+                    <p class="mb-0 fs-8 text-white-50">WebMed Care Plan Enrollment</p>
+                </div>
+                <div class="card-body p-4">
+                    <h3 class="fw-bold text-dark mb-1 text-center">@Model.Plan.PlanName</h3>
+                    <p class="text-muted fs-7 text-center mb-4">@(Model.Plan.Description ?? "Basic plan for regular consultations")</p>
+
+                    <div class="bg-light p-3 rounded-3 mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2 fs-7">
+                            <span class="text-muted">Duration:</span>
+                            <strong class="text-dark">@Model.Plan.DurationMonths Months</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2 fs-7">
+                            <span class="text-muted">Coverage Details:</span>
+                            <strong class="text-dark text-end" style="max-width: 150px;">@(Model.Coverage?.CoverageDetails ?? "N/A")</strong>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center fs-7">
+                            <span class="text-muted">Deductible:</span>
+                            <strong class="text-dark">@(Model.Pricing?.Deductible != null ? Model.Pricing.Deductible.Value.ToString("N0") : "0") VND</strong>
+                        </div>
+                    </div>
+
+                    <div class="border-top pt-3 d-flex justify-content-between align-items-center">
+                        <span class="fw-bold text-dark fs-5">Premium Fee:</span>
+                        <span class="fw-extrabold text-success fs-4">@(Model.Pricing?.Premium != null ? Model.Pricing.Premium.ToString("N0") : "0") VND</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            $('input[name="paymentMethod"]').change(function() {
+                if ($(this).val() === 'CreditCard') {
+                    $('#creditCardInputs').removeClass('d-none');
+                    $('#walletInputs').addClass('d-none');
+                } else {
+                    $('#creditCardInputs').addClass('d-none');
+                    $('#walletInputs').removeClass('d-none');
+                }
+            });
+        });
+    </script>
+}
+
+<style>
+    .fw-extrabold {
+        font-weight: 800;
+    }
+    .fs-8 {
+        font-size: 0.78rem;
+    }
+    .fs-7 {
+        font-size: 0.88rem;
+    }
+</style>

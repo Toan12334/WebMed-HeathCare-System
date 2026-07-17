@@ -5,53 +5,107 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - WebMed_HeathCare_System</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/WebMed_HeathCare_System.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">WebMed_HeathCare_System</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+        <nav class="navbar navbar-expand-lg navbar-light webmed-navbar shadow-sm sticky-top mb-5">
+            <div class="container-fluid px-4">
+                <a class="navbar-brand webmed-brand" asp-area="" asp-controller="Home" asp-action="Index"><i class="bi bi-heart-pulse-fill text-emerald animate-pulse"></i> Web<span>Med</span></a>
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="MedicalInformation" asp-action="Search">Medical Information</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="HealthCalculator" asp-action="Index">Health Calculator</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="InsuranceGuide" asp-action="Index">Insurance Guide</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-danger fw-bold" asp-area="" asp-controller="EmergencyRequest" asp-action="Index">🚑 Emergency</a>
-                        </li>
+                        <!-- Common Guest/Patient Navigation -->
+                        @if (User.Identity?.IsAuthenticated == false || User.IsInRole("Patient"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Pharmacy" asp-action="Index">Online Pharmacy</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="FindDoctor" asp-action="Index">Find a Doctor</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Appointment" asp-action="Index">Appointments</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="OrderTracking" asp-action="Index">My Orders</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="MedicalInformation" asp-action="Search">Medical Information</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="HealthCalculator" asp-action="Index">Health Calculator</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="InsuranceGuide" asp-action="Index">Insurance Guide</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-danger fw-bold" asp-area="" asp-controller="EmergencyRequest" asp-action="Index">🚑 Emergency</a>
+                            </li>
+                        }
+
+                        <!-- Doctor Specific Navigation -->
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Doctor"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Appointment" asp-action="Index">Consultation Schedule</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="DoctorPortal" asp-action="Availability">My Availability</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="DoctorPortal" asp-action="Reviews">Patient Reviews</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="DoctorPortal" asp-action="License">Licensing</a>
+                            </li>
+                        }
+
+                        <!-- Pharmacist Specific Navigation -->
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Pharmacist"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Pharmacist" asp-action="Index">Pharmacist Dashboard</a>
+                            </li>
+                        }
+
+                        <!-- Admin Specific Navigation -->
+                        @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Users">Admin Console</a>
+                            </li>
+                        }
+
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                     </ul>
                     <ul class="navbar-nav">
+                        @if (User.Identity?.IsAuthenticated == false || User.IsInRole("Patient"))
+                        {
+                            <li class="nav-item me-2">
+                                <a class="nav-link text-dark" asp-controller="Pharmacy" asp-action="Cart"><i class="bi bi-cart3"></i> Cart</a>
+                            </li>
+                        }
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <li class="nav-item">
-                                <span class="nav-link text-dark">Hello, @User.Identity.Name!</span>
+                            <li class="nav-item me-2">
+                                <span class="nav-link text-dark fw-bold"><i class="bi bi-person-circle"></i> @User.Identity.Name</span>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Authentication" asp-action="Logout">Logout</a>
+                                <a class="btn btn-outline-danger rounded-pill px-4" asp-area="" asp-controller="Authentication" asp-action="Logout">Logout</a>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Authentication" asp-action="Login">Login</a>
+                                <a class="btn btn-primary rounded-pill px-4 text-white" asp-area="" asp-controller="Authentication" asp-action="Login">Login</a>
                             </li>
                         }
                     </ul>
@@ -59,15 +113,22 @@
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+    <div class="container min-vh-100">
+        <main role="main" class="pb-5">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="webmed-footer">
         <div class="container">
-            &copy; 2026 - WebMed_HeathCare_System - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <span class="fw-bold text-white"><i class="bi bi-heart-pulse-fill text-emerald"></i> WebMed</span> Hospital Systems
+                </div>
+                <div class="col-md-6 text-center text-md-end fs-7 mt-2 mt-md-0">
+                    &copy; 2026 - WebMed - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
+                </div>
+            </div>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

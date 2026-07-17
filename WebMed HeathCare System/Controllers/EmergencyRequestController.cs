@@ -23,7 +23,7 @@ namespace WebMed_HeathCare_System.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SubmitRequest(string pickupLocation, string emergencyDetails)
+        public async Task<IActionResult> SubmitRequest(string pickupLocation, string emergencyDetails, decimal? latitude, decimal? longitude)
         {
             if (string.IsNullOrWhiteSpace(pickupLocation))
             {
@@ -45,22 +45,28 @@ namespace WebMed_HeathCare_System.Controllers
                 return View("Index");
             }
 
-            // Simulate Ambulance Dispatcher finding an ambulance
+            // If coordinates are not provided, fallback to default HCMC coordinates
+            decimal patientLat = latitude ?? 10.776m;
+            decimal patientLng = longitude ?? 106.700m;
+
+            // Ambulance starts at a nearby hospital (simulated offset of -0.008)
+            decimal startLat = patientLat - 0.008m;
+            decimal startLng = patientLng - 0.008m;
+
             string assignedAmbulance = "AMB-1024";
-            decimal startLat = 10.762622m; // Example starting point (HCMC)
-            decimal startLng = 106.660172m;
 
             var request = new AmbulanceRequest
             {
                 PatientId = patient.PatientId,
                 PickupLocation = pickupLocation,
+                Latitude = patientLat,
+                Longitude = patientLng,
                 Status = "Assigned",
                 AssignedAmbulanceVehicle = assignedAmbulance,
                 AmbulanceLatitude = startLat,
                 AmbulanceLongitude = startLng,
                 Eta = "15 mins",
                 RequestedAt = DateTime.Now
-                // Note: We don't have an emergencyDetails column in AmbulanceRequest, but in a real app we'd save it.
             };
 
             _context.AmbulanceRequests.Add(request);
@@ -94,14 +100,23 @@ namespace WebMed_HeathCare_System.Controllers
             // Simulate ambulance moving by slightly changing coordinates if it's assigned
             if (request.Status == "Assigned" || request.Status == "On the way")
             {
-                // In a real app, GPSService would update the DB or send live events.
-                // Here we just slightly adjust the mock coordinates to simulate movement.
-                request.AmbulanceLatitude += 0.0001m;
-                request.AmbulanceLongitude += 0.0001m;
+                // Calculate route progression from starting hospital to patient location (cycle every 3 minutes)
+                double elapsedSeconds = (DateTime.Now - request.RequestedAt).TotalSeconds;
+                double steps = (elapsedSeconds % 180) / 180.0; // 0.0 to 1.0
+
+                decimal destLat = request.Latitude ?? 10.776m;
+                decimal destLng = request.Longitude ?? 106.700m;
+
+                decimal startLat = destLat - 0.008m;
+                decimal startLng = destLng - 0.008m;
+
+                request.AmbulanceLatitude = startLat + (destLat - startLat) * (decimal)steps;
+                request.AmbulanceLongitude = startLng + (destLng - startLng) * (decimal)steps;
                 
-                // Randomize ETA for simulation
-                int mins = new Random().Next(2, 14);
-                request.Eta = $"{mins} mins";
+                // Calculate ETA progressively based on elapsed time since request was made
+                int remainingMinutes = 15 - (int)(elapsedSeconds / 60);
+                if (remainingMinutes < 1) remainingMinutes = 1; // Floor to 1 minute
+                request.Eta = $"{remainingMinutes} mins";
 
                 await _context.SaveChangesAsync();
             }

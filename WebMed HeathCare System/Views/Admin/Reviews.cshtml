@@ -1,0 +1,120 @@
+@model IEnumerable<WebMed_HeathCare_System.Models.DoctorReview>
+
+@{
+    ViewData["Title"] = "Moderate Reviews - Admin Panel";
+}
+
+<div class="container-fluid mt-4 px-4 mb-5">
+    <h1 class="fw-extrabold mb-4 text-dark"><i class="bi bi-star-fill text-warning animate-pulse"></i> Patient Reviews Moderation</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Navigation Menu -->
+    <div class="d-flex justify-content-end mb-4">
+        <div class="btn-group shadow-sm">
+            <a asp-action="Users" class="btn btn-outline-primary">Users</a>
+            <a asp-action="Doctors" class="btn btn-outline-primary">Doctor Verification</a>
+            <a asp-action="Reviews" class="btn btn-primary active">Review Moderation</a>
+            <a asp-action="News" class="btn btn-outline-primary">Health News</a>
+        </div>
+    </div>
+
+    <!-- Moderation Table List -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-body p-0">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="p-3">Review ID</th>
+                                <th class="p-3">Patient</th>
+                                <th class="p-3">Doctor Name</th>
+                                <th class="p-3 text-center">Rating</th>
+                                <th class="p-3">Comment / Content</th>
+                                <th class="p-3 text-center">Status</th>
+                                <th class="p-3 text-center" style="width: 250px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var review in Model)
+                            {
+                                <tr>
+                                    <td class="p-3 fw-bold">#@review.ReviewId</td>
+                                    <td class="p-3 fw-bold text-dark">@review.Patient.PatientNavigation.FullName</td>
+                                    <td class="p-3">@review.Doctor.DoctorNavigation.FullName</td>
+                                    <td class="p-3 text-center text-warning fw-bold">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= review.Rating)
+                                            {
+                                                <i class="bi bi-star-fill"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-star"></i>
+                                            }
+                                        }
+                                    </td>
+                                    <td class="p-3 text-muted fs-7">@review.Comment</td>
+                                    <td class="p-3 text-center">
+                                        @if (review.ModerationStatus == "Approved")
+                                        {
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill fw-bold">Approved</span>
+                                        }
+                                        else if (review.ModerationStatus == "Rejected")
+                                        {
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 rounded-pill fw-bold">Hidden</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-1 rounded-pill fw-bold">@review.ModerationStatus</span>
+                                        }
+                                    </td>
+                                    <td class="p-3 text-center">
+                                        <div class="d-flex gap-2">
+                                            <form asp-action="ModerateReview" method="post" class="w-50">
+                                                <input type="hidden" name="id" value="@review.ReviewId" />
+                                                <input type="hidden" name="status" value="Approved" />
+                                                <button type="submit" class="btn btn-outline-success btn-sm w-100 rounded-3 fw-bold"><i class="bi bi-eye-fill"></i> Approve</button>
+                                            </form>
+                                            <form asp-action="ModerateReview" method="post" class="w-50">
+                                                <input type="hidden" name="id" value="@review.ReviewId" />
+                                                <input type="hidden" name="status" value="Rejected" />
+                                                <button type="submit" class="btn btn-outline-danger btn-sm w-100 rounded-3 fw-bold"><i class="bi bi-eye-slash-fill"></i> Hide Review</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="py-5 text-center">
+                    <i class="bi bi-chat-square-text text-muted" style="font-size: 4rem;"></i>
+                    <h3 class="fw-bold mt-3">No patient reviews</h3>
+                    <p class="text-muted">There are no reviews left by patients yet.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .fw-extrabold {
+        font-weight: 800;
+    }
+    .fs-7 {
+        font-size: 0.88rem;
+    }
+</style>

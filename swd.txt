@@ -1,0 +1,1080 @@
+1
+@startuml
+actor Patient
+boundary RegisterPage
+control RegistrationSystem
+database Database
+
+Patient -> RegisterPage : Open registration page
+RegisterPage --> Patient : Display registration form
+Patient -> RegisterPage : Enter personal information and credentials
+RegisterPage -> RegistrationSystem : Submit registration request
+RegistrationSystem -> Database : Check if account already exists
+
+alt Account does not exist
+    Database --> RegistrationSystem : Account not found
+    RegistrationSystem -> Database : Save new account
+    Database --> RegistrationSystem : Account created
+    RegistrationSystem --> RegisterPage : Registration successful
+    RegisterPage --> Patient : Display success message
+else Account already exists
+    Database --> RegistrationSystem : Account exists
+    RegistrationSystem --> RegisterPage : Registration failed
+    RegisterPage --> Patient : Display error message
+end
+@endum
+
+2
+@startuml
+actor Patient
+boundary LoginPage
+control AuthenticationController
+database Database
+
+Patient -> LoginPage : Open login page
+LoginPage --> Patient : Display login form
+Patient -> LoginPage : Enter username and password
+LoginPage -> AuthenticationController : Submit login request
+AuthenticationController -> Database : Validate credentials
+
+alt Credentials are valid
+    Database --> AuthenticationController : Authentication successful
+    AuthenticationController --> LoginPage : Login successful
+    LoginPage --> Patient : Redirect to dashboard
+else Credentials are invalid
+    Database --> AuthenticationController : Authentication failed
+    AuthenticationController --> LoginPage : Login failed
+    LoginPage --> Patient : Display error message
+end
+@endum
+
+3
+@startuml
+actor Patient
+boundary Dashboard
+control AuthenticationController
+control SessionManager
+
+Patient -> Dashboard : Click "Logout"
+Dashboard -> AuthenticationController : Send logout request
+AuthenticationController -> SessionManager : Invalidate session
+SessionManager --> AuthenticationController : Session terminated
+AuthenticationController --> Dashboard : Logout successful
+Dashboard --> Patient : Redirect to login page
+@endum
+
+4
+@startuml
+actor Patient
+boundary SearchPage
+control MedicalInformationController
+database MedicalInformationDB
+
+Patient -> SearchPage : Open Medical Information page
+SearchPage --> Patient : Display search interface
+Patient -> SearchPage : Enter keyword
+SearchPage -> Patient : Click Search
+SearchPage -> MedicalInformationController : Submit search request(keyword)
+MedicalInformationController -> MedicalInformationDB : Search medical information(keyword)
+
+alt Information found
+    MedicalInformationDB --> MedicalInformationController : Return search results
+    MedicalInformationController --> SearchPage : Display search results
+    SearchPage --> Patient : Show list of articles
+    Patient -> SearchPage : Select an article
+    SearchPage -> MedicalInformationController : Request article details
+    MedicalInformationController -> MedicalInformationDB : Retrieve article details
+    MedicalInformationDB --> MedicalInformationController : Return article details
+    MedicalInformationController --> SearchPage : Display article content
+    SearchPage --> Patient : View medical information
+else No information found
+    MedicalInformationDB --> MedicalInformationController : No results
+    MedicalInformationController --> SearchPage : Display error message
+    SearchPage --> Patient : Show "No information found"
+end
+@endum
+
+5
+@startuml
+actor Patient
+boundary HealthCalculatorPage
+control HealthCalculatorController
+control HealthCalculatorService
+
+Patient -> HealthCalculatorPage : Open Health Calculator page
+HealthCalculatorPage --> Patient : Display calculator form
+Patient -> HealthCalculatorPage : Enter height, weight, age, gender, activity level
+HealthCalculatorPage -> Patient : Select calculation type (BMI/Calories)
+HealthCalculatorPage -> Patient : Click "Calculate"
+HealthCalculatorPage -> HealthCalculatorController : Submit calculation request
+HealthCalculatorController -> HealthCalculatorService : Validate input data
+
+alt Input data is valid
+    HealthCalculatorService -> HealthCalculatorService : Calculate BMI
+    HealthCalculatorService -> HealthCalculatorService : Calculate calorie needs
+    HealthCalculatorService --> HealthCalculatorController : Return calculation results
+    HealthCalculatorController --> HealthCalculatorPage : Display health indicators
+    HealthCalculatorPage --> Patient : Show BMI, calorie needs, and recommendations
+else Invalid input
+    HealthCalculatorService --> HealthCalculatorController : Validation failed
+    HealthCalculatorController --> HealthCalculatorPage : Display validation error
+    HealthCalculatorPage --> Patient : Request corrected information
+end
+@endum
+
+6
+@startuml
+actor Patient
+boundary EmergencyRequestUI
+control EmergencyRequestController
+entity EmergencyRequest
+control AmbulanceDispatcher
+participant Ambulance
+
+Patient -> EmergencyRequestUI : Open emergency request form
+EmergencyRequestUI --> Patient : Display request form
+Patient -> EmergencyRequestUI : Enter location & emergency details
+EmergencyRequestUI -> Patient : Submit request
+EmergencyRequestUI -> EmergencyRequestController : submitEmergencyRequest(location, details)
+EmergencyRequestController -> EmergencyRequestController : Validate input
+
+alt Invalid information
+    EmergencyRequestController --> EmergencyRequestUI : Validation error
+    EmergencyRequestUI --> Patient : Display error message
+else Valid information
+    EmergencyRequestController -> EmergencyRequest : Create emergency request
+    EmergencyRequest --> EmergencyRequestController : Request created
+    EmergencyRequestController -> AmbulanceDispatcher : Find available ambulance
+    
+    alt Ambulance available
+        AmbulanceDispatcher -> Ambulance : Assign emergency mission
+        Ambulance --> AmbulanceDispatcher : Assignment confirmed
+        AmbulanceDispatcher --> EmergencyRequestController : Ambulance assigned
+        EmergencyRequestController --> EmergencyRequestUI : Request successful, ETA & Ambulance info
+        EmergencyRequestUI --> Patient : Display confirmation
+    else No ambulance available
+        AmbulanceDispatcher --> EmergencyRequestController : No ambulance available
+        EmergencyRequestController --> EmergencyRequestUI : Notify no ambulance available
+        EmergencyRequestUI --> Patient : Display failure message
+    end
+end
+@endum
+
+7
+@startuml
+actor Patient
+boundary TrackAmbulanceUI
+control TrackAmbulanceController
+entity EmergencyRequest
+participant Ambulance
+control GPSService
+
+Patient -> TrackAmbulanceUI : Open "Track Ambulance"
+TrackAmbulanceUI -> TrackAmbulanceController : requestTracking(requestId)
+TrackAmbulanceController -> EmergencyRequest : Get assigned ambulance
+EmergencyRequest --> TrackAmbulanceController : Ambulance ID
+
+alt Ambulance assigned
+    loop Refresh every few seconds
+        TrackAmbulanceController -> GPSService : Get ambulance location(ambulanceId)
+        GPSService --> TrackAmbulanceController : Current latitude & longitude
+        TrackAmbulanceController -> Ambulance : Get current status
+        Ambulance --> TrackAmbulanceController : Status (On the way)
+        TrackAmbulanceController -> TrackAmbulanceController : Calculate ETA
+        TrackAmbulanceController --> TrackAmbulanceUI : Current location + ETA + Status
+        TrackAmbulanceUI --> Patient : Update map and arrival time
+    end
+    
+    Ambulance -> TrackAmbulanceController : Notify patient reached
+    TrackAmbulanceController --> TrackAmbulanceUI : Ambulance has arrived
+    TrackAmbulanceUI --> Patient : Display arrival notification
+else No ambulance assigned
+    TrackAmbulanceController --> TrackAmbulanceUI : Tracking unavailable
+    TrackAmbulanceUI --> Patient : Display error message
+end
+@endum
+
+8
+@startuml
+actor Patient
+boundary InsuranceGuideUI
+control InsuranceGuideController
+control InsurancePlanRepository
+control CoverageRepository
+control PricingRepository
+
+Patient -> InsuranceGuideUI : Open Insurance Guide
+InsuranceGuideUI -> InsuranceGuideController : loadInsurancePlans()
+InsuranceGuideController -> InsurancePlanRepository : getAvailablePlans()
+InsurancePlanRepository --> InsuranceGuideController : List of plans
+InsuranceGuideController --> InsuranceGuideUI : Display insurance plans
+InsuranceGuideUI --> Patient : Show plan list
+
+Patient -> InsuranceGuideUI : Select a plan
+InsuranceGuideUI -> InsuranceGuideController : viewPlanDetails(planId)
+InsuranceGuideController -> CoverageRepository : getCoverageDetails(planId)
+CoverageRepository --> InsuranceGuideController : Coverage details
+InsuranceGuideController -> PricingRepository : getPricingInformation(planId)
+PricingRepository --> InsuranceGuideController : Premiums, deductibles, copays
+InsuranceGuideController -> InsurancePlanRepository : getBenefits(planId)
+InsurancePlanRepository --> InsuranceGuideController : Benefit information
+InsuranceGuideController --> InsuranceGuideUI : Coverage + Benefits + Pricing
+InsuranceGuideUI --> Patient : Display detailed plan information
+
+opt Compare another plan
+    Patient -> InsuranceGuideUI : Select another plan
+    InsuranceGuideUI -> InsuranceGuideController : viewPlanDetails(otherPlanId)
+    InsuranceGuideController -> CoverageRepository : getCoverageDetails(otherPlanId)
+    CoverageRepository --> InsuranceGuideController : Coverage details
+    InsuranceGuideController -> PricingRepository : getPricingInformation(otherPlanId)
+    PricingRepository --> InsuranceGuideController : Pricing information
+    InsuranceGuideController -> InsurancePlanRepository : getBenefits(otherPlanId)
+    InsurancePlanRepository --> InsuranceGuideController : Benefit information
+    InsuranceGuideController --> InsuranceGuideUI : Display comparison data
+    InsuranceGuideUI --> Patient : Show comparison view
+end
+@endum
+
+9
+@startuml
+actor Patient
+boundary PaymentUI
+control PaymentController
+entity Order
+entity Payment
+participant PaymentGateway
+
+Patient -> PaymentUI : Open payment page
+PaymentUI -> PaymentController : Load payment information(orderId)
+PaymentController -> Order : Get order details(orderId)
+Order --> PaymentController : Order information & total amount
+PaymentController --> PaymentUI : Display payment summary
+Patient -> PaymentUI : Select payment method
+Patient -> PaymentUI : Confirm payment
+PaymentUI -> PaymentController : processPayment(orderId, paymentMethod)
+PaymentController -> Payment : Create payment transaction
+Payment --> PaymentController : Transaction created
+PaymentController -> PaymentGateway : Process payment(amount, paymentMethod)
+
+alt Payment successful
+    PaymentGateway --> PaymentController : Payment success
+    PaymentController -> Payment : Update status = Paid
+    Payment --> PaymentController : Payment updated
+    PaymentController -> Order : Update order status = Paid
+    Order --> PaymentController : Order updated
+    PaymentController --> PaymentUI : Payment successful
+    PaymentUI --> Patient : Display payment confirmation & receipt
+else Payment failed
+    PaymentGateway --> PaymentController : Payment failed
+    PaymentController -> Payment : Update status = Failed
+    Payment --> PaymentController : Status updated
+    PaymentController --> PaymentUI : Display payment failed
+    PaymentUI --> Patient : Retry or choose another payment method
+end
+@endum
+
+10
+@startuml
+actor Patient
+boundary OnlinePharmacyUI
+control PharmacyController
+entity Medicine
+control Cart
+control Inventory
+entity Order
+
+Patient -> OnlinePharmacyUI : Search medicine(keyword)
+OnlinePharmacyUI -> PharmacyController : searchMedicine(keyword)
+PharmacyController -> Medicine : Find medicines(keyword)
+Medicine --> PharmacyController : Medicine list
+PharmacyController --> OnlinePharmacyUI : Display search results
+OnlinePharmacyUI --> Patient : Show available medicines
+
+Patient -> OnlinePharmacyUI : Select medicine
+OnlinePharmacyUI -> PharmacyController : viewMedicineDetails(medicineId)
+PharmacyController -> Medicine : Get medicine details
+Medicine --> PharmacyController : Details, price, stock
+PharmacyController --> OnlinePharmacyUI : Display medicine details
+
+Patient -> OnlinePharmacyUI : Add medicine(quantity)
+OnlinePharmacyUI -> PharmacyController : addToCart(medicineId, quantity)
+PharmacyController -> Inventory : Check stock(quantity)
+
+alt Medicine available
+    Inventory --> PharmacyController : Stock available
+    PharmacyController -> Cart : Add medicine to cart
+    Cart --> PharmacyController : Cart updated
+    PharmacyController --> OnlinePharmacyUI : Display updated cart
+    Patient -> OnlinePharmacyUI : Confirm order
+    OnlinePharmacyUI -> PharmacyController : placeOrder()
+    PharmacyController -> Order : Create medicine order
+    Order --> PharmacyController : Order created
+    PharmacyController -> Inventory : Update stock
+    Inventory --> PharmacyController : Stock updated
+    PharmacyController --> OnlinePharmacyUI : Order successful
+    OnlinePharmacyUI --> Patient : Display order confirmation
+else Out of stock
+    Inventory --> PharmacyController : Insufficient stock
+    PharmacyController --> OnlinePharmacyUI : Display out of stock message
+    OnlinePharmacyUI --> Patient : Select another quantity or medicine
+end
+@endum
+
+11
+@startuml
+actor Patient
+boundary CheckoutUI
+control CheckoutController
+control Cart
+control Inventory
+entity Order
+
+Patient -> CheckoutUI : Open checkout page
+CheckoutUI -> CheckoutController : loadCheckout()
+CheckoutController -> Cart : Get cart items()
+Cart --> CheckoutController : Selected medicines
+CheckoutController -> Inventory : Check medicine availability()
+Inventory --> CheckoutController : Stock available
+CheckoutController -> CheckoutController : Calculate subtotal & total price
+CheckoutController --> CheckoutUI : Display checkout summary
+CheckoutUI --> Patient : Show medicines, quantities, total amount
+
+Patient -> CheckoutUI : Enter delivery information
+Patient -> CheckoutUI : Confirm checkout
+CheckoutUI -> CheckoutController : checkout(deliveryInfo)
+
+alt All medicines available
+    CheckoutController -> Order : Create pending order(deliveryInfo)
+    Order --> CheckoutController : Order created
+    CheckoutController -> Cart : Mark cart as Checked Out
+    Cart --> CheckoutController : Cart updated
+    CheckoutController --> CheckoutUI : Checkout completed
+    CheckoutUI --> Patient : Redirect to Payment(orderId)
+else Medicine out of stock
+    CheckoutController --> CheckoutUI : Notify unavailable medicines
+    CheckoutUI --> Patient : Modify cart and retry
+end
+@endum
+
+12
+@startuml
+actor Patient
+boundary FindDoctorUI
+control FindDoctorController
+entity Doctor
+control Schedule
+
+Patient -> FindDoctorUI : Open Find Doctor page
+FindDoctorUI --> Patient : Display search form
+Patient -> FindDoctorUI : Enter search criteria\n(specialty, location, rating, availability)
+FindDoctorUI -> FindDoctorController : searchDoctors(criteria)
+FindDoctorController -> Doctor : Find doctors(criteria)
+Doctor --> FindDoctorController : Matching doctors
+
+alt Doctors found
+    loop For each doctor
+        FindDoctorController -> Schedule : Get availability(doctorId)
+        Schedule --> FindDoctorController : Available time slots
+    end
+    FindDoctorController --> FindDoctorUI : Display doctor list\n(profile, specialty, rating, location, availability)
+    
+    Patient -> FindDoctorUI : Select a doctor
+    FindDoctorUI -> FindDoctorController : viewDoctorDetails(doctorId)
+    FindDoctorController -> Doctor : Get doctor profile
+    Doctor --> FindDoctorController : Profile details
+    FindDoctorController -> Schedule : Get full schedule
+    Schedule --> FindDoctorController : Available appointments
+    FindDoctorController --> FindDoctorUI : Display doctor details
+    FindDoctorUI --> Patient : Show profile, ratings, \navailability, consultation fee
+else No doctor found
+    FindDoctorController --> FindDoctorUI : Display "No matching doctors found"
+    FindDoctorUI --> Patient : Modify search criteria
+end
+@endum
+
+13
+@startuml
+actor Patient
+boundary BookAppointmentUI
+control AppointmentController
+entity Doctor
+control Schedule
+entity Appointment
+
+Patient -> BookAppointmentUI : Open appointment booking page
+BookAppointmentUI -> AppointmentController : Load selected doctor(doctorId)
+AppointmentController -> Doctor : Get doctor information
+Doctor --> AppointmentController : Doctor profile
+AppointmentController -> Schedule : Get available time slots
+Schedule --> AppointmentController : Available schedule
+AppointmentController --> BookAppointmentUI : Display doctor information and available slots
+
+Patient -> BookAppointmentUI : Select preferred date & time
+Patient -> BookAppointmentUI : Confirm appointment
+BookAppointmentUI -> AppointmentController : bookAppointment(doctorId, dateTime)
+AppointmentController -> Schedule : Check slot availability(dateTime)
+
+alt Time slot available
+    Schedule --> AppointmentController : Slot available
+    AppointmentController -> Appointment : Create appointment
+    Appointment --> AppointmentController : Appointment created
+    AppointmentController -> Schedule : Reserve selected slot
+    Schedule --> AppointmentController : Schedule updated
+    AppointmentController --> BookAppointmentUI : Booking successful
+    BookAppointmentUI --> Patient : Display appointment confirmation
+else Time slot unavailable
+    Schedule --> AppointmentController : Slot unavailable
+    AppointmentController --> BookAppointmentUI : Display unavailable time slot
+    BookAppointmentUI --> Patient : Select another date or time
+end
+@endum
+
+14
+@startuml
+actor Patient
+actor Doctor
+boundary ConsultationUI
+control ConsultationController
+entity Appointment
+entity MedicalRecord
+entity Prescription
+
+Patient -> ConsultationUI : Open consultation session
+ConsultationUI -> ConsultationController : startConsultation(appointmentId)
+ConsultationController -> Appointment : Verify appointment
+Appointment --> ConsultationController : Appointment confirmed
+ConsultationController --> Doctor : Notify consultation started
+Doctor --> ConsultationController : Accept consultation
+ConsultationController --> ConsultationUI : Start consultation session
+
+Patient -> Doctor : Describe symptoms
+Doctor -> Patient : Ask medical questions
+
+Doctor -> ConsultationUI : Enter diagnosis
+ConsultationUI -> ConsultationController : Save diagnosis
+ConsultationController -> MedicalRecord : Update medical record
+MedicalRecord --> ConsultationController : Record updated
+
+Doctor -> ConsultationUI : Create prescription
+ConsultationUI -> ConsultationController : Save prescription
+ConsultationController -> Prescription : Store prescription
+Prescription --> ConsultationController : Prescription saved
+
+ConsultationController -> Appointment : Mark appointment as Completed
+Appointment --> ConsultationController : Status updated
+ConsultationController --> ConsultationUI : Consultation completed
+ConsultationUI --> Patient : Display diagnosis and prescription
+@endum
+
+15
+@startuml
+actor Patient
+boundary DoctorReviewUI
+control DoctorReviewController
+entity Appointment
+entity Review
+entity Doctor
+
+Patient -> DoctorReviewUI : Open Doctor Review page
+DoctorReviewUI -> DoctorReviewController : loadReviewForm(appointmentId)
+DoctorReviewController -> Appointment : Verify completed appointment
+Appointment --> DoctorReviewController : Appointment completed
+DoctorReviewController --> DoctorReviewUI : Display review form
+
+Patient -> DoctorReviewUI : Enter rating and feedback
+DoctorReviewUI -> Patient : Submit review
+DoctorReviewUI -> DoctorReviewController : submitReview(rating, feedback)
+DoctorReviewController -> Review : Save review
+Review --> DoctorReviewController : Review saved
+DoctorReviewController -> Doctor : Update average rating
+Doctor --> DoctorReviewController : Rating updated
+DoctorReviewController --> DoctorReviewUI : Review submitted successfully
+DoctorReviewUI --> Patient : Display confirmation message
+@endum
+
+16
+@startuml
+actor Patient
+boundary TrackOrderUI
+control OrderTrackingController
+entity Order
+control Delivery
+
+Patient -> TrackOrderUI : Open Track Order page
+TrackOrderUI -> OrderTrackingController : trackOrder(orderId)
+OrderTrackingController -> Order : Get order details(orderId)
+Order --> OrderTrackingController : Order information
+OrderTrackingController -> Delivery : Get delivery status
+Delivery --> OrderTrackingController : Current status & tracking information
+OrderTrackingController --> TrackOrderUI : Display order status
+TrackOrderUI --> Patient : Show Processing, Packaging, Shipping, ETA
+
+loop Real-time status updates
+    OrderTrackingController -> Delivery : Request latest tracking status
+    Delivery --> OrderTrackingController : Updated location & status
+    OrderTrackingController --> TrackOrderUI : Refresh order progress
+    TrackOrderUI --> Patient : Update tracking timeline and delivery status
+end
+
+alt Order delivered
+    Delivery --> OrderTrackingController : Delivered
+    OrderTrackingController -> Order : Update order status = Completed
+    Order --> OrderTrackingController : Status updated
+    OrderTrackingController --> TrackOrderUI : Display delivery completed
+    TrackOrderUI --> Patient : Notify order successfully delivered
+else Delivery delayed
+    Delivery --> OrderTrackingController : Delivery delayed
+    OrderTrackingController --> TrackOrderUI : Display delay notification
+    TrackOrderUI --> Patient : Show updated estimated delivery time
+end
+@endum
+
+17
+@startuml
+actor Pharmacist
+boundary ManageOrdersUI
+control OrderManagementController
+entity Order
+entity Payment
+
+Pharmacist -> ManageOrdersUI : Open Manage Orders page
+ManageOrdersUI -> OrderManagementController : loadOrders()
+OrderManagementController -> Order : Retrieve incoming orders
+Order --> OrderManagementController : Order list
+OrderManagementController --> ManageOrdersUI : Display incoming orders
+ManageOrdersUI --> Pharmacist : Show order list
+
+Pharmacist -> ManageOrdersUI : Apply filters\n(Paid/COD, Status)
+ManageOrdersUI -> OrderManagementController : filterOrders(criteria)
+OrderManagementController -> Order : Retrieve filtered orders(criteria)
+Order --> OrderManagementController : Filtered order list
+OrderManagementController --> ManageOrdersUI : Display filtered orders
+
+Pharmacist -> ManageOrdersUI : Select an order
+ManageOrdersUI -> OrderManagementController : viewOrderDetails(orderId)
+OrderManagementController -> Order : Get order details(orderId)
+Order --> OrderManagementController : Order information
+OrderManagementController -> Payment : Get payment status(orderId)
+Payment --> OrderManagementController : Paid / COD
+OrderManagementController --> ManageOrdersUI : Display order details
+
+Pharmacist -> ManageOrdersUI : Start medicine preparation
+ManageOrdersUI -> OrderManagementController : startPreparation(orderId)
+OrderManagementController -> Order : Update status = Preparing
+Order --> OrderManagementController : Status updated
+OrderManagementController --> ManageOrdersUI : Preparation started
+ManageOrdersUI --> Pharmacist : Display updated order status
+@endum
+
+18
+@startuml
+actor Pharmacist
+boundary PrepareMedicineUI
+control PrepareMedicineController
+entity Order
+control Inventory
+entity Package
+
+Pharmacist -> PrepareMedicineUI : Open Prepare Medicine page
+PrepareMedicineUI -> PrepareMedicineController : loadOrder(orderId)
+PrepareMedicineController -> Order : Get order details(orderId)
+Order --> PrepareMedicineController : Medicine list
+PrepareMedicineController --> PrepareMedicineUI : Display prescribed medicines
+Pharmacist -> PrepareMedicineUI : Start medicine preparation
+
+loop For each prescribed medicine
+    PrepareMedicineUI -> PrepareMedicineController : Request medicine(itemId)
+    PrepareMedicineController -> Inventory : Check stock(itemId)
+    Inventory --> PrepareMedicineController : Stock available
+    PrepareMedicineController -> Inventory : Deduct quantity(itemId)
+    Inventory --> PrepareMedicineController : Inventory updated
+end
+
+Pharmacist -> PrepareMedicineUI : Confirm medicines picked
+PrepareMedicineUI -> PrepareMedicineController : Pack medicines(orderId)
+PrepareMedicineController -> Package : Create package
+Package --> PrepareMedicineController : Package created
+PrepareMedicineController -> Order : Update status = Packed
+Order --> PrepareMedicineController : Status updated
+PrepareMedicineController --> PrepareMedicineUI : Preparation completed
+PrepareMedicineUI --> Pharmacist : Display "Ready for Shipping"
+@endum
+
+19
+@startuml
+actor Pharmacist
+boundary UpdateInventoryUI
+control InventoryController
+entity Order
+control Inventory
+
+Pharmacist -> UpdateInventoryUI : Confirm order preparation completed
+UpdateInventoryUI -> InventoryController : confirmPreparation(orderId)
+InventoryController -> Order : Get medicine list(orderId)
+Order --> InventoryController : Medicines and quantities
+
+loop For each medicine
+    InventoryController -> Inventory : Get current stock(medicineId)
+    Inventory --> InventoryController : Current quantity
+    InventoryController -> Inventory : Update stock(currentQty - orderedQty)
+    Inventory --> InventoryController : Stock updated
+end
+
+InventoryController -> Order : Update status = Ready for Shipping
+Order --> InventoryController : Order status updated
+InventoryController --> UpdateInventoryUI : Inventory updated successfully
+UpdateInventoryUI --> Pharmacist : Display confirmation
+@endum
+
+20
+@startuml
+actor Pharmacist
+actor Courier
+boundary DispatchOrderUI
+control DispatchOrderController
+entity Order
+entity Shipment
+control Notification
+
+Pharmacist -> DispatchOrderUI : Open Dispatch Order page
+DispatchOrderUI -> DispatchOrderController : loadReadyOrders()
+DispatchOrderController -> Order : Get orders(status = Ready for Shipping)
+Order --> DispatchOrderController : Ready orders
+DispatchOrderController --> DispatchOrderUI : Display ready orders
+
+Pharmacist -> DispatchOrderUI : Select order for dispatch
+DispatchOrderUI -> DispatchOrderController : dispatchOrder(orderId)
+DispatchOrderController -> Shipment : Create shipment record
+Shipment --> DispatchOrderController : Shipment created
+
+Pharmacist -> Courier : Hand over medicine parcel
+Courier --> DispatchOrderController : Confirm parcel received
+
+DispatchOrderController -> Order : Update status = Shipping
+Order --> DispatchOrderController : Status updated
+DispatchOrderController -> Shipment : Update shipment status = In Transit
+Shipment --> DispatchOrderController : Shipment updated
+DispatchOrderController -> Notification : Send shipping notification
+Notification --> DispatchOrderController : Notification sent
+
+DispatchOrderController --> DispatchOrderUI : Dispatch completed
+DispatchOrderUI --> Pharmacist : Display "Order In Transit"
+@endum
+
+21
+@startuml
+actor Doctor
+boundary LicenseSubmissionUI
+control LicenseController
+entity License
+entity Payment
+participant PaymentGateway
+entity Account
+
+Doctor -> LicenseSubmissionUI : Open License Submission page
+LicenseSubmissionUI -> LicenseController : Load submission form
+LicenseController --> LicenseSubmissionUI : Display license form and fee information
+Doctor -> LicenseSubmissionUI : Enter professional license details
+Doctor -> LicenseSubmissionUI : Upload supporting documents
+Doctor -> LicenseSubmissionUI : Submit application
+LicenseSubmissionUI -> LicenseController : submitLicense(details, documents)
+LicenseController -> License : Save license information
+License --> LicenseController : License record created
+LicenseController --> LicenseSubmissionUI : Display payment page
+
+Doctor -> LicenseSubmissionUI : Select payment method
+Doctor -> LicenseSubmissionUI : Confirm payment
+LicenseSubmissionUI -> LicenseController : processLicenseFee()
+LicenseController -> Payment : Create payment transaction
+Payment --> LicenseController : Transaction created
+LicenseController -> PaymentGateway : Process payment
+
+alt Payment successful
+    PaymentGateway --> LicenseController : Payment approved
+    LicenseController -> Payment : Update status = Paid
+    Payment --> LicenseController : Payment updated
+    LicenseController -> Account : Activate/Renew doctor account
+    Account --> LicenseController : Account status updated
+    LicenseController --> LicenseSubmissionUI : Submission completed
+    LicenseSubmissionUI --> Doctor : Display activation confirmation
+else Payment failed
+    PaymentGateway --> LicenseController : Payment declined
+    LicenseController -> Payment : Update status = Failed
+    Payment --> LicenseController : Payment updated
+    LicenseController --> LicenseSubmissionUI : Display payment failed
+    LicenseSubmissionUI --> Doctor : Retry payment
+end
+@endum
+
+22
+@startuml
+actor Doctor
+boundary AvailabilityUI
+control AvailabilityController
+control Schedule
+entity Appointment
+
+Doctor -> AvailabilityUI : Open Configure Availability page
+AvailabilityUI -> AvailabilityController : loadAvailability()
+AvailabilityController -> Schedule : Get current availability
+Schedule --> AvailabilityController : Available time slots
+AvailabilityController --> AvailabilityUI : Display current schedule
+
+Doctor -> AvailabilityUI : Add/Edit/Delete time slots
+AvailabilityUI -> AvailabilityController : updateAvailability(updatedSlots)
+
+loop For each modified time slot
+    AvailabilityController -> Appointment : Check appointment conflicts(slot)
+    alt No appointment conflict
+        Appointment --> AvailabilityController : Slot available
+        AvailabilityController -> Schedule : Save updated slot
+        Schedule --> AvailabilityController : Slot updated
+    else Conflict detected
+        Appointment --> AvailabilityController : Existing appointment found
+        AvailabilityController --> AvailabilityUI : Display conflict message
+        AvailabilityUI --> Doctor : Select another time slot
+    end
+end
+
+AvailabilityController --> AvailabilityUI : Display updated availability
+AvailabilityUI --> Doctor : Configuration completed successfully
+@endum
+
+23
+@startuml
+actor Doctor
+boundary ConsultationScheduleUI
+control ConsultationScheduleController
+entity Appointment
+entity Patient
+
+Doctor -> ConsultationScheduleUI : Open Consultation Schedule
+ConsultationScheduleUI -> ConsultationScheduleController : loadAppointments()
+ConsultationScheduleController -> Appointment : Retrieve doctor's appointments
+Appointment --> ConsultationScheduleController : Appointment list
+ConsultationScheduleController --> ConsultationScheduleUI : Display appointment list
+
+Doctor -> ConsultationScheduleUI : Filter appointments\n(Upcoming / Past)
+ConsultationScheduleUI -> ConsultationScheduleController : filterAppointments(criteria)
+ConsultationScheduleController -> Appointment : Search appointments(criteria)
+Appointment --> ConsultationScheduleController : Filtered appointment list
+ConsultationScheduleController --> ConsultationScheduleUI : Display filtered appointments
+
+Doctor -> ConsultationScheduleUI : Select an appointment
+ConsultationScheduleUI -> ConsultationScheduleController : viewAppointmentDetails(appointmentId)
+ConsultationScheduleController -> Appointment : Get appointment details
+Appointment --> ConsultationScheduleController : Appointment information
+ConsultationScheduleController -> Patient : Get patient information
+Patient --> ConsultationScheduleController : Patient profile
+ConsultationScheduleController --> ConsultationScheduleUI : Display appointment details
+ConsultationScheduleUI --> Doctor : Show patient, date, time, consultation type, status
+@enduml
+
+24
+@startuml
+actor Doctor
+boundary PrescriptionUI
+control PrescriptionController
+entity Appointment
+control MedicineCatalog
+entity Prescription
+entity MedicalRecord
+
+Doctor -> PrescriptionUI : Open Issue Prescription page
+PrescriptionUI -> PrescriptionController : loadConsultation(appointmentId)
+PrescriptionController -> Appointment : Get consultation details
+Appointment --> PrescriptionController : Patient information
+PrescriptionController --> PrescriptionUI : Display prescription form
+
+Doctor -> PrescriptionUI : Search medicine(keyword)
+PrescriptionUI -> PrescriptionController : searchMedicine(keyword)
+PrescriptionController -> MedicineCatalog : Search medicines(keyword)
+MedicineCatalog --> PrescriptionController : Medicine list
+PrescriptionController --> PrescriptionUI : Display medicine catalogue
+
+Doctor -> PrescriptionUI : Select medicine
+Doctor -> PrescriptionUI : Enter dosage, quantity, instructions
+PrescriptionUI -> PrescriptionController : addMedicineToPrescription()
+PrescriptionController -> MedicineCatalog : Validate medicine
+MedicineCatalog --> PrescriptionController : Medicine valid
+
+Doctor -> PrescriptionUI : Confirm prescription
+PrescriptionUI -> PrescriptionController : issuePrescription()
+PrescriptionController -> Prescription : Create digital prescription
+Prescription --> PrescriptionController : Prescription created
+PrescriptionController -> MedicalRecord : Save prescription
+MedicalRecord --> PrescriptionController : Medical record updated
+
+PrescriptionController --> PrescriptionUI : Prescription issued successfully
+PrescriptionUI --> Doctor : Display digital prescription
+@enduml
+
+25
+@startuml
+actor Doctor
+boundary MedicineCatalogueUI
+control MedicineCatalogueController
+entity MedicineCatalogue
+control Inventory
+
+Doctor -> MedicineCatalogueUI : Open Medicine Catalogue
+MedicineCatalogueUI -> MedicineCatalogueController : loadCatalogue()
+MedicineCatalogueController -> MedicineCatalogue : Retrieve available medicines
+MedicineCatalogue --> MedicineCatalogueController : Medicine list
+MedicineCatalogueController --> MedicineCatalogueUI : Display medicine catalogue
+
+Doctor -> MedicineCatalogueUI : Search medicines(keyword/category)
+MedicineCatalogueUI -> MedicineCatalogueController : searchMedicine(criteria)
+MedicineCatalogueController -> MedicineCatalogue : Search medicines(criteria)
+MedicineCatalogue --> MedicineCatalogueController : Matching medicines
+MedicineCatalogueController --> MedicineCatalogueUI : Display search results
+
+Doctor -> MedicineCatalogueUI : Select a medicine
+MedicineCatalogueUI -> MedicineCatalogueController : viewMedicineDetails(medicineId)
+MedicineCatalogueController -> MedicineCatalogue : Get medicine details(medicineId)
+MedicineCatalogue --> MedicineCatalogueController : Name, dosage form, strength
+MedicineCatalogueController -> Inventory : Check availability(medicineId)
+Inventory --> MedicineCatalogueController : Stock status
+MedicineCatalogueController --> MedicineCatalogueUI : Display medicine details
+MedicineCatalogueUI --> Doctor : View medicine information
+@enduml
+
+26
+@startuml
+actor Doctor
+boundary ReviewDashboardUI
+control ReviewController
+entity Review
+entity DoctorProfile
+
+Doctor -> ReviewDashboardUI : Open Patient Reviews Dashboard
+ReviewDashboardUI -> ReviewController : loadReviewSummary()
+ReviewController -> Review : Retrieve all reviews(doctorId)
+Review --> ReviewController : Ratings and feedback list
+
+ReviewController -> ReviewController : Calculate average rating
+ReviewController -> ReviewController : Aggregate ratings by stars
+ReviewController -> ReviewController : Generate feedback summary
+
+ReviewController -> DoctorProfile : Update latest rating statistics
+DoctorProfile --> ReviewController : Statistics updated
+
+ReviewController --> ReviewDashboardUI : Display review dashboard
+ReviewDashboardUI --> Doctor : Show average rating,\nstar distribution,\nreview summary
+
+Doctor -> ReviewDashboardUI : Select a review
+ReviewDashboardUI -> ReviewController : viewReview(reviewId)
+ReviewController -> Review : Get review details(reviewId)
+Review --> ReviewController : Rating and feedback
+ReviewController --> ReviewDashboardUI : Display review details
+ReviewDashboardUI --> Doctor : View patient feedback
+@enduml
+
+27
+@startuml
+actor Admin
+boundary UserManagementUI
+control UserManagementController
+entity User
+
+Admin -> UserManagementUI : Open User Management
+UserManagementUI -> UserManagementController : loadUsers()
+UserManagementController -> User : Retrieve user accounts
+User --> UserManagementController : User list
+UserManagementController --> UserManagementUI : Display user accounts
+
+Admin -> UserManagementUI : Search or filter users
+UserManagementUI -> UserManagementController : searchUsers(criteria)
+UserManagementController -> User : Search users(criteria)
+User --> UserManagementController : Filtered user list
+UserManagementController --> UserManagementUI : Display filtered users
+
+alt Create new account
+    Admin -> UserManagementUI : Enter new user information
+    UserManagementUI -> UserManagementController : createUser(userInfo)
+    UserManagementController -> User : Create account
+    User --> UserManagementController : Account created
+    UserManagementController --> UserManagementUI : Display success message
+else Update account
+    Admin -> UserManagementUI : Edit user information
+    UserManagementUI -> UserManagementController : updateUser(userId, userInfo)
+    UserManagementController -> User : Update account
+    User --> UserManagementController : Account updated
+    UserManagementController --> UserManagementUI : Display success message
+else Suspend account
+    Admin -> UserManagementUI : Suspend account
+    UserManagementUI -> UserManagementController : suspendUser(userId)
+    UserManagementController -> User : Update status = Suspended
+    User --> UserManagementController : Status updated
+    UserManagementController --> UserManagementUI : Display suspension confirmation
+else Delete account
+    Admin -> UserManagementUI : Delete account
+    UserManagementUI -> UserManagementController : deleteUser(userId)
+    UserManagementController -> User : Delete account
+    User --> UserManagementController : Account deleted
+    UserManagementController --> UserManagementUI : Display deletion confirmation
+end
+
+UserManagementUI --> Admin : Display updated user list
+@enduml
+
+28
+@startuml
+actor Admin
+boundary HealthNewsUI
+control HealthNewsController
+entity News
+control Verification
+control Notification
+
+Admin -> HealthNewsUI : Open Health News Management
+HealthNewsUI -> HealthNewsController : loadNews()
+HealthNewsController -> News : Retrieve news/articles
+News --> HealthNewsController : News list
+HealthNewsController --> HealthNewsUI : Display news list
+
+Admin -> HealthNewsUI : Select an article
+HealthNewsUI -> HealthNewsController : viewArticle(articleId)
+HealthNewsController -> News : Get article details
+News --> HealthNewsController : Article content
+HealthNewsController --> HealthNewsUI : Display article details
+
+Admin -> HealthNewsUI : Edit article content
+HealthNewsUI -> HealthNewsController : saveDraft(updatedArticle)
+HealthNewsController -> News : Update article
+News --> HealthNewsController : Draft saved
+
+Admin -> HealthNewsUI : Publish article
+HealthNewsUI -> HealthNewsController : publishArticle(articleId)
+HealthNewsController -> Verification : Verify article content
+Verification --> HealthNewsController : Verification passed
+
+HealthNewsController -> News : Update status = Published
+News --> HealthNewsController : Article published
+HealthNewsController -> Notification : Notify platform users
+Notification --> HealthNewsController : Notification sent
+
+HealthNewsController --> HealthNewsUI : Publish successful
+HealthNewsUI --> Admin : Display published article
+@enduml
+
+29
+@startuml
+actor Admin
+boundary RolePermissionUI
+control RolePermissionController
+entity Role
+entity Permission
+
+Admin -> RolePermissionUI : Open Role & Permission Management
+RolePermissionUI -> RolePermissionController : loadRoles()
+RolePermissionController -> Role : Retrieve all roles
+Role --> RolePermissionController : Role list
+RolePermissionController --> RolePermissionUI : Display roles
+
+Admin -> RolePermissionUI : Select a role
+RolePermissionUI -> RolePermissionController : viewRole(roleId)
+RolePermissionController -> Permission : Retrieve assigned permissions(roleId)
+Permission --> RolePermissionController : Permission list
+RolePermissionController --> RolePermissionUI : Display permissions
+
+Admin -> RolePermissionUI : Add/Remove permissions
+RolePermissionUI -> RolePermissionController : updatePermissions(roleId, permissions)
+RolePermissionController -> Permission : Save permission changes
+Permission --> RolePermissionController : Permissions updated
+RolePermissionController -> Role : Update role configuration
+Role --> RolePermissionController : Role updated
+
+RolePermissionController --> RolePermissionUI : Display update successful
+RolePermissionUI --> Admin : View updated permissions
+@enduml
+
+30
+@startuml
+actor Admin
+actor Doctor
+boundary DoctorVerificationUI
+control DoctorVerificationController
+entity DoctorProfile
+entity License
+control Notification
+
+Admin -> DoctorVerificationUI : Open Doctor Verification page
+DoctorVerificationUI -> DoctorVerificationController : loadPendingProfiles()
+DoctorVerificationController -> DoctorProfile : Retrieve pending doctor profiles
+DoctorProfile --> DoctorVerificationController : Pending profile list
+DoctorVerificationController --> DoctorVerificationUI : Display pending profiles
+
+Admin -> DoctorVerificationUI : Select doctor profile
+DoctorVerificationUI -> DoctorVerificationController : viewProfile(profileId)
+DoctorVerificationController -> DoctorProfile : Get doctor profile
+DoctorProfile --> DoctorVerificationController : Personal information
+DoctorVerificationController -> License : Retrieve license credentials
+License --> DoctorVerificationController : License documents
+DoctorVerificationController --> DoctorVerificationUI : Display profile details
+Admin -> DoctorVerificationUI : Review credentials and documents
+
+alt Approve profile
+    Admin -> DoctorVerificationUI : Approve application
+    DoctorVerificationUI -> DoctorVerificationController : approveProfile(profileId)
+    DoctorVerificationController -> DoctorProfile : Update status = Approved
+    DoctorProfile --> DoctorVerificationController : Profile approved
+    DoctorVerificationController -> Notification : Send approval notification
+    Notification --> Doctor : Account approved
+    DoctorVerificationController --> DoctorVerificationUI : Display approval success
+else Reject profile
+    Admin -> DoctorVerificationUI : Reject application
+    DoctorVerificationUI -> DoctorVerificationController : rejectProfile(profileId, reason)
+    DoctorVerificationController -> DoctorProfile : Update status = Rejected
+    DoctorProfile --> DoctorVerificationController : Profile rejected
+    DoctorVerificationController -> Notification : Send rejection notification
+    Notification --> Doctor : Rejection with reason
+    DoctorVerificationController --> DoctorVerificationUI : Display rejection success
+end
+@enduml
+
+31
+@startuml
+actor Admin
+actor Doctor
+boundary DoctorVerificationUI
+control DoctorVerificationController
+entity DoctorProfile
+entity License
+control Notification
+
+Admin -> DoctorVerificationUI : Open Doctor Verification page
+DoctorVerificationUI -> DoctorVerificationController : loadPendingProfiles()
+DoctorVerificationController -> DoctorProfile : Retrieve pending doctor profiles
+DoctorProfile --> DoctorVerificationController : Pending profile list
+DoctorVerificationController --> DoctorVerificationUI : Display pending profiles
+
+Admin -> DoctorVerificationUI : Select doctor profile
+DoctorVerificationUI -> DoctorVerificationController : viewProfile(profileId)
+DoctorVerificationController -> DoctorProfile : Get doctor profile
+DoctorProfile --> DoctorVerificationController : Personal information
+DoctorVerificationController -> License : Retrieve license credentials
+License --> DoctorVerificationController : License documents
+DoctorVerificationController --> DoctorVerificationUI : Display profile details
+Admin -> DoctorVerificationUI : Review credentials and documents
+
+alt Approve profile
+    Admin -> DoctorVerificationUI : Approve application
+    DoctorVerificationUI -> DoctorVerificationController : approveProfile(profileId)
+    DoctorVerificationController -> DoctorProfile : Update status = Approved
+    DoctorProfile --> DoctorVerificationController : Profile approved
+    DoctorVerificationController -> Notification : Send approval notification
+    Notification --> Doctor : Account approved
+    DoctorVerificationController --> DoctorVerificationUI : Display approval success
+else Reject profile
+    Admin -> DoctorVerificationUI : Reject application
+    DoctorVerificationUI -> DoctorVerificationController : rejectProfile(profileId, reason)
+    DoctorVerificationController -> DoctorProfile : Update status = Rejected
+    DoctorProfile --> DoctorVerificationController : Profile rejected
+    DoctorVerificationController -> Notification : Send rejection notification
+    Notification --> Doctor : Rejection with reason
+    DoctorVerificationController --> DoctorVerificationUI : Display rejection success
+end
+@enduml
+
+

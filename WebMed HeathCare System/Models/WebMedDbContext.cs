@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,6 +34,12 @@ public partial class WebMedDbContext : DbContext
     public virtual DbSet<HealthCalculation> HealthCalculations { get; set; }
 
     public virtual DbSet<InsurancePlan> InsurancePlans { get; set; }
+    
+    public virtual DbSet<Coverage> Coverages { get; set; }
+    
+    public virtual DbSet<Pricing> Pricings { get; set; }
+    
+    public virtual DbSet<Benefit> Benefits { get; set; }
 
     public virtual DbSet<Medicine> Medicines { get; set; }
 
@@ -273,7 +279,46 @@ public partial class WebMedDbContext : DbContext
             entity.Property(e => e.DurationMonths).HasDefaultValue(12);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.PlanName).HasMaxLength(100);
-            entity.Property(e => e.Price).HasColumnType("decimal(18, 0)");
+        });
+
+        modelBuilder.Entity<Coverage>(entity =>
+        {
+            entity.HasKey(e => e.CoverageId);
+            
+            entity.HasIndex(e => e.PlanId).IsUnique();
+
+            entity.HasOne(d => d.Plan).WithOne(p => p.Coverage)
+                .HasForeignKey<Coverage>(d => d.PlanId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Coverages_Plans");
+        });
+
+        modelBuilder.Entity<Pricing>(entity =>
+        {
+            entity.HasKey(e => e.PricingId);
+            
+            entity.HasIndex(e => e.PlanId).IsUnique();
+
+            entity.Property(e => e.Premium).HasColumnType("decimal(18, 0)");
+            entity.Property(e => e.Deductible).HasColumnType("decimal(18, 0)");
+            entity.Property(e => e.Copay).HasColumnType("decimal(18, 0)");
+
+            entity.HasOne(d => d.Plan).WithOne(p => p.Pricing)
+                .HasForeignKey<Pricing>(d => d.PlanId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Pricings_Plans");
+        });
+
+        modelBuilder.Entity<Benefit>(entity =>
+        {
+            entity.HasKey(e => e.BenefitId);
+
+            entity.Property(e => e.BenefitName).HasMaxLength(255);
+
+            entity.HasOne(d => d.Plan).WithMany(p => p.Benefits)
+                .HasForeignKey(d => d.PlanId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Benefits_Plans");
         });
 
         modelBuilder.Entity<Medicine>(entity =>
