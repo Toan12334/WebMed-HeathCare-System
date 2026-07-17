@@ -21,7 +21,7 @@ namespace WebMed_HeathCare_System
 
             // Register Service Layer
             builder.Services.AddScoped<IUserService, UserService>();
-
+builder.Services.AddScoped<WebMed_HeathCare_System.Interfaces.IHealthCalculatorService, WebMed_HeathCare_System.Services.HealthCalculatorService>();
             // Configure Cookie Authentication
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>

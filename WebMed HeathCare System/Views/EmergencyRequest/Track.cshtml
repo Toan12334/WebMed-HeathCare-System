@@ -1,0 +1,64 @@
+@model WebMed_HeathCare_System.Models.AmbulanceRequest
+
+@{
+    ViewData["Title"] = "Track Ambulance";
+}
+
+<div class="container mt-4">
+    <h2>Ambulance Tracking</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-5">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">Status: <span id="statusBadge" class="badge bg-warning text-dark">@Model.Status</span></h5>
+                    <p class="mt-3"><strong>Request ID:</strong> #@Model.RequestId</p>
+                    <p><strong>Pickup Location:</strong> @Model.PickupLocation</p>
+                    <p><strong>Assigned Vehicle:</strong> <span id="vehicleNo">@Model.AssignedAmbulanceVehicle</span></p>
+                    
+                    <div class="alert alert-info mt-4">
+                        <h4 class="alert-heading">Estimated Time of Arrival (ETA)</h4>
+                        <h2 id="etaDisplay" class="display-5 text-center">@Model.Eta</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-7">
+            <!-- Mock Map Area -->
+            <div class="card shadow-sm">
+                <div class="card-body p-0 position-relative" style="height: 400px; background-color: #e9ecef; overflow: hidden;">
+                    <div class="position-absolute top-50 start-50 translate-middle text-center w-100">
+                        <p class="text-muted"><i class="bi bi-map" style="font-size: 2rem;"></i><br/>Map simulation</p>
+                        <p>Live coordinates: <br/> <strong id="coordsDisplay" class="text-danger">Lat: @Model.AmbulanceLatitude | Lng: @Model.AmbulanceLongitude</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Polling GPSService every 3 seconds as per sequence diagram loop
+            setInterval(function () {
+                $.ajax({
+                    url: '/EmergencyRequest/GetTrackingData',
+                    type: 'GET',
+                    data: { requestId: @Model.RequestId },
+                    success: function (data) {
+                        $('#coordsDisplay').text('Lat: ' + data.latitude.toFixed(6) + ' | Lng: ' + data.longitude.toFixed(6));
+                        $('#statusBadge').text(data.status);
+                        $('#etaDisplay').text(data.eta);
+                        $('#vehicleNo').text(data.vehicle);
+                    },
+                    error: function (err) {
+                        console.error("Tracking unavailable or disconnected.");
+                    }
+                });
+            }, 3000);
+        });
+    </script>
+}

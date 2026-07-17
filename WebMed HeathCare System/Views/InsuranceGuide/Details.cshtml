@@ -1,0 +1,63 @@
+@model WebMed_HeathCare_System.Models.InsurancePlanDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Plan.PlanName;
+}
+
+<div class="container mt-4">
+    <a asp-action="Index" class="btn btn-secondary mb-3">&larr; Back to Plans</a>
+
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">@Model.Plan.PlanName</h2>
+            <h3 class="mb-0 text-success">@Model.Plan.Price.ToString("N0") VND <small class="fs-6 text-light">/ @Model.Plan.DurationMonths months</small></h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Pricing & Network -->
+                <div class="col-md-6 mb-4">
+                    <h4 class="text-primary border-bottom pb-2">Pricing Information</h4>
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr><th>Deductible:</th><td>@Model.Deductible</td></tr>
+                            <tr><th>Copay:</th><td>@Model.Copay</td></tr>
+                            <tr><th>Network Type:</th><td>@Model.NetworkType</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Coverage Details -->
+                <div class="col-md-6 mb-4">
+                    <h4 class="text-primary border-bottom pb-2">Coverage Highlights</h4>
+                    <ul class="list-group list-group-flush">
+                        @foreach (var cov in Model.Coverages)
+                        {
+                            <li class="list-group-item"><i class="bi bi-check-circle-fill text-success me-2"></i> @cov</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <div class="row mt-2">
+                <!-- Benefits Information -->
+                <div class="col-12">
+                    <h4 class="text-primary border-bottom pb-2">Additional Benefits</h4>
+                    <div class="row">
+                        @foreach (var benefit in Model.Benefits)
+                        {
+                            <div class="col-md-6 mb-2">
+                                <div class="d-flex align-items-center">
+                                    <div class="bg-light rounded p-2 me-3"><i class="bi bi-star-fill text-warning"></i></div>
+                                    <div>@benefit</div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-center">
+            <button class="btn btn-lg btn-primary">Enroll Now</button>
+        </div>
+    </div>
+</div>

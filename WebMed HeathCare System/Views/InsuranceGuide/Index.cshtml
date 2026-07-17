@@ -1,0 +1,62 @@
+@model IEnumerable<WebMed_HeathCare_System.Models.InsurancePlan>
+
+@{
+    ViewData["Title"] = "Insurance Guide";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Health Insurance Plans</h2>
+    
+    <div class="row">
+        @foreach (var plan in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm border-primary">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h4 class="my-0 font-weight-normal">@plan.PlanName</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <h1 class="card-title pricing-card-title">@plan.Price.ToString("N0") <small class="text-muted">VND</small></h1>
+                        <ul class="list-unstyled mt-3 mb-4">
+                            <li>Duration: @plan.DurationMonths months</li>
+                            <li>Status: @(plan.IsActive == true ? "Active" : "Inactive")</li>
+                        </ul>
+                        <a asp-action="Details" asp-route-id="@plan.PlanId" class="btn btn-lg btn-block btn-outline-primary w-100">View Details</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (Model.Count() >= 2)
+    {
+        <div class="card mt-4 bg-light">
+            <div class="card-body">
+                <h5 class="card-title">Compare Plans</h5>
+                <form asp-action="Compare" method="get" class="row align-items-end">
+                    <div class="col-md-4">
+                        <label>Select Plan 1:</label>
+                        <select name="plan1" class="form-select">
+                            @foreach (var p in Model)
+                            {
+                                <option value="@p.PlanId">@p.PlanName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Select Plan 2:</label>
+                        <select name="plan2" class="form-select">
+                            @foreach (var p in Model)
+                            {
+                                <option value="@p.PlanId">@p.PlanName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-success w-100">Compare</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+</div>

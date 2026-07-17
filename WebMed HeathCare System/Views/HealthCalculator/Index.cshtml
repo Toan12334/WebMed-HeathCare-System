@@ -1,0 +1,88 @@
+@{
+    ViewData["Title"] = "Health Calculator";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title text-center text-primary mb-4">Health Calculator</h2>
+                    
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">@ViewBag.Error</div>
+                    }
+
+                    <form asp-action="Calculate" method="post">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Height (cm)</label>
+                                <input type="number" step="0.1" name="height" class="form-control" value="@ViewBag.Height" required />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Weight (kg)</label>
+                                <input type="number" step="0.1" name="weight" class="form-control" value="@ViewBag.Weight" required />
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Age</label>
+                                <input type="number" name="age" class="form-control" value="@ViewBag.Age" required />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Gender</label>
+                                <select name="gender" class="form-select">
+                                    <option value="Male" selected="@(ViewBag.Gender == "Male")">Male</option>
+                                    <option value="Female" selected="@(ViewBag.Gender == "Female")">Female</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Activity Level</label>
+                                <select name="activityLevel" class="form-select">
+                                    <option value="sedentary" selected="@(ViewBag.ActivityLevel == "sedentary")">Sedentary</option>
+                                    <option value="light" selected="@(ViewBag.ActivityLevel == "light")">Light Activity</option>
+                                    <option value="moderate" selected="@(ViewBag.ActivityLevel == "moderate")">Moderate Activity</option>
+                                    <option value="active" selected="@(ViewBag.ActivityLevel == "active")">Very Active</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-4 text-center">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="calcType" id="calcBMI" value="BMI" checked="@(ViewBag.CalcType == null || ViewBag.CalcType == "BMI")">
+                                <label class="form-check-label" for="calcBMI">Calculate BMI</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="calcType" id="calcCalories" value="Calories" checked="@(ViewBag.CalcType == "Calories")">
+                                <label class="form-check-label" for="calcCalories">Calculate Daily Calories</label>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Calculate</button>
+                        </div>
+                    </form>
+
+                    @if (ViewBag.BMI != null)
+                    {
+                        <div class="alert alert-info mt-4 text-center">
+                            <h4>Your BMI: <strong>@ViewBag.BMI</strong></h4>
+                            <h5>Category: <span class="badge bg-secondary">@ViewBag.BMICategory</span></h5>
+                            <p class="mb-0 mt-2">A healthy BMI is between 18.5 and 24.9.</p>
+                        </div>
+                    }
+                    else if (ViewBag.Calories != null)
+                    {
+                        <div class="alert alert-success mt-4 text-center">
+                            <h4>Estimated Daily Calorie Needs:</h4>
+                            <h2 class="display-6 fw-bold">@ViewBag.Calories <small class="fs-5 fw-normal">kcal/day</small></h2>
+                            <p class="mb-0 mt-2">This is an estimate to maintain your current weight based on your activity level.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

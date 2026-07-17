@@ -1,0 +1,80 @@
+@{
+    ViewData["Title"] = "Compare Plans";
+    var p1 = (WebMed_HeathCare_System.Models.InsurancePlanDetailsViewModel)ViewBag.Plan1;
+    var p2 = (WebMed_HeathCare_System.Models.InsurancePlanDetailsViewModel)ViewBag.Plan2;
+}
+
+<div class="container mt-4">
+    <a asp-action="Index" class="btn btn-secondary mb-3">&larr; Back to Plans</a>
+    <h2 class="mb-4 text-center">Plan Comparison</h2>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped text-center align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th width="20%">Feature</th>
+                    <th width="40%" class="fs-4">@p1.Plan.PlanName</th>
+                    <th width="40%" class="fs-4">@p2.Plan.PlanName</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="fw-bold text-start">Price</td>
+                    <td class="fs-5 text-success fw-bold">@p1.Plan.Price.ToString("N0") VND</td>
+                    <td class="fs-5 text-success fw-bold">@p2.Plan.Price.ToString("N0") VND</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold text-start">Duration</td>
+                    <td>@p1.Plan.DurationMonths months</td>
+                    <td>@p2.Plan.DurationMonths months</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold text-start">Network Type</td>
+                    <td>@p1.NetworkType</td>
+                    <td>@p2.NetworkType</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold text-start">Deductible</td>
+                    <td>@p1.Deductible</td>
+                    <td>@p2.Deductible</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold text-start">Copay</td>
+                    <td>@p1.Copay</td>
+                    <td>@p2.Copay</td>
+                </tr>
+                <tr>
+                    <td class="fw-bold text-start">Coverage</td>
+                    <td>
+                        <ul class="list-unstyled mb-0 text-start">
+                            @foreach(var c in p1.Coverages) { <li><i class="bi bi-check text-success"></i> @c</li> }
+                        </ul>
+                    </td>
+                    <td>
+                        <ul class="list-unstyled mb-0 text-start">
+                            @foreach(var c in p2.Coverages) { <li><i class="bi bi-check text-success"></i> @c</li> }
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="fw-bold text-start">Benefits</td>
+                    <td>
+                        <ul class="list-unstyled mb-0 text-start">
+                            @foreach(var b in p1.Benefits) { <li><i class="bi bi-star-fill text-warning"></i> @b</li> }
+                        </ul>
+                    </td>
+                    <td>
+                        <ul class="list-unstyled mb-0 text-start">
+                            @foreach(var b in p2.Benefits) { <li><i class="bi bi-star-fill text-warning"></i> @b</li> }
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><button class="btn btn-primary w-50">Select</button></td>
+                    <td><button class="btn btn-primary w-50">Select</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

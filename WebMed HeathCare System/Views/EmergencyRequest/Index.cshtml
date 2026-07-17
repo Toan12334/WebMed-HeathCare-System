@@ -1,0 +1,35 @@
+@{
+    ViewData["Title"] = "Request Ambulance";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger shadow">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="card-title mb-0"><i class="bi bi-ambulance"></i> Emergency Ambulance Request</h3>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger">@ViewBag.Error</div>
+                    }
+
+                    <form asp-action="SubmitRequest" method="post">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Pickup Location (Exact Address)</label>
+                            <textarea name="pickupLocation" class="form-control" rows="3" required placeholder="Enter street name, house number, ward, district..."></textarea>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Emergency Details (Optional)</label>
+                            <textarea name="emergencyDetails" class="form-control" rows="2" placeholder="Briefly describe the emergency condition..."></textarea>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-danger btn-lg">REQUEST AMBULANCE NOW</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
