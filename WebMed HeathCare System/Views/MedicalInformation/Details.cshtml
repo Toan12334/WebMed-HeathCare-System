@@ -1,0 +1,26 @@
+@model WebMed_HeathCare_System.Models.Article
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="container mt-4">
+    <a asp-action="Search" class="btn btn-secondary mb-3">&larr; Back to Search</a>
+    
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h1 class="card-title">@Model.Title</h1>
+            <h6 class="card-subtitle mb-2 text-muted">
+                Category: @Model.Category | Published on: @Model.PublishedAt.ToString("f")
+                @if (Model.Author != null)
+                {
+                    <span>| Author: @Model.Author.FullName</span>
+                }
+            </h6>
+            <hr />
+            <div class="card-text mt-4">
+                @Html.Raw(Model.Content)
+            </div>
+        </div>
+    </div>
+</div>
