@@ -111,9 +111,7 @@ namespace WebMed_HeathCare_System.Controllers
                             return RedirectToAction("Cart", "Pharmacy");
                         }
 
-                        // Deduct stock quantity
-                        medicine.StockQuantity -= item.Quantity;
-                        
+                        // Verification successful, total amount calculated (Stock deduction moved to Pharmacist packing confirmation)
                         totalAmount += medicine.Price * item.Quantity;
 
                         orderDetails.Add(new OrderDetail

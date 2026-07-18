@@ -83,22 +83,45 @@ namespace WebMed_HeathCare_System.Controllers
 
             if (order == null) return NotFound();
 
-            // Double check stock (we already deducted at checkout, but we verify here)
-            foreach (var detail in order.OrderDetails)
+            using (var transaction = await _context.Database.BeginTransactionAsync())
             {
-                var med = await _context.Medicines.FindAsync(detail.MedicineId);
-                if (med == null)
+                try
                 {
-                    TempData["ErrorMessage"] = $"Medicine not found for ID: {detail.MedicineId}";
-                    return RedirectToAction("Details", new { id });
+                    // Verify and deduct stock quantity
+                    foreach (var detail in order.OrderDetails)
+                    {
+                        var med = await _context.Medicines.FindAsync(detail.MedicineId);
+                        if (med == null)
+                        {
+                            TempData["ErrorMessage"] = $"Medicine not found for ID: {detail.MedicineId}";
+                            return RedirectToAction("Details", new { id });
+                        }
+
+                        if (med.StockQuantity < detail.Quantity)
+                        {
+                            TempData["ErrorMessage"] = $"Insufficient stock for medicine '{med.Name}'. Available: {med.StockQuantity}, Requested: {detail.Quantity}";
+                            return RedirectToAction("Details", new { id });
+                        }
+
+                        // Deduct stock quantity here to satisfy UC 19
+                        med.StockQuantity -= detail.Quantity;
+                    }
+
+                    order.OrderStatus = "Packed";
+                    order.UpdatedAt = DateTime.Now;
+                    await _context.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+
+                    TempData["SuccessMessage"] = $"Order #{id} packed successfully. Stock quantities deducted and ready for shipping.";
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    TempData["ErrorMessage"] = "An error occurred while confirming order preparation.";
                 }
             }
 
-            order.OrderStatus = "Packed";
-            order.UpdatedAt = DateTime.Now;
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = $"Order #{id} packed successfully. Ready for shipping.";
             return RedirectToAction("Details", new { id });
         }
 
