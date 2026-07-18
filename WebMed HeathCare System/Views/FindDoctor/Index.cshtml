@@ -1,107 +1,263 @@
 @model IEnumerable<WebMed_HeathCare_System.Models.Doctor>
 
 @{
-    ViewData["Title"] = "Find a Doctor - WebMed";
+    ViewData["Title"] = "Medical Specialist Team - WebMed";
 }
 
-<div class="container mt-4">
+<div class="container mt-4 pb-5">
     <!-- Header Block -->
-    <div class="bg-gradient text-white p-5 rounded-4 shadow-sm mb-5 text-center" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-        <h1 class="display-5 fw-bold mb-2">Find a Medical Specialist</h1>
-        <p class="lead mb-4">Connect with verified experts and book online consultations in seconds.</p>
-
-        <!-- Search / Filter form -->
-        <form asp-action="Index" method="get" class="row g-2 justify-content-center">
-            <div class="col-md-4">
-                <select name="specialty" class="form-select form-select-lg rounded-pill border-0 shadow-sm px-4">
-                    <option value="">All Specialties</option>
-                    @foreach (var spec in (List<string>)ViewBag.Specialties)
-                    {
-                        <!option value="@spec" @(ViewBag.SelectedSpecialty == spec ? "selected" : "")>@spec</!option>
-                    }
-                </select>
-            </div>
-            <div class="col-md-4">
-                <select name="location" class="form-select form-select-lg rounded-pill border-0 shadow-sm px-4">
-                    <option value="">All Locations</option>
-                    @foreach (var loc in (List<string>)ViewBag.Locations)
-                    {
-                        <!option value="@loc" @(ViewBag.SelectedLocation == loc ? "selected" : "")>@loc</!option>
-                    }
-                </select>
-            </div>
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-dark btn-lg w-100 rounded-pill fw-bold"><i class="bi bi-filter"></i> Filter</button>
-            </div>
-        </form>
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-dark text-uppercase tracking-wide" style="font-size: 2rem; letter-spacing: 1px;">
+            Medical Specialist Team
+        </h2>
+        <div class="mx-auto bg-emerald mb-3" style="width: 60px; height: 4px; border-radius: 2px;"></div>
     </div>
 
-    <!-- Doctor Grid -->
-    <div class="row">
-        @if (Model != null && Model.Any())
-        {
-            @foreach (var doctor in Model)
-            {
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden position-relative hover-lift transition-all">
-                        <div class="card-body p-4 d-flex flex-column">
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="bg-emerald-100 text-emerald-800 rounded-circle p-3 me-3" style="background-color: #d1fae5; color: #065f46;">
-                                    <i class="bi bi-person-heart-fill fs-3"></i>
-                                </div>
-                                <div>
-                                    <h5 class="card-title fw-bold text-dark mb-0">@doctor.DoctorNavigation.FullName</h5>
-                                    <span class="badge bg-light text-emerald px-2 py-1 mt-1 fw-bold text-uppercase" style="color: #059669; border: 1px solid #a7f3d0;">@doctor.Specialty</span>
-                                </div>
-                            </div>
+    <!-- Top Filters Form -->
+    <form asp-action="Index" method="get" id="filterForm" class="mb-5">
+        <!-- Preserve selected specialty when submitting top filters -->
+        <input type="hidden" name="specialty" value="@ViewBag.SelectedSpecialty" />
 
-                            <p class="text-muted flex-grow-1 fs-7">
-                                @(doctor.Bio?.Length > 150 ? doctor.Bio.Substring(0, 147) + "..." : doctor.Bio ?? "No bio available.")
-                            </p>
-
-                            <div class="bg-light p-3 rounded-3 mb-3">
-                                <div class="d-flex justify-content-between align-items-center mb-2 fs-7">
-                                    <span class="text-muted"><i class="bi bi-geo-alt-fill text-danger"></i> Location:</span>
-                                    <strong class="text-dark">@doctor.Location</strong>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center fs-7">
-                                    <span class="text-muted"><i class="bi bi-star-fill text-warning"></i> Rating:</span>
-                                    <strong class="text-dark">@doctor.AverageRating.ToString("F1") / 5.0</strong>
-                                </div>
-                            </div>
-
-                            <a asp-action="Details" asp-route-id="@doctor.DoctorId" class="btn btn-emerald w-100 rounded-3 fw-bold py-2 mt-auto" style="background-color: #059669; color: white;">
-                                <i class="bi bi-calendar-event-fill me-1"></i> View Profile & Book
-                            </a>
-                        </div>
+        <div class="bg-white p-4 rounded-4 shadow-sm border border-light">
+            <div class="row g-3 align-items-center">
+                <!-- Location / Clinic -->
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0"><i class="bi bi-geo-alt text-muted"></i></span>
+                        <select name="location" class="form-select bg-light border-0 py-2 fs-7" onchange="this.form.submit()">
+                            <option value="">All Locations</option>
+                            @foreach (var loc in (List<string>)ViewBag.Locations)
+                            {
+                                <!option value="@loc" @(ViewBag.SelectedLocation == loc ? "selected" : "")>@loc</!option>
+                            }
+                        </select>
                     </div>
                 </div>
-            }
-        }
-        else
-        {
-            <div class="col-12 text-center py-5">
-                <i class="bi bi-people text-muted mb-3" style="font-size: 3rem;"></i>
-                <h3 class="fw-bold">No doctors found</h3>
-                <p class="text-muted">Modify your filters or search criteria to find available specialists.</p>
-                <a asp-action="Index" class="btn btn-emerald rounded-pill px-4 mt-2" style="background-color: #059669; color: white;">Reset Filters</a>
+
+                <!-- Position -->
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0"><i class="bi bi-briefcase text-muted"></i></span>
+                        <select name="position" class="form-select bg-light border-0 py-2 fs-7" onchange="this.form.submit()">
+                            <option value="">All Positions</option>
+                            @foreach (var pos in (List<string>)ViewBag.Positions)
+                            {
+                                <!option value="@pos" @(ViewBag.SelectedPosition == pos ? "selected" : "")>
+                                    @(pos == "director" ? "Director/Manager" : pos == "expert" ? "Expert Advisor" : pos == "specialist" ? "Specialist" : "Advisor")
+                                </!option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Rank / Degree -->
+                <div class="col-md-2">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0"><i class="bi bi-mortarboard text-muted"></i></span>
+                        <select name="rank" class="form-select bg-light border-0 py-2 fs-7" onchange="this.form.submit()">
+                            <option value="">Rank / Degree</option>
+                            @foreach (var rk in (List<string>)ViewBag.Ranks)
+                            {
+                                <!option value="@rk" @(ViewBag.SelectedRank == rk ? "selected" : "")>@rk</!option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Search Input -->
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" name="searchTerm" class="form-control bg-light border-0 py-2 fs-7" 
+                               placeholder="Search doctor by name or biography..." value="@ViewBag.SearchTerm" />
+                        <button type="submit" class="btn btn-emerald px-3"><i class="bi bi-search"></i></button>
+                    </div>
+                </div>
             </div>
-        }
+
+            <!-- Active Filters Indicators -->
+            @if (!string.IsNullOrEmpty(ViewBag.SelectedLocation) || !string.IsNullOrEmpty(ViewBag.SelectedPosition) || !string.IsNullOrEmpty(ViewBag.SelectedRank) || !string.IsNullOrEmpty(ViewBag.SearchTerm) || !string.IsNullOrEmpty(ViewBag.SelectedSpecialty))
+            {
+                <div class="d-flex flex-wrap gap-2 align-items-center mt-3 pt-3 border-top border-light">
+                    <span class="small text-muted me-2">Active Filters:</span>
+                    
+                    @if (!string.IsNullOrEmpty(ViewBag.SelectedSpecialty))
+                    {
+                        <span class="badge bg-emerald-100 text-emerald-800 px-3 py-1 rounded-pill">
+                            Specialty: @ViewBag.SelectedSpecialty
+                            <a href="?specialty=&location=@ViewBag.SelectedLocation&position=@ViewBag.SelectedPosition&rank=@ViewBag.SelectedRank&searchTerm=@ViewBag.SearchTerm" class="text-emerald-800 ms-1"><i class="bi bi-x-circle-fill"></i></a>
+                        </span>
+                    }
+                    @if (!string.IsNullOrEmpty(ViewBag.SelectedLocation))
+                    {
+                        <span class="badge bg-light text-dark px-3 py-1 rounded-pill border">
+                            Location: @ViewBag.SelectedLocation
+                            <a href="?specialty=@ViewBag.SelectedSpecialty&location=&position=@ViewBag.SelectedPosition&rank=@ViewBag.SelectedRank&searchTerm=@ViewBag.SearchTerm" class="text-dark ms-1"><i class="bi bi-x-circle-fill"></i></a>
+                        </span>
+                    }
+                    @if (!string.IsNullOrEmpty(ViewBag.SelectedPosition))
+                    {
+                        <span class="badge bg-light text-dark px-3 py-1 rounded-pill border">
+                            Position: @ViewBag.SelectedPosition
+                            <a href="?specialty=@ViewBag.SelectedSpecialty&location=@ViewBag.SelectedLocation&position=&rank=@ViewBag.SelectedRank&searchTerm=@ViewBag.SearchTerm" class="text-dark ms-1"><i class="bi bi-x-circle-fill"></i></a>
+                        </span>
+                    }
+                    @if (!string.IsNullOrEmpty(ViewBag.SelectedRank))
+                    {
+                        <span class="badge bg-light text-dark px-3 py-1 rounded-pill border">
+                            Degree: @ViewBag.SelectedRank
+                            <a href="?specialty=@ViewBag.SelectedSpecialty&location=@ViewBag.SelectedLocation&position=@ViewBag.SelectedPosition&rank=&searchTerm=@ViewBag.SearchTerm" class="text-dark ms-1"><i class="bi bi-x-circle-fill"></i></a>
+                        </span>
+                    }
+                    @if (!string.IsNullOrEmpty(ViewBag.SearchTerm))
+                    {
+                        <span class="badge bg-light text-dark px-3 py-1 rounded-pill border">
+                            Keyword: "@ViewBag.SearchTerm"
+                            <a href="?specialty=@ViewBag.SelectedSpecialty&location=@ViewBag.SelectedLocation&position=@ViewBag.SelectedPosition&rank=@ViewBag.SelectedRank&searchTerm=" class="text-dark ms-1"><i class="bi bi-x-circle-fill"></i></a>
+                        </span>
+                    }
+                    
+                    <a href="?" class="btn btn-link btn-sm text-danger p-0 ms-auto">Clear all filters</a>
+                </div>
+            }
+        </div>
+    </form>
+
+    <!-- Main Section: Sidebar + Content -->
+    <div class="row">
+        <!-- Sidebar: Specialties -->
+        <div class="col-md-3 mb-4">
+            <div class="bg-white rounded-4 shadow-sm border border-light overflow-hidden">
+                <div class="p-3 bg-light border-bottom">
+                    <h5 class="fw-bold text-dark mb-0 fs-6"><i class="bi bi-filter-left me-2"></i>Specialties</h5>
+                </div>
+                <div class="list-group list-group-flush specialty-sidebar-list">
+                    <!-- All Specialties -->
+                    <a href="?specialty=&location=@ViewBag.SelectedLocation&position=@ViewBag.SelectedPosition&rank=@ViewBag.SelectedRank&searchTerm=@ViewBag.SearchTerm" 
+                       class="list-group-item list-group-item-action py-3 px-4 fw-bold fs-7 @(string.IsNullOrEmpty(ViewBag.SelectedSpecialty) ? "active-specialty" : "")">
+                        All Specialties
+                    </a>
+                    
+                    @foreach (var spec in (List<string>)ViewBag.Specialties)
+                    {
+                        <a href="?specialty=@spec&location=@ViewBag.SelectedLocation&position=@ViewBag.SelectedPosition&rank=@ViewBag.SelectedRank&searchTerm=@ViewBag.SearchTerm" 
+                           class="list-group-item list-group-item-action py-3 px-4 fw-bold fs-7 @(ViewBag.SelectedSpecialty == spec ? "active-specialty" : "")">
+                            @spec
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Content: Doctors Grid -->
+        <div class="col-md-9">
+            <div class="row">
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var doctor in Model)
+                    {
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden text-center hover-lift position-relative">
+                                <!-- Background Decorative Arc -->
+                                <div class="bg-light-blue-arc" style="height: 120px; background: linear-gradient(180deg, #dbeafe 0%, #ffffff 100%);"></div>
+                                
+                                <div class="card-body p-4 pt-0 d-flex flex-column align-items-center" style="margin-top: -60px;">
+                                    <!-- Doctor Avatar Container -->
+                                    <div class="position-relative mb-3">
+                                        <img src="~/images/doctor.png" alt="@doctor.DoctorNavigation.FullName" 
+                                             class="rounded-circle border border-4 border-white shadow" 
+                                             style="width: 110px; height: 110px; object-fit: cover; background-color: #f3f4f6;" />
+                                        @if (doctor.IsVerified)
+                                        {
+                                            <span class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center border border-2 border-white" 
+                                                  style="width: 24px; height: 24px; font-size: 0.75rem;" title="Verified Expert">
+                                                <i class="bi bi-patch-check-fill"></i>
+                                            </span>
+                                        }
+                                    </div>
+
+                                    <!-- Doctor Name and Titles -->
+                                    <h5 class="fw-bold mb-1 px-2" style="color: #1e3a8a; min-height: 48px; font-size: 1.1rem; line-height: 1.3;">
+                                        @doctor.DoctorNavigation.FullName
+                                    </h5>
+                                    
+                                    <!-- Specialty badge -->
+                                    <span class="badge rounded-pill bg-light text-emerald px-3 py-1 mb-2 fw-semibold fs-8" 
+                                          style="border: 1px solid #a7f3d0; color: var(--primary-color);">
+                                        @doctor.Specialty
+                                    </span>
+
+                                    <!-- Bio/Position description -->
+                                    <p class="text-muted fs-7 mb-4 px-1 flex-grow-1" style="min-height: 60px; line-height: 1.5;">
+                                        @(doctor.Bio?.Length > 120 ? doctor.Bio.Substring(0, 117) + "..." : doctor.Bio ?? "No bio description provided.")
+                                    </p>
+
+                                    <!-- Action Button -->
+                                    <a asp-action="Details" asp-route-id="@doctor.DoctorId" 
+                                       class="btn btn-dark w-100 rounded-pill py-2.5 fw-bold text-white shadow-sm mt-auto transition-all d-flex align-items-center justify-content-center gap-2"
+                                       style="background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%); border: none;">
+                                        <i class="bi bi-calendar-check-fill fs-8"></i> Book Now
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12 text-center py-5">
+                        <i class="bi bi-people text-muted mb-3" style="font-size: 3.5rem;"></i>
+                        <h3 class="fw-bold">No doctors found</h3>
+                        <p class="text-muted px-4">We couldn't find any specialist matching your criteria. Try resetting all filters or changing locations.</p>
+                        <a href="?" class="btn btn-emerald rounded-pill px-4 mt-2">Reset All Filters</a>
+                    </div>
+                }
+            </div>
+        </div>
     </div>
 </div>
 
 <style>
+    .fs-7 {
+        font-size: 0.9rem !important;
+    }
+    .fs-8 {
+        font-size: 0.8rem !important;
+    }
     .hover-lift:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.06) !important;
     }
     .transition-all {
-        transition: all 0.25s ease;
+        transition: all 0.25s ease-in-out;
     }
-    .fs-7 {
-        font-size: 0.88rem;
+    .bg-emerald {
+        background-color: var(--primary-color) !important;
     }
-    .text-emerald {
-        color: #059669 !important;
+    .btn-emerald {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+    }
+    .btn-emerald:hover {
+        background-color: var(--primary-hover);
+        color: white;
+    }
+    
+    /* Sidebar styling matching screenshot */
+    .specialty-sidebar-list .list-group-item {
+        border-left: 4px solid transparent;
+        color: #475569;
+        transition: all 0.2s ease;
+    }
+    .specialty-sidebar-list .list-group-item:hover {
+        background-color: #f8fafc;
+        color: var(--primary-color);
+        padding-left: 1.75rem !important;
+    }
+    .specialty-sidebar-list .active-specialty {
+        background-color: #f0fdf4 !important;
+        border-left: 4px solid var(--primary-color) !important;
+        color: var(--primary-color) !important;
     }
 </style>

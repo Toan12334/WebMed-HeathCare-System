@@ -385,7 +385,7 @@ namespace WebMed_HeathCare_System.Controllers
 
         // POST: /Admin/CreateNews
         [HttpPost]
-        public async Task<IActionResult> CreateNews(string title, string category, string content)
+        public async Task<IActionResult> CreateNews(string title, string category, string content, string imageUrl)
         {
             if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(content))
             {
@@ -404,7 +404,8 @@ namespace WebMed_HeathCare_System.Controllers
                 AuthorId = authorId,
                 IsPublished = true, // Directly publish for ease of testing
                 IsActive = true,
-                PublishedAt = DateTime.Now
+                PublishedAt = DateTime.Now,
+                ImageUrl = imageUrl
             };
 
             _context.Articles.Add(article);

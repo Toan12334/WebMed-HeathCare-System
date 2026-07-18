@@ -14,32 +14,44 @@ namespace WebMed_HeathCare_System.Controllers
         }
 
         [HttpGet]
-        public IActionResult Search()
+        public async Task<IActionResult> Search(string category, string keyword)
         {
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Search(string keyword)
-        {
+            ViewBag.SelectedCategory = category;
             ViewBag.Keyword = keyword;
 
-            if (string.IsNullOrWhiteSpace(keyword))
+            var query = _context.Articles
+                .Where(a => a.IsActive && a.IsPublished);
+
+            if (!string.IsNullOrEmpty(category))
             {
-                ViewBag.Message = "Please enter a keyword to search.";
-                return View();
+                query = query.Where(a => a.Category == category);
             }
 
-            var results = await _context.Articles
-                .Where(a => (a.Title.Contains(keyword) || a.Content.Contains(keyword)) && a.IsActive && a.IsPublished)
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                query = query.Where(a => a.Title.Contains(keyword) || a.Content.Contains(keyword));
+            }
+
+            var articles = await query
+                .OrderByDescending(a => a.PublishedAt)
                 .ToListAsync();
 
-            if (results.Count == 0)
+            ViewBag.Categories = new List<string>
             {
-                ViewBag.Message = "No information found.";
-            }
+                "News",
+                "Notifications",
+                "Hospital Activities",
+                "Research",
+                "Events",
+                "Cooperation",
+                "Training",
+                "Community",
+                "Pharma Info",
+                "Recruitment",
+                "Success Stories"
+            };
 
-            return View(results);
+            return View(articles);
         }
 
         [HttpGet]
@@ -53,6 +65,28 @@ namespace WebMed_HeathCare_System.Controllers
             {
                 return NotFound();
             }
+
+            // Get related articles (same category, excluding current article, limit to 4)
+            var relatedArticles = await _context.Articles
+                .Where(a => a.Category == article.Category && a.ArticleId != id && a.IsActive && a.IsPublished)
+                .OrderByDescending(a => a.PublishedAt)
+                .Take(4)
+                .ToListAsync();
+
+            // If not enough related articles, backfill with other latest articles
+            if (relatedArticles.Count < 4)
+            {
+                var needed = 4 - relatedArticles.Count;
+                var backfillIds = relatedArticles.Select(ra => ra.ArticleId).Concat(new[] { id }).ToList();
+                var backfill = await _context.Articles
+                    .Where(a => !backfillIds.Contains(a.ArticleId) && a.IsActive && a.IsPublished)
+                    .OrderByDescending(a => a.PublishedAt)
+                    .Take(needed)
+                    .ToListAsync();
+                relatedArticles.AddRange(backfill);
+            }
+
+            ViewBag.RelatedArticles = relatedArticles;
 
             return View(article);
         }

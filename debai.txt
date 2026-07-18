@@ -1,0 +1,28 @@
+1. Chủ đề 1: Hệ thống Dịch vụ Chăm sóc Sức khỏe WebMed
+Bài toán / Bối cảnh:
+Hiện nay, nhu cầu về dịch vụ chăm sóc sức khỏe là vô cùng lớn vì nó hỗ trợ đắc lực cho việc quản lý bệnh viện hoặc phòng khám. Phạm vi của các hệ thống dịch vụ y tế đang mở rộng từng ngày và điều này đúng trên phạm vi toàn thế giới. Một số giải pháp trong số này bao gồm việc nâng cao nhận thức của người dân về các dịch vụ y tế và chính sách sức khỏe. Mục tiêu của hệ thống này là cung cấp sự hỗ trợ y tế tức thì cho người dân với sự trợ giúp của công nghệ.
+Hệ thống này giúp loại bỏ các rào cản về nhạy cảm văn hóa thường tồn tại ở nhiều bệnh viện, đồng thời cải thiện chất lượng hỗ trợ y tế. Các tính năng hấp dẫn của hệ thống bao gồm: bác sĩ trực tuyến, giao thuốc tận nhà và bản tin nâng cao nhận thức. Người dùng cũng có thể tìm kiếm và lựa chọn giữa các chương trình bảo hiểm khác nhau được hiển thị trên hệ thống.
+Các mục tiêu chính của hệ thống y tế WebMed là cho phép mọi công dân nhận được dịch vụ chăm sóc sức khỏe bất cứ khi nào cần thiết, đồng thời cung cấp các dịch vụ y tế tiết kiệm chi phí và đáp ứng các tiêu chuẩn chất lượng đã được thiết lập sẵn.
+Các chức năng chính của hệ thống này giải quyết các vấn đề về tài chính, tra cứu sức khỏe (Health A–Z), tài nguyên, thuốc và thực phẩm chức năng, tin tức và chuyên gia, thanh toán và phản hồi.
+Đăng ký (Register): Cho phép bệnh nhân hoặc người chăm sóc đăng ký tài khoản trên trang web.
+Đăng nhập (Login): Cho phép bệnh nhân truy cập vào trang web.
+Tài chính (Financing): Tập trung vào việc mua bảo hiểm.
+Tra cứu sức khỏe (Health A–Z): Hiển thị tất cả các loại bệnh cùng với các triệu chứng của chúng.
+Tài nguyên (Resources): Bao gồm các chức năng con như kiểm tra triệu chứng, máy tính sức khỏe, tìm bác sĩ dựa trên vị trí địa lý của bệnh nhân, hướng dẫn bảo hiểm và cung cấp xe cứu thương.
+Thuốc và thực phẩm chức năng (Drugs and supplements): Bao gồm dịch vụ giao thuốc trực tuyến, nơi người dân có thể mua thuốc qua mạng.
+Tin tức và chuyên gia (News and experts): Cung cấp nhận thức về sức khỏe và các mối đe dọa dịch bệnh đang diễn ra. Chức năng này cũng cung cấp thông tin về các chương trình tư vấn và hội trại hiến máu nhân đạo.
+Thanh toán (Payment): Dùng để hoàn trả chi phí cho các nhà cung cấp dịch vụ đã thực hiện.
+Phản hồi (Feedback): Thu thập đánh giá của người dùng về trang web.
+Các Chức năng
+Các chức năng chính của hệ thống này cùng với mô tả chi tiết bao gồm:
+Đăng ký (Register): Tính năng này đóng vai trò như một chức năng thành viên, cho phép người dùng, bệnh nhân hoặc người chăm sóc đăng ký tài khoản trên trang web này để truy cập tất cả các tài nguyên.
+Đăng nhập (Login): Tính năng này xác thực người dùng để cấp quyền truy cập.
+Tiện ích (Facilities): Tính năng này cho phép truy cập vào tất cả các tùy chọn (tính năng) có sẵn trên trang web.
+Đăng xuất (Logout): Tính năng này kết thúc phiên truy cập vào trang web.
+Tài chính (Finance): Tính năng này cho phép mua bảo hiểm hoặc thanh toán cho các dịch vụ chăm sóc sức khỏe đã sử dụng.
+Tra cứu sức khỏe (Health A–Z): Tính năng này cung cấp thông tin chi tiết về tất cả các loại bệnh.
+Tài nguyên (Resources): Tính năng này có các chức năng con, bao gồm: kiểm tra triệu chứng, máy tính sức khỏe, tìm bác sĩ, hướng dẫn bảo hiểm và cung cấp xe cứu thương.
+Thuốc và thực phẩm chức năng (Drugs and supplements): Tính năng này cung cấp dịch vụ giao thuốc trực tuyến. Chức năng này sẽ tiếp nhận đơn thuốc/chỉ định của bác sĩ để cấp thuốc và dựa trên sự đồng ý mua trực tuyến của bệnh nhân.
+Tin tức và chuyên gia (News and experts): Tính năng này cung cấp nhận thức về sức khỏe và các mối đe dọa dịch bệnh đang diễn ra.
+Thanh toán (Payment): Tính năng này xử lý việc thanh toán cho các dịch vụ đã sử dụng. Chức năng này được chia thành hai chức năng con: thanh toán cho bác sĩ đối với các dịch vụ đã cung cấp và thanh toán cho dịch vụ giao thuốc trực tuyến.
+Phản hồi (Feedback): Tính năng này thu thập các đánh giá, góp ý của người dùng về trang web.

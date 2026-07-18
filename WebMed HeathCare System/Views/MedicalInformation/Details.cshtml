@@ -2,25 +2,176 @@
 
 @{
     ViewData["Title"] = Model.Title;
+
+    var categoryMapping = new Dictionary<string, string>
+    {
+        { "News", "Tin Tức" },
+        { "Notifications", "Thông Báo" },
+        { "Hospital Activities", "Hoạt Động Bệnh Viện" },
+        { "Research", "Nghiên Cứu Khoa Học" },
+        { "Events", "Hội Thảo Và Sự Kiện" },
+        { "Cooperation", "Hợp Tác" },
+        { "Training", "Đào Tạo" },
+        { "Community", "Hoạt Động Cộng Đồng" },
+        { "Pharma Info", "Thông Tin Dược" },
+        { "Recruitment", "Tuyển Dụng" },
+        { "Success Stories", "Câu Chuyện Thành Công" }
+    };
+
+    var displayCategory = categoryMapping.ContainsKey(Model.Category) ? categoryMapping[Model.Category] : Model.Category;
+
+    // Helper to get realistic Unsplash images based on Category or ID
+    string GetArticleImage(int id, string category, string imageUrl)
+    {
+        if (!string.IsNullOrEmpty(imageUrl))
+        {
+            return imageUrl;
+        }
+        var images = new[]
+        {
+            "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80", // Hospital
+            "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=800&q=80", // Conference
+            "https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=800&q=80", // Research
+            "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&w=800&q=80", // Pediatric
+            "https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?auto=format&fit=crop&w=800&q=80", // Success baby
+            "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?auto=format&fit=crop&w=800&q=80", // Medical team
+            "https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=800&q=80", // Doctor consulting
+            "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=800&q=80"  // Stethoscope
+        };
+        
+        if (category == "Events") return images[1];
+        if (category == "Research") return images[2];
+        if (category == "Success Stories") return images[4];
+        if (category == "News") return images[0];
+        
+        return images[id % images.Length];
+    }
 }
 
-<div class="container mt-4">
-    <a asp-action="Search" class="btn btn-secondary mb-3">&larr; Back to Search</a>
+<div class="container mt-4 pb-5">
+    <!-- Back to Search Button -->
+    <div class="mb-4">
+        <a asp-action="Search" class="btn btn-secondary px-4 py-2 text-white fw-semibold rounded-3 shadow-sm" 
+           style="background-color: #475569; border: none;">
+            &larr; Back to Search
+        </a>
+    </div>
     
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <h1 class="card-title">@Model.Title</h1>
-            <h6 class="card-subtitle mb-2 text-muted">
-                Category: @Model.Category | Published on: @Model.PublishedAt.ToString("f")
+    <!-- Main Article Body -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5">
+        <!-- Wide Banner Header Image -->
+        <div style="height: 400px; overflow: hidden; position: relative;">
+            <img src="@GetArticleImage(Model.ArticleId, Model.Category, Model.ImageUrl)" alt="@Model.Title" class="w-100 h-100 object-cover" />
+            <div class="position-absolute bottom-0 start-0 w-100 p-4" style="background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);">
+                <span class="badge bg-primary text-white px-3 py-1.5 mb-2 rounded-pill fs-7 fw-semibold text-uppercase">
+                    @displayCategory
+                </span>
+            </div>
+        </div>
+
+        <div class="card-body p-5">
+            <!-- Article Title -->
+            <h1 class="card-title fw-bold text-dark mb-3" style="font-size: 2.2rem; line-height: 1.25;">
+                @Model.Title
+            </h1>
+
+            <!-- Meta details -->
+            <div class="text-muted fs-7 mb-4 pb-3 border-bottom d-flex flex-wrap gap-3">
+                <span><strong>Chuyên mục:</strong> @displayCategory</span>
+                <span>|</span>
+                <span><strong>Ngày đăng:</strong> @Model.PublishedAt.ToString("dddd, MMMM dd, yyyy h:mm tt")</span>
                 @if (Model.Author != null)
                 {
-                    <span>| Author: @Model.Author.FullName</span>
+                    <span>|</span>
+                    <span><strong>Tác giả:</strong> @Model.Author.FullName</span>
                 }
-            </h6>
-            <hr />
-            <div class="card-text mt-4">
+            </div>
+
+            <!-- Content -->
+            <div class="card-text fs-6 text-dark leading-relaxed" style="line-height: 1.8;">
                 @Html.Raw(Model.Content)
             </div>
         </div>
     </div>
+
+    <!-- Related Articles Section (Bài viết liên quan) -->
+    <div class="bg-white p-4 rounded-4 shadow-sm border border-light">
+        <h4 class="fw-bold text-uppercase tracking-wider mb-4" style="color: #1e3a8a; letter-spacing: 0.5px;">
+            Bài viết liên quan
+        </h4>
+
+        <div class="row g-4 mb-4">
+            @if (ViewBag.RelatedArticles != null)
+            {
+                @foreach (var article in (List<WebMed_HeathCare_System.Models.Article>)ViewBag.RelatedArticles)
+                {
+                    <div class="col-lg-3 col-md-6">
+                        <div class="card h-100 border border-light shadow-sm rounded-4 overflow-hidden hover-lift transition-all">
+                            <!-- Thumbnail -->
+                            <div style="height: 150px; overflow: hidden; position: relative;">
+                                <img src="@GetArticleImage(article.ArticleId, article.Category, article.ImageUrl)" alt="@article.Title" class="w-100 h-100 object-cover" />
+                            </div>
+                            
+                            <!-- Card Body -->
+                            <div class="card-body p-3 d-flex flex-column justify-content-between">
+                                <h6 class="fw-bold text-dark mb-3 line-clamp-3" style="font-size: 0.95rem; line-height: 1.35; min-height: 55px;">
+                                    @article.Title
+                                </h6>
+                                
+                                <div class="d-flex rounded overflow-hidden mt-auto" style="height: 38px;">
+                                    <!-- Date Badge (Orange) -->
+                                    <div class="bg-warning text-white px-2 d-flex align-items-center justify-content-center fw-bold fs-8" 
+                                         style="width: 55%; background-color: #f97316 !important;">
+                                        @article.PublishedAt.ToString("dd/MM/yyyy")
+                                    </div>
+                                    <!-- Action Button (Blue) -->
+                                    <a asp-action="Details" asp-route-id="@article.ArticleId" 
+                                       class="btn btn-primary px-2 d-flex align-items-center justify-content-center text-white fw-bold fs-8" 
+                                       style="width: 45%; background-color: #0284c7 !important; border: none; border-radius: 0;">
+                                        Chi tiết &gt;&gt;
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <!-- View All Button (Orange, center aligned) -->
+        <div class="text-center mt-3">
+            <a asp-action="Search" class="btn btn-warning px-5 py-2.5 text-white fw-bold rounded-pill shadow-sm" 
+               style="background-color: #f97316; border: none; font-size: 0.95rem;">
+                Xem toàn bộ &gt;&gt;
+            </a>
+        </div>
+    </div>
 </div>
+
+<style>
+    .fs-7 {
+        font-size: 0.9rem !important;
+    }
+    .fs-8 {
+        font-size: 0.8rem !important;
+    }
+    .object-cover {
+        object-fit: cover;
+    }
+    .hover-lift:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.08) !important;
+    }
+    .transition-all {
+        transition: all 0.25s ease-in-out;
+    }
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;  
+        overflow: hidden;
+    }
+    .leading-relaxed {
+        text-align: justify;
+    }
+</style>

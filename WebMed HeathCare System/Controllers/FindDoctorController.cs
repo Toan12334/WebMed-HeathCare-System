@@ -14,7 +14,8 @@ namespace WebMed_HeathCare_System.Controllers
         }
 
         // GET: /FindDoctor
-        public async Task<IActionResult> Index(string specialty, string location)
+        // GET: /FindDoctor
+        public async Task<IActionResult> Index(string specialty, string location, string rank, string position, string searchTerm)
         {
             var query = _context.Doctors
                 .Include(d => d.DoctorNavigation)
@@ -28,6 +29,21 @@ namespace WebMed_HeathCare_System.Controllers
             if (!string.IsNullOrEmpty(location))
             {
                 query = query.Where(d => d.Location!.Contains(location));
+            }
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                query = query.Where(d => d.DoctorNavigation.FullName.Contains(searchTerm) || d.Bio!.Contains(searchTerm));
+            }
+
+            if (!string.IsNullOrEmpty(rank))
+            {
+                query = query.Where(d => d.DoctorNavigation.FullName.Contains(rank));
+            }
+
+            if (!string.IsNullOrEmpty(position))
+            {
+                query = query.Where(d => d.Bio!.Contains(position) || d.DoctorNavigation.FullName.Contains(position));
             }
 
             var doctors = await query.ToListAsync();
@@ -45,8 +61,14 @@ namespace WebMed_HeathCare_System.Controllers
                 .Distinct()
                 .ToListAsync();
 
+            ViewBag.Ranks = new List<string> { "Prof.", "Assoc. Prof.", "PhD", "MD" };
+            ViewBag.Positions = new List<string> { "director", "expert", "specialist", "advisor" };
+
             ViewBag.SelectedSpecialty = specialty;
             ViewBag.SelectedLocation = location;
+            ViewBag.SelectedRank = rank;
+            ViewBag.SelectedPosition = position;
+            ViewBag.SearchTerm = searchTerm;
 
             return View(doctors);
         }

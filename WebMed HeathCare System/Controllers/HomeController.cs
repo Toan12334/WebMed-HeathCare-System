@@ -15,6 +15,21 @@ namespace WebMed_HeathCare_System.Controllers
 
         public IActionResult Index()
         {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                if (User.IsInRole("Admin"))
+                {
+                    return RedirectToAction("Users", "Admin");
+                }
+                else if (User.IsInRole("Doctor"))
+                {
+                    return RedirectToAction("Index", "Appointment");
+                }
+                else if (User.IsInRole("Pharmacist"))
+                {
+                    return RedirectToAction("Index", "Pharmacist");
+                }
+            }
             return View();
         }
 

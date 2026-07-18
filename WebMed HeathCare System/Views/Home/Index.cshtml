@@ -1,8 +1,162 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Trang Chủ - WebMed Healthcare";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Hero Banner Section -->
+<div class="hero-section mb-5">
+    <div class="row align-items-center">
+        <div class="col-lg-7 hero-content text-center text-lg-start ps-lg-5">
+            <h1 class="hero-title">
+                Kết nối cộng đồng<br />
+                <span>Lan tỏa sức khỏe</span>
+            </h1>
+            <p class="hero-subtitle">
+                "Cam kết mang đến sức khỏe và niềm tin cho mọi nhà bằng chất lượng dịch vụ chuẩn y tế hàng đầu."
+            </p>
+            <div class="d-flex flex-wrap justify-content-center justify-content-lg-start gap-3 mt-4">
+                <a href="#about-webmed" class="btn btn-primary btn-lg shadow-sm">Tìm hiểu thêm</a>
+                <a asp-controller="EmergencyRequest" asp-action="Index" class="btn btn-outline-danger btn-lg shadow-sm">🚑 Yêu cầu cấp cứu</a>
+            </div>
+        </div>
+        <div class="col-lg-5 mt-5 mt-lg-0 hero-image-container pe-lg-5">
+            <img src="~/images/banner.png" alt="WebMed Healthcare Illustration" class="img-fluid" />
+        </div>
+    </div>
+</div>
+
+<!-- Quick Action Cards Section -->
+<div class="action-cards-container">
+    <!-- Gọi Tổng Đài -->
+    <a href="tel:19001234" class="action-card action-card-hotline" data-bs-toggle="modal" data-bs-target="#hotlineModal">
+        <div class="d-flex flex-column h-100 justify-content-between">
+            <div>
+                <div class="action-card-icon">
+                    <i class="bi bi-telephone-fill"></i>
+                </div>
+                <div class="action-card-title">Gọi tổng đài</div>
+                <div class="action-card-desc">Tổng đài viên của chúng tôi sẽ giải đáp các câu hỏi của bạn</div>
+            </div>
+            <div class="text-end mt-3">
+                <i class="bi bi-arrow-right-circle-fill fs-4"></i>
+            </div>
+        </div>
+    </a>
+
+    <!-- Đặt Lịch Hẹn -->
+    <a asp-controller="Appointment" asp-action="Index" class="action-card action-card-appointment">
+        <div class="d-flex flex-column h-100 justify-content-between">
+            <div>
+                <div class="action-card-icon">
+                    <i class="bi bi-calendar-event-fill"></i>
+                </div>
+                <div class="action-card-title">Đặt lịch hẹn</div>
+                <div class="action-card-desc">Đặt lịch hẹn trực tuyến nhanh chóng với các chuyên gia y khoa</div>
+            </div>
+            <div class="text-end mt-3">
+                <i class="bi bi-arrow-right-circle-fill fs-4"></i>
+            </div>
+        </div>
+    </a>
+
+    <!-- Tìm Bác Sĩ -->
+    <a asp-controller="FindDoctor" asp-action="Index" class="action-card action-card-doctor">
+        <div class="d-flex flex-column h-100 justify-content-between">
+            <div>
+                <div class="action-card-icon">
+                    <i class="bi bi-person-fill-add"></i>
+                </div>
+                <div class="action-card-title">Tìm bác sĩ</div>
+                <div class="action-card-desc">Chọn bác sĩ uy tín theo tên, chuyên môn và khu vực thuận tiện nhất</div>
+            </div>
+            <div class="text-end mt-3">
+                <i class="bi bi-arrow-right-circle-fill fs-4"></i>
+            </div>
+        </div>
+    </a>
+</div>
+
+<!-- Web Information / Features Section -->
+<div id="about-webmed" class="info-section container mb-5">
+    <div class="text-center mb-5">
+        <span class="section-tag">Dịch vụ của chúng tôi</span>
+        <h2 class="section-title">Hệ Thống Y Tế Toàn Diện Chuẩn Mực</h2>
+    </div>
+
+    <div class="row g-4">
+        <!-- Feature 1 -->
+        <div class="col-md-6 col-lg-3">
+            <div class="info-card">
+                <div class="info-card-icon-wrapper">
+                    <i class="bi bi-heart-pulse"></i>
+                </div>
+                <h3 class="info-card-title">Chăm Sóc Tận Tâm</h3>
+                <p class="info-card-desc">
+                    Đặt sức khỏe và sự an tâm của người bệnh lên hàng đầu với sự phục vụ ân cần nhất.
+                </p>
+            </div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="col-md-6 col-lg-3">
+            <div class="info-card">
+                <div class="info-card-icon-wrapper">
+                    <i class="bi bi-award"></i>
+                </div>
+                <h3 class="info-card-title">Đội Ngũ Chuyên Gia</h3>
+                <p class="info-card-desc">
+                    Quy tụ các bác sĩ, giáo sư đầu ngành có chuyên môn cao và giàu kinh nghiệm điều trị.
+                </p>
+            </div>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="col-md-6 col-lg-3">
+            <div class="info-card">
+                <div class="info-card-icon-wrapper">
+                    <i class="bi bi-shield-plus"></i>
+                </div>
+                <h3 class="info-card-title">Thiết Bị Hiện Đại</h3>
+                <p class="info-card-desc">
+                    Trang bị hệ thống máy móc chuẩn đoán và xét nghiệm y khoa tiên tiến bậc nhất.
+                </p>
+            </div>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="col-md-6 col-lg-3">
+            <div class="info-card">
+                <div class="info-card-icon-wrapper">
+                    <i class="bi bi-telephone-outbound"></i>
+                </div>
+                <h3 class="info-card-title">Hỗ Trợ 24/7</h3>
+                <p class="info-card-desc">
+                    Đội ngũ hỗ trợ trực tuyến và dịch vụ cấp cứu khẩn cấp luôn sẵn sàng đồng hành cùng bạn.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hotline Modal -->
+<div class="modal fade" id="hotlineModal" tabindex="-1" aria-labelledby="hotlineModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-header border-0 bg-light" style="border-radius: 16px 16px 0 0;">
+                <h5 class="modal-title fw-bold text-dark" id="hotlineModalLabel">
+                    <i class="bi bi-telephone-outbound-fill text-emerald me-2"></i>Tổng Đài Hỗ Trợ Khách Hàng
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <p class="text-muted mb-4">Để được tư vấn y tế nhanh chóng và đặt lịch trực tiếp, xin vui lòng liên hệ hotline của chúng tôi:</p>
+                <a href="tel:19001234" class="btn btn-emerald btn-lg px-5 py-3 fs-5 shadow-sm rounded-pill mb-3">
+                    <i class="bi bi-phone me-2"></i>1900 1234
+                </a>
+                <p class="small text-muted mt-2">Tổng đài hoạt động 24/7 kể cả ngày lễ và Chủ Nhật.</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center pb-4">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
 </div>
