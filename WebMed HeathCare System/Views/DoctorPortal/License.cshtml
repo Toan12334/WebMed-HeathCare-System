@@ -74,10 +74,22 @@
                         </div>
                         <a asp-action="PaymentLicense" asp-route-licenseId="@license.LicenseId" class="btn btn-warning btn-lg w-100 rounded-3 fw-bold py-3"><i class="bi bi-credit-card"></i> Pay License Fee (@license.FeeAmount.ToString("N0") VND)</a>
                     }
-                    else
+                    else if (license.VerificationStatus == "Approved")
                     {
                         <div class="alert alert-success rounded-3 text-center mb-0">
                             <i class="bi bi-shield-fill-check"></i> Verification complete. You can now configure your schedule availability and take online sessions.
+                        </div>
+                    }
+                    else if (license.VerificationStatus == "Pending")
+                    {
+                        <div class="alert alert-warning rounded-3 text-center mb-0">
+                            <i class="bi bi-hourglass-split"></i> Payment received. Your license is pending verification review by administrators.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-danger rounded-3 text-center mb-0">
+                            <i class="bi bi-x-circle-fill"></i> License verification rejected. Please contact administrator support.
                         </div>
                     }
                 }
@@ -95,9 +107,9 @@
             <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
                 <h4 class="fw-bold text-dark border-bottom pb-2 mb-4">Submit Credentials</h4>
                 
-                @if (license == null)
+                @if (license == null || license.VerificationStatus == "Approved" || license.VerificationStatus == "Rejected")
                 {
-                    <form asp-action="SubmitLicense" method="post">
+                    <form asp-action="SubmitLicense" method="post" enctype="multipart/form-data">
                         <!-- License No -->
                         <div class="mb-3">
                             <label class="form-label fw-bold text-secondary">Medical License Number (ID)</label>
@@ -106,9 +118,9 @@
 
                         <!-- Supporting document upload mock -->
                         <div class="mb-4">
-                            <label class="form-label fw-bold text-secondary">Supporting Certificate Documents (.pdf)</label>
-                            <input type="file" class="form-control rounded-3" disabled />
-                            <small class="text-muted">Mock File Uploader. Will automatically upload simulated file.</small>
+                            <label class="form-label fw-bold text-secondary">Supporting Certificate Documents (.pdf, .png, .jpg, .jpeg)</label>
+                            <input type="file" name="licenseFile" class="form-control rounded-3" accept=".pdf,.png,.jpg,.jpeg" required />
+                            <small class="text-muted">Upload copy of your medical certificate or license.</small>
                         </div>
 
                         <!-- Fee mock -->
@@ -126,14 +138,67 @@
                 else
                 {
                     <div class="text-center py-5">
-                        <i class="bi bi-file-earmark-check text-muted" style="font-size: 4rem;"></i>
-                        <h5 class="fw-bold mt-3">Credentials submitted</h5>
-                        <p class="text-muted">Licensing credentials have already been registered. Contact administration to modify details.</p>
+                        <i class="bi bi-file-earmark-lock-fill text-warning animate-pulse" style="font-size: 4rem;"></i>
+                        <h5 class="fw-bold mt-3">Application Under Review</h5>
+                        <p class="text-muted">You have a pending application awaiting payment or review. You cannot submit new credentials until it is processed.</p>
                     </div>
                 }
             </div>
         </div>
     </div>
+
+    <!-- Licensing History List -->
+    @if (ViewBag.Licenses != null && ((List<WebMed_HeathCare_System.Models.DoctorLicense>)ViewBag.Licenses).Any())
+    {
+        <div class="card border-0 shadow-sm rounded-4 p-4 mt-5">
+            <h4 class="fw-bold text-dark border-bottom pb-2 mb-4"><i class="bi bi-clock-history"></i> License Submission History</h4>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="p-3">License Number</th>
+                            <th class="p-3">Submitted Date</th>
+                            <th class="p-3">Fee Status</th>
+                            <th class="p-3">Verification Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var lic in (List<WebMed_HeathCare_System.Models.DoctorLicense>)ViewBag.Licenses)
+                        {
+                            <tr>
+                                <td class="p-3 fw-bold">@lic.LicenseNumber</td>
+                                <td class="p-3 text-muted">@lic.SubmittedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td class="p-3">
+                                    @if (lic.PaymentStatus == "Paid")
+                                    {
+                                        <span class="badge bg-success text-white px-2.5 py-1 rounded">Paid</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger text-white px-2.5 py-1 rounded">Pending</span>
+                                    }
+                                </td>
+                                <td class="p-3">
+                                    @if (lic.VerificationStatus == "Approved")
+                                    {
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 rounded">Approved</span>
+                                    }
+                                    else if (lic.VerificationStatus == "Pending")
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2.5 py-1 rounded">Pending Review</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1 rounded">@lic.VerificationStatus</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
 </div>
 
 <style>

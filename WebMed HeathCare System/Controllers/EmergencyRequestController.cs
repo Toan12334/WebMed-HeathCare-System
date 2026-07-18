@@ -6,7 +6,7 @@ using WebMed_HeathCare_System.Models;
 
 namespace WebMed_HeathCare_System.Controllers
 {
-    [Authorize] // Require login to request ambulance
+    // Allow anonymous ambulance requests
     public class EmergencyRequestController : Controller
     {
         private readonly WebMedDbContext _context;
@@ -32,17 +32,14 @@ namespace WebMed_HeathCare_System.Controllers
             }
 
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!int.TryParse(userIdString, out int userId))
+            int? patientId = null;
+            if (int.TryParse(userIdString, out int userId))
             {
-                return RedirectToAction("Login", "Authentication");
-            }
-
-            // Find the patient record for this user
-            var patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == userId);
-            if (patient == null)
-            {
-                ViewBag.Error = "You must be registered as a patient to request an ambulance.";
-                return View("Index");
+                var patient = await _context.Patients.FirstOrDefaultAsync(p => p.PatientId == userId);
+                if (patient != null)
+                {
+                    patientId = patient.PatientId;
+                }
             }
 
             // If coordinates are not provided, fallback to default HCMC coordinates
@@ -57,7 +54,7 @@ namespace WebMed_HeathCare_System.Controllers
 
             var request = new AmbulanceRequest
             {
-                PatientId = patient.PatientId,
+                PatientId = patientId,
                 PickupLocation = pickupLocation,
                 Latitude = patientLat,
                 Longitude = patientLng,

@@ -79,7 +79,7 @@ namespace WebMed_HeathCare_System.Controllers
             var doctor = await _context.Doctors
                 .Include(d => d.DoctorNavigation)
                 .Include(d => d.AvailabilitySlots.Where(s => s.IsActive && !s.IsBooked && s.StartDateTime > DateTime.Now))
-                .FirstOrDefaultAsync(d => d.DoctorId == id && d.IsActive);
+                .FirstOrDefaultAsync(d => d.DoctorId == id && d.IsActive && d.IsVerified);
 
             if (doctor == null)
             {

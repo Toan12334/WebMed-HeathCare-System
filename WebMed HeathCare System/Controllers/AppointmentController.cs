@@ -32,6 +32,13 @@ namespace WebMed_HeathCare_System.Controllers
 
             if (role == "Doctor")
             {
+                var doctor = await _context.Doctors.FindAsync(userId);
+                if (doctor != null && !doctor.IsVerified)
+                {
+                    TempData["ErrorMessage"] = "You must submit and get your professional license approved by the administrator before accessing other features.";
+                    return RedirectToAction("License", "DoctorPortal");
+                }
+
                 appointments = await _context.Appointments
                     .Include(a => a.Patient)
                     .ThenInclude(p => p.PatientNavigation)

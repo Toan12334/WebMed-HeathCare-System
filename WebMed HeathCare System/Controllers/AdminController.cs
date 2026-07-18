@@ -463,22 +463,33 @@ namespace WebMed_HeathCare_System.Controllers
             var role = await _context.Roles.FindAsync(roleId);
             if (role == null) return NotFound();
 
-            if (string.IsNullOrWhiteSpace(roleName))
-            {
-                TempData["ErrorMessage"] = "Role name is required.";
-                return RedirectToAction("Roles");
-            }
+            var systemRoles = new HashSet<string> { "Admin", "Doctor", "Pharmacist", "Patient" };
+            var isSystem = systemRoles.Contains(role.RoleName);
 
-            if (role.RoleName.ToLower() != roleName.ToLower())
+            if (isSystem)
             {
-                if (await _context.Roles.AnyAsync(r => r.RoleName.ToLower() == roleName.ToLower() && r.RoleId != roleId))
+                // Force name to stay the same for system core roles, only allow editing description
+                roleName = role.RoleName;
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(roleName))
                 {
-                    TempData["ErrorMessage"] = $"Role name '{roleName}' is already taken.";
+                    TempData["ErrorMessage"] = "Role name is required.";
                     return RedirectToAction("Roles");
                 }
+
+                if (role.RoleName.ToLower() != roleName.ToLower())
+                {
+                    if (await _context.Roles.AnyAsync(r => r.RoleName.ToLower() == roleName.ToLower() && r.RoleId != roleId))
+                    {
+                        TempData["ErrorMessage"] = $"Role name '{roleName}' is already taken.";
+                        return RedirectToAction("Roles");
+                    }
+                }
+                role.RoleName = roleName;
             }
 
-            role.RoleName = roleName;
             role.Description = description;
             await _context.SaveChangesAsync();
 
@@ -492,6 +503,13 @@ namespace WebMed_HeathCare_System.Controllers
         {
             var role = await _context.Roles.FindAsync(id);
             if (role == null) return NotFound();
+
+            var systemRoles = new HashSet<string> { "Admin", "Doctor", "Pharmacist", "Patient" };
+            if (systemRoles.Contains(role.RoleName))
+            {
+                TempData["ErrorMessage"] = $"Cannot delete system core role '{role.RoleName}'.";
+                return RedirectToAction("Roles");
+            }
 
             // Verify if any active/inactive users are assigned to this role
             var hasUsers = await _context.Users.AnyAsync(u => u.RoleId == id && u.AccountStatus != "SoftDeleted");

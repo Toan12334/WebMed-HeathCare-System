@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace WebMed_HeathCare_System.Models;
@@ -7,7 +7,7 @@ public partial class AmbulanceRequest
 {
     public int RequestId { get; set; }
 
-    public int PatientId { get; set; }
+    public int? PatientId { get; set; }
 
     public string PickupLocation { get; set; } = null!;
 
@@ -29,5 +29,5 @@ public partial class AmbulanceRequest
 
     public DateTime RequestedAt { get; set; }
 
-    public virtual Patient Patient { get; set; } = null!;
+    public virtual Patient? Patient { get; set; }
 }

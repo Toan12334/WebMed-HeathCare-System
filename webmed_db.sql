@@ -112,6 +112,7 @@ CREATE TABLE Articles (
     IsPublished BIT NOT NULL DEFAULT 1,
     IsActive BIT NOT NULL DEFAULT 1, -- Soft Delete
     PublishedAt DATETIME NOT NULL DEFAULT GETDATE(),
+    ImageUrl NVARCHAR(500) NULL,
     CONSTRAINT FK_Articles_Admins FOREIGN KEY (AuthorId) REFERENCES Users(UserId)
 );
 
@@ -139,7 +140,7 @@ CREATE TABLE HealthCalculations (
 -- Tracks emergency ambulance requests and real-time monitoring
 CREATE TABLE AmbulanceRequests (
     RequestId INT IDENTITY(1,1) PRIMARY KEY,
-    PatientId INT NOT NULL,
+    PatientId INT NULL,
     PickupLocation NVARCHAR(255) NOT NULL,
     Latitude DECIMAL(9,6) NULL,
     Longitude DECIMAL(9,6) NULL,
@@ -416,10 +417,90 @@ INSERT INTO Patients (PatientId, DateOfBirth, Gender, Address, BloodType) VALUES
 INSERT INTO Doctors (DoctorId, Specialty, Location, Bio, AverageRating, IsVerified) VALUES
 (2, 'Cardiology', 'Block A, Floor 3, WebMed Clinic', 'Expert cardiologist with 15+ years experience.', 5.00, 1);
 
--- Seed Articles for Health A-Z
-INSERT INTO Articles (Title, Content, Category, AuthorId, IsPublished) VALUES
-(N'Hiểu về Tăng Huyết Áp', N'Bài viết chi tiết về nguyên nhân, triệu chứng và giải pháp cho bệnh cao huyết áp...', N'Diseases', 1, 1),
-(N'Chế độ dinh dưỡng lành mạnh', N'Hướng dẫn tính toán calorie và xây dựng thực đơn tối ưu hàng ngày...', N'Wellness', 1, 1);
+-- Dynamic Doctor Seeding (9 English Doctors)
+DECLARE @DoctorRoleId INT;
+SELECT @DoctorRoleId = RoleId FROM Roles WHERE RoleName = 'Doctor';
+
+IF OBJECT_ID('tempdb..#DoctorSeed') IS NOT NULL DROP TABLE #DoctorSeed;
+CREATE TABLE #DoctorSeed (
+    Username VARCHAR(50),
+    FullName NVARCHAR(100),
+    Email VARCHAR(100),
+    PhoneNumber VARCHAR(20),
+    Specialty NVARCHAR(100),
+    Location NVARCHAR(255),
+    Bio NVARCHAR(MAX)
+);
+
+INSERT INTO #DoctorSeed (Username, FullName, Email, PhoneNumber, Specialty, Location, Bio)
+VALUES
+('dr_arthur', 'Assoc. Prof. Dr. Arthur Pendelton', 'arthur.pendelton@webmed.com', '0912345671', 'Fetal Medicine Center', 'Hanoi Clinic', 'Assoc. Prof. Arthur Pendelton is a leading expert in fetal medicine with over 20 years of clinical experience.'),
+('dr_elizabeth', 'Prof. Dr. Elizabeth Holmes', 'elizabeth.holmes@webmed.com', '0912345672', 'Fetal Medicine Center', 'Hanoi Clinic', 'Prof. Elizabeth Holmes focuses on maternal-fetal medical research and advanced prenatal diagnostics.'),
+('dr_david', 'Dr. David Miller, PhD', 'david.miller@webmed.com', '0912345673', 'Oncology Center', 'HCMC Clinic', 'Dr. David Miller is a board-certified oncologist specializing in immunotherapy and clinical cancer trials.'),
+('dr_sarah', 'Prof. Dr. Sarah Jenkins', 'sarah.jenkins@webmed.com', '0912345674', 'Cardiology Center', 'Hanoi Clinic', 'Prof. Sarah Jenkins is an interventional cardiologist committed to state-of-the-art cardiovascular health care.'),
+('dr_james', 'Dr. James Carter, MD', 'james.carter@webmed.com', '0912345675', 'Obstetrics Department', 'HCMC Clinic', 'Dr. James Carter is an obstetrician-gynecologist focused on high-risk pregnancy management and general gynecology.'),
+('dr_emily', 'Dr. Emily Watson', 'emily.watson@webmed.com', '0912345676', 'Gynecology Department', 'Hanoi Clinic', 'Dr. Emily Watson provides comprehensive gynecological services and minimally invasive surgeries.'),
+('dr_robert', 'Assoc. Prof. Dr. Robert Taylor', 'robert.taylor@webmed.com', '0912345677', 'Pediatrics Department', 'HCMC Clinic', 'Assoc. Prof. Robert Taylor is a dedicated pediatrician specializing in childhood growth and developmental disorders.'),
+('dr_linda', 'Dr. Linda Ross, PhD', 'linda.ross@webmed.com', '0912345678', 'Gastroenterology Center', 'Hanoi Clinic', 'Dr. Linda Ross is a gastroenterologist with expertise in endoscopy and inflammatory bowel diseases.'),
+('dr_william', 'Dr. William Vance, MD', 'william.vance@webmed.com', '0912345679', 'Traditional Medicine Center', 'HCMC Clinic', 'Dr. William Vance integrates traditional Eastern medicine practices with modern Western clinical diagnostics.');
+
+DECLARE @Username VARCHAR(50), @D_FullName NVARCHAR(100), @D_Email VARCHAR(100), @D_PhoneNumber VARCHAR(20), @D_Specialty NVARCHAR(100), @D_Location NVARCHAR(255), @D_Bio NVARCHAR(MAX);
+
+DECLARE db_cursor CURSOR FOR 
+SELECT Username, FullName, Email, PhoneNumber, Specialty, Location, Bio FROM #DoctorSeed;
+
+OPEN db_cursor;
+FETCH NEXT FROM db_cursor INTO @Username, @D_FullName, @D_Email, @D_PhoneNumber, @D_Specialty, @D_Location, @D_Bio;
+
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM Users WHERE Username = @Username)
+    BEGIN
+        INSERT INTO Users (RoleId, Username, PasswordHash, FullName, Email, PhoneNumber, AccountStatus, IsActive, CreatedAt, UpdatedAt)
+        VALUES (@DoctorRoleId, @Username, 'hash_doc_smith456', @D_FullName, @D_Email, @D_PhoneNumber, 'Active', 1, GETDATE(), GETDATE());
+        
+        DECLARE @NewUserId INT = SCOPE_IDENTITY();
+        
+        INSERT INTO Doctors (DoctorId, Specialty, Location, Bio, AverageRating, IsVerified, IsActive)
+        VALUES (@NewUserId, @D_Specialty, @D_Location, @D_Bio, 4.80, 1, 1);
+
+        INSERT INTO DoctorLicenses (DoctorId, LicenseNumber, DocumentUrl, FeeAmount, PaymentStatus, VerificationStatus, SubmittedAt)
+        VALUES (@NewUserId, 'LIC-' + UPPER(@Username), 'http://example.com/docs/license.pdf', 150000, 'Approved', 'Approved', GETDATE());
+        
+        INSERT INTO AvailabilitySlots (DoctorId, StartDateTime, EndDateTime, IsBooked, IsActive)
+        VALUES 
+        (@NewUserId, DATEADD(hour, 9, CAST(CAST(DATEADD(day, 1, GETDATE()) AS DATE) AS DATETIME)), DATEADD(hour, 10, CAST(CAST(DATEADD(day, 1, GETDATE()) AS DATE) AS DATETIME)), 0, 1),
+        (@NewUserId, DATEADD(hour, 14, CAST(CAST(DATEADD(day, 1, GETDATE()) AS DATE) AS DATETIME)), DATEADD(hour, 15, CAST(CAST(DATEADD(day, 1, GETDATE()) AS DATE) AS DATETIME)), 0, 1),
+        (@NewUserId, DATEADD(hour, 10, CAST(CAST(DATEADD(day, 2, GETDATE()) AS DATE) AS DATETIME)), DATEADD(hour, 11, CAST(CAST(DATEADD(day, 2, GETDATE()) AS DATE) AS DATETIME)), 0, 1);
+    END
+    FETCH NEXT FROM db_cursor INTO @Username, @D_FullName, @D_Email, @D_PhoneNumber, @D_Specialty, @D_Location, @D_Bio;
+END;
+
+CLOSE db_cursor;
+DEALLOCATE db_cursor;
+DROP TABLE #DoctorSeed;
+
+-- Seed Articles (Extensive News, Events, Activities)
+DECLARE @AuthorId INT;
+SELECT TOP 1 @AuthorId = UserId FROM Users ORDER BY UserId ASC;
+
+INSERT INTO Articles (Title, Content, Category, AuthorId, IsPublished, IsActive, PublishedAt)
+VALUES
+('WebMed Updates Advancements at World Congress 2026', 'The 23rd World Congress on Fetal Medicine (FMF 2026) brought together leading international experts to share the latest research, diagnostic methodologies, and therapeutic protocols. WebMed presented a comprehensive update on maternal-fetal medicine.', 'Events', @AuthorId, 1, 1, GETDATE()),
+('Clinical Pharmacy Workshop at WebMed University Hospital', 'A practical seminar detailing the latest workflows, safety guidelines, and clinical drug interaction audits in hospital pharmacies. Experts shared evidence-based guidelines on drug safety monitoring.', 'Events', @AuthorId, 1, 1, DATEADD(day, -5, GETDATE())),
+('International Fetal Health & Prenatal Diagnostics Symposium 2026', 'A major conference gathering global specialists to discuss advanced genetic testing, high-resolution ultrasound, and early intervention treatments for prenatal conditions.', 'Events', @AuthorId, 1, 1, DATEADD(day, -8, GETDATE())),
+('Orthopedic and Maxillofacial Reconstructive Surgery Seminar', 'A focused workshop demonstrating advanced surgical methodologies, computerized modeling, and post-operative physical therapy for patients recovering from complex reconstructive surgeries.', 'Events', @AuthorId, 1, 1, DATEADD(day, -10, GETDATE())),
+('Breakthrough in Minimally Invasive Robotic Surgery', 'WebMed has successfully integrated the latest robotic surgery systems, enabling highly precise procedures with shorter recovery times and minimal scarring for patients.', 'News', @AuthorId, 1, 1, DATEADD(day, -2, GETDATE())),
+('New State-of-the-Art Cardiology Wing Inaugurated', 'Our hospital has opened a new dedicated cardiology care department, equipped with advanced hybrid operating rooms and 24/7 cardiac monitoring facilities.', 'News', @AuthorId, 1, 1, DATEADD(day, -6, GETDATE())),
+('Hospital Holiday Service Hours and Emergency Guidelines', 'Please find the schedule of general clinic operations and specialist availability during the upcoming national holiday. Emergency services remain fully active 24/7.', 'Notifications', @AuthorId, 1, 1, DATEADD(day, -1, GETDATE())),
+('Annual Patient Care Quality Review and Standards Audit', 'WebMed conducted its annual comprehensive quality audit. The hospital maintained high ratings across hygiene, patient satisfaction, and treatment success rates.', 'Hospital Activities', @AuthorId, 1, 1, DATEADD(day, -12, GETDATE())),
+('New Study on Maternal Genetic Screening Efficacy Published', 'Our clinical research division has published a peer-reviewed paper in the International Journal of Prenatal Health detailing the diagnostic accuracy of non-invasive genetic screens.', 'Research', @AuthorId, 1, 1, DATEADD(day, -15, GETDATE())),
+('Global Partnership Signed with Stockholm Medical Institute', 'WebMed is proud to announce a collaborative partnership focusing on specialist exchange programs and joint clinical trials for advanced therapies.', 'Cooperation', @AuthorId, 1, 1, DATEADD(day, -20, GETDATE())),
+('Advanced Neonatal Life Support Certification Program', 'Our senior pediatric and obstetric staff completed an intensive training program on neonatal emergency resuscitation techniques, ensuring world-class infant care standards.', 'Training', @AuthorId, 1, 1, DATEADD(day, -4, GETDATE())),
+('Free Medical Checkup Campaign for Rural Communes 2026', 'WebMed organized a voluntary outreach mission, providing free medical examinations, pediatric health counseling, and essential medicines to over 500 families.', 'Community', @AuthorId, 1, 1, DATEADD(day, -14, GETDATE())),
+('Essential Safety Updates on Anti-hypertensive Medications', 'The Clinical Pharmacy Department has released a safety bulletin detailing dosage optimization and key monitoring parameters for patients using beta-blocker combinations.', 'Pharma Info', @AuthorId, 1, 1, DATEADD(day, -7, GETDATE())),
+('Hiring Senior Pediatricians & Cardiology Specialists', 'Join our world-class medical team. WebMed is seeking board-certified specialists to lead our expanding outpatient and clinical research departments.', 'Recruitment', @AuthorId, 1, 1, DATEADD(day, -3, GETDATE())),
+('Miraculous Recovery: 32-Week Premature Infant Discharged', 'Thanks to the persistent dedication of our Neonatal Intensive Care Unit (NICU), a premature baby born with severe pulmonary distress has been discharged in perfect health.', 'Success Stories', @AuthorId, 1, 1, DATEADD(day, -18, GETDATE()));
 
 -- Seed Medicine Stock Catalogue (VND format)
 INSERT INTO Medicines (Name, Description, Category, Price, StockQuantity, IsPrescriptionRequired) VALUES

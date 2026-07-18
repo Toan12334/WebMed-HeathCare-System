@@ -6,7 +6,17 @@
 }
 
 <div class="container-fluid mt-4 px-4 mb-5">
-    <h1 class="fw-extrabold mb-4 text-dark"><i class="bi bi-people-fill"></i> User Accounts Management</h1>
+    <!-- Header Block -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 border-bottom pb-3">
+        <h1 class="fw-extrabold mb-0 text-dark"><i class="bi bi-people-fill text-primary"></i> User Accounts</h1>
+        <div class="btn-group shadow-sm">
+            <a asp-action="Users" class="btn btn-primary active">Users</a>
+            <a asp-action="Doctors" class="btn btn-outline-primary">Doctor Verification</a>
+            <a asp-action="Reviews" class="btn btn-outline-primary">Review Moderation</a>
+            <a asp-action="News" class="btn btn-outline-primary">Health News</a>
+            <a asp-action="Roles" class="btn btn-outline-primary">System Roles</a>
+        </div>
+    </div>
 
     @if (TempData["SuccessMessage"] != null)
     {
@@ -24,25 +34,18 @@
         </div>
     }
 
-    <!-- Search Form, Action Buttons & Navigation Links -->
+    <!-- Search Form & Add User Action Button -->
     <div class="row g-3 mb-4 align-items-center">
         <div class="col-md-5">
-            <form asp-action="Users" method="get" class="d-flex bg-white shadow-sm rounded-pill p-1 overflow-hidden">
+            <form asp-action="Users" method="get" class="d-flex bg-white shadow-sm rounded-pill p-1 overflow-hidden border">
                 <input type="text" name="searchEmail" class="form-control border-0 px-4 py-2 rounded-pill" placeholder="Search by name or email..." value="@ViewBag.SearchEmail" style="box-shadow: none;" />
                 <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Search</button>
             </form>
         </div>
-        <div class="col-md-7 text-md-end d-flex justify-content-md-end align-items-center gap-2 flex-wrap">
+        <div class="col-md-7 text-md-end">
             <button type="button" class="btn btn-success rounded-pill px-4 py-2 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#createUserModal">
                 <i class="bi bi-person-plus-fill me-1"></i> Add New User
             </button>
-            <div class="btn-group shadow-sm">
-                <a asp-action="Users" class="btn btn-primary active">Users</a>
-                <a asp-action="Doctors" class="btn btn-outline-primary">Doctor Verification</a>
-                <a asp-action="Reviews" class="btn btn-outline-primary">Review Moderation</a>
-                <a asp-action="News" class="btn btn-outline-primary">Health News</a>
-                <a asp-action="Roles" class="btn btn-outline-primary">System Roles</a>
-            </div>
         </div>
     </div>
 
