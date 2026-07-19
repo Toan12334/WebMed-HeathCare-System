@@ -151,6 +151,15 @@ namespace WebMed_HeathCare_System.Controllers
                 return RedirectToAction("Index");
             }
 
+            // Check if patient already has a pending payment insurance for this plan
+            var pendingInsurance = await _context.PatientInsurances
+                .FirstOrDefaultAsync(pi => pi.PatientId == userId && pi.PlanId == planId && pi.Status == "PendingPayment");
+
+            if (pendingInsurance != null)
+            {
+                return RedirectToAction("Payment", new { patientInsuranceId = pendingInsurance.PatientInsuranceId });
+            }
+
             // Create PatientInsurance record
             var patientInsurance = new PatientInsurance
             {
@@ -158,8 +167,11 @@ namespace WebMed_HeathCare_System.Controllers
                 PlanId = planId,
                 StartDate = DateTime.Now,
                 EndDate = DateTime.Now.AddMonths(plan.DurationMonths),
-                Status = "Active"
+                Status = "PendingPayment"
             };
+
+            _context.PatientInsurances.Add(patientInsurance);
+            await _context.SaveChangesAsync();
 
             // Create Payment record
             var payment = new Payment
@@ -168,18 +180,100 @@ namespace WebMed_HeathCare_System.Controllers
                 Amount = pricing.Premium,
                 PaymentType = "Insurance",
                 PaymentMethod = paymentMethod ?? "CreditCard",
-                TransactionReference = "TXN-INS-" + new Random().Next(100000, 999999),
-                PaymentStatus = "Completed",
-                AssociatedId = planId,
+                TransactionReference = null,
+                PaymentStatus = "Pending",
+                AssociatedId = patientInsurance.PatientInsuranceId,
                 PaidAt = DateTime.Now
             };
 
-            _context.PatientInsurances.Add(patientInsurance);
             _context.Payments.Add(payment);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = $"Successfully enrolled in {plan.PlanName}!";
+            return RedirectToAction("Payment", new { patientInsuranceId = patientInsurance.PatientInsuranceId });
+        }
+
+        // GET: /InsuranceGuide/Payment/{patientInsuranceId}
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Payment(int patientInsuranceId)
+        {
+            var patientInsurance = await _context.PatientInsurances
+                .Include(pi => pi.Plan)
+                .FirstOrDefaultAsync(pi => pi.PatientInsuranceId == patientInsuranceId);
+
+            if (patientInsurance == null) return NotFound();
+
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId) || patientInsurance.PatientId != userId)
+            {
+                return Forbid();
+            }
+
+            var payment = await _context.Payments
+                .FirstOrDefaultAsync(p => p.PaymentType == "Insurance" && p.AssociatedId == patientInsuranceId);
+
+            if (payment == null) return NotFound();
+
+            ViewBag.Payment = payment;
+            return View(patientInsurance);
+        }
+
+        // POST: /InsuranceGuide/ProcessInsurancePayment
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ProcessInsurancePayment(int patientInsuranceId)
+        {
+            var patientInsurance = await _context.PatientInsurances.FindAsync(patientInsuranceId);
+            if (patientInsurance == null) return NotFound();
+
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId) || patientInsurance.PatientId != userId)
+            {
+                return Forbid();
+            }
+
+            var payment = await _context.Payments
+                .FirstOrDefaultAsync(p => p.PaymentType == "Insurance" && p.AssociatedId == patientInsuranceId);
+
+            if (payment == null) return NotFound();
+
+            // Simulate gateway success
+            patientInsurance.Status = "Active";
+            
+            payment.PaymentStatus = "Completed";
+            payment.TransactionReference = "TXN-INS-" + new Random().Next(100000, 999999);
+            payment.PaidAt = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Insurance enrollment payment processed successfully! Your plan is now Active.";
             return RedirectToAction("Index");
+        }
+
+        // POST: /InsuranceGuide/FailInsurancePayment
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> FailInsurancePayment(int patientInsuranceId)
+        {
+            var patientInsurance = await _context.PatientInsurances.FindAsync(patientInsuranceId);
+            if (patientInsurance == null) return NotFound();
+
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId) || patientInsurance.PatientId != userId)
+            {
+                return Forbid();
+            }
+
+            var payment = await _context.Payments
+                .FirstOrDefaultAsync(p => p.PaymentType == "Insurance" && p.AssociatedId == patientInsuranceId);
+
+            if (payment == null) return NotFound();
+
+            payment.PaymentStatus = "Failed";
+            await _context.SaveChangesAsync();
+
+            TempData["ErrorMessage"] = "Insurance payment simulation failed. Please retry payment or contact support.";
+            return RedirectToAction("Payment", new { patientInsuranceId });
         }
     }
 }

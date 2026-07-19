@@ -355,6 +355,26 @@ namespace WebMed_HeathCare_System.Controllers
             review.ModerationStatus = status; // "Approved" or "Rejected" / "Hidden"
             await _context.SaveChangesAsync();
 
+            // Recalculate average rating for the doctor
+            var doctor = await _context.Doctors.FindAsync(review.DoctorId);
+            if (doctor != null)
+            {
+                var ratings = await _context.DoctorReviews
+                    .Where(r => r.DoctorId == doctor.DoctorId && r.ModerationStatus == "Approved")
+                    .Select(r => r.Rating)
+                    .ToListAsync();
+
+                if (ratings.Any())
+                {
+                    doctor.AverageRating = (decimal)ratings.Average();
+                }
+                else
+                {
+                    doctor.AverageRating = 0;
+                }
+                await _context.SaveChangesAsync();
+            }
+
             TempData["SuccessMessage"] = $"Review moderation status updated to {status}.";
             return RedirectToAction("Reviews");
         }
@@ -524,6 +544,51 @@ namespace WebMed_HeathCare_System.Controllers
 
             TempData["SuccessMessage"] = $"Role '{role.RoleName}' deleted successfully.";
             return RedirectToAction("Roles");
+        }
+
+        // ==========================================
+        // UC 32: EMERGENCY AMBULANCE DISPATCH
+        // ==========================================
+
+        // GET: /Admin/Emergencies
+        [HttpGet]
+        public async Task<IActionResult> Emergencies()
+        {
+            var requests = await _context.AmbulanceRequests
+                .OrderByDescending(r => r.RequestedAt)
+                .ToListAsync();
+
+            return View(requests);
+        }
+
+        // POST: /Admin/DispatchAmbulance
+        [HttpPost]
+        public async Task<IActionResult> DispatchAmbulance(int requestId, string vehicleNumber)
+        {
+            var request = await _context.AmbulanceRequests.FindAsync(requestId);
+            if (request == null) return NotFound();
+
+            if (string.IsNullOrWhiteSpace(vehicleNumber))
+            {
+                vehicleNumber = "AMB-1024";
+            }
+
+            request.Status = "Assigned";
+            request.AssignedAmbulanceVehicle = vehicleNumber;
+
+            // Ambulance starts at a nearby hospital (simulated offset of -0.008)
+            decimal destLat = request.Latitude ?? 10.776m;
+            decimal destLng = request.Longitude ?? 106.700m;
+
+            request.AmbulanceLatitude = destLat - 0.008m;
+            request.AmbulanceLongitude = destLng - 0.008m;
+            request.Eta = "15 mins";
+            request.RequestedAt = DateTime.Now; // reset timer to start tracking progression
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Ambulance vehicle {vehicleNumber} dispatched successfully.";
+            return RedirectToAction("Emergencies");
         }
     }
 }

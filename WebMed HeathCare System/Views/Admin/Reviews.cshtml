@@ -14,6 +14,7 @@
             <a asp-action="Reviews" class="btn btn-primary active">Review Moderation</a>
             <a asp-action="News" class="btn btn-outline-primary">Health News</a>
             <a asp-action="Roles" class="btn btn-outline-primary">System Roles</a>
+            <a asp-action="Emergencies" class="btn btn-outline-primary">Emergency Dispatch</a>
         </div>
     </div>
 
@@ -79,18 +80,22 @@
                                         }
                                     </td>
                                     <td class="p-3 text-center">
-                                        <div class="d-flex gap-2">
-                                            <form asp-action="ModerateReview" method="post" class="w-50">
-                                                <input type="hidden" name="id" value="@review.ReviewId" />
-                                                <input type="hidden" name="status" value="Approved" />
-                                                <button type="submit" class="btn btn-outline-success btn-sm w-100 rounded-3 fw-bold"><i class="bi bi-eye-fill"></i> Approve</button>
-                                            </form>
-                                            <form asp-action="ModerateReview" method="post" class="w-50">
+                                        @if (review.ModerationStatus == "Approved")
+                                        {
+                                            <form asp-action="ModerateReview" method="post" class="w-100">
                                                 <input type="hidden" name="id" value="@review.ReviewId" />
                                                 <input type="hidden" name="status" value="Rejected" />
                                                 <button type="submit" class="btn btn-outline-danger btn-sm w-100 rounded-3 fw-bold"><i class="bi bi-eye-slash-fill"></i> Hide Review</button>
                                             </form>
-                                        </div>
+                                        }
+                                        else
+                                        {
+                                            <form asp-action="ModerateReview" method="post" class="w-100">
+                                                <input type="hidden" name="id" value="@review.ReviewId" />
+                                                <input type="hidden" name="status" value="Approved" />
+                                                <button type="submit" class="btn btn-outline-success btn-sm w-100 rounded-3 fw-bold"><i class="bi bi-eye-fill"></i> Unhide Review</button>
+                                            </form>
+                                        }
                                     </td>
                                 </tr>
                             }

@@ -23,6 +23,7 @@ namespace WebMed_HeathCare_System.Controllers
             var query = _context.Orders
                 .Include(o => o.Patient)
                 .ThenInclude(p => p.PatientNavigation)
+                .Where(o => o.OrderStatus != "Pending" || o.PaymentMethod == "COD")
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(statusFilter))
@@ -49,6 +50,13 @@ namespace WebMed_HeathCare_System.Controllers
 
             if (order == null) return NotFound();
 
+            // Backend verification: Prevent pharmacist from viewing unpaid online orders
+            if (order.OrderStatus == "Pending" && order.PaymentMethod != "COD")
+            {
+                TempData["ErrorMessage"] = "Cannot view or prepare unpaid online orders.";
+                return RedirectToAction("Index");
+            }
+
             return View(order);
         }
 
@@ -58,6 +66,13 @@ namespace WebMed_HeathCare_System.Controllers
         {
             var order = await _context.Orders.FindAsync(id);
             if (order == null) return NotFound();
+
+            // Backend verification: Prevent pharmacist from preparing unpaid online orders
+            if (order.OrderStatus == "Pending" && order.PaymentMethod != "COD")
+            {
+                TempData["ErrorMessage"] = "Cannot prepare unpaid online orders.";
+                return RedirectToAction("Index");
+            }
 
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (int.TryParse(userIdString, out int userId))
@@ -153,6 +168,38 @@ namespace WebMed_HeathCare_System.Controllers
 
             TempData["SuccessMessage"] = $"Order #{id} completed (Delivered).";
             return RedirectToAction("Details", new { id });
+        }
+
+        // GET: /Pharmacist/Inventory
+        [HttpGet]
+        public async Task<IActionResult> Inventory()
+        {
+            var medicines = await _context.Medicines
+                .OrderBy(m => m.StockQuantity)
+                .ToListAsync();
+
+            return View(medicines);
+        }
+
+        // POST: /Pharmacist/Restock
+        [HttpPost]
+        public async Task<IActionResult> Restock(int medicineId, int quantityToAdd)
+        {
+            if (quantityToAdd <= 0)
+            {
+                TempData["ErrorMessage"] = "Quantity to add must be greater than 0.";
+                return RedirectToAction("Inventory");
+            }
+
+            var medicine = await _context.Medicines.FindAsync(medicineId);
+            if (medicine == null) return NotFound();
+
+            medicine.StockQuantity += quantityToAdd;
+            medicine.IsActive = true; // reactivate if it was deactivated due to out of stock
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Successfully restocked {quantityToAdd} units of '{medicine.Name}'. Total stock is now {medicine.StockQuantity}.";
+            return RedirectToAction("Inventory");
         }
     }
 }
