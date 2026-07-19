@@ -1,19 +1,18 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using WebMed_HeathCare_System.Models;
+using WebMed_HeathCare_System.Interfaces;
 
 namespace WebMed_HeathCare_System.Controllers
 {
     [Authorize]
     public class AppointmentController : Controller
     {
-        private readonly WebMedDbContext _context;
+        private readonly IAppointmentService _appointmentService;
 
-        public AppointmentController(WebMedDbContext context)
+        public AppointmentController(IAppointmentService appointmentService)
         {
-            _context = context;
+            _appointmentService = appointmentService;
         }
 
         // GET: /Appointment
@@ -28,36 +27,13 @@ namespace WebMed_HeathCare_System.Controllers
 
             var role = User.FindFirstValue(ClaimTypes.Role);
 
-            List<Appointment> appointments;
-
-            if (role == "Doctor")
+            if (role == "Doctor" && await _appointmentService.IsUnverifiedDoctorAsync(userId))
             {
-                var doctor = await _context.Doctors.FindAsync(userId);
-                if (doctor != null && !doctor.IsVerified)
-                {
-                    TempData["ErrorMessage"] = "You must submit and get your professional license approved by the administrator before accessing other features.";
-                    return RedirectToAction("License", "DoctorPortal");
-                }
-
-                appointments = await _context.Appointments
-                    .Include(a => a.Patient)
-                    .ThenInclude(p => p.PatientNavigation)
-                    .Include(a => a.Slot)
-                    .Where(a => a.DoctorId == userId)
-                    .OrderByDescending(a => a.AppointmentDateTime)
-                    .ToListAsync();
-            }
-            else
-            {
-                appointments = await _context.Appointments
-                    .Include(a => a.Doctor)
-                    .ThenInclude(d => d.DoctorNavigation)
-                    .Include(a => a.Slot)
-                    .Where(a => a.PatientId == userId)
-                    .OrderByDescending(a => a.AppointmentDateTime)
-                    .ToListAsync();
+                TempData["ErrorMessage"] = "You must submit and get your professional license approved by the administrator before accessing other features.";
+                return RedirectToAction("License", "DoctorPortal");
             }
 
+            var appointments = await _appointmentService.GetAppointmentsForUserAsync(userId, role);
             return View(appointments);
         }
 
@@ -71,53 +47,29 @@ namespace WebMed_HeathCare_System.Controllers
                 return RedirectToAction("Login", "Authentication");
             }
 
-            var patient = await _context.Patients.FindAsync(userId);
+            var patient = await _appointmentService.GetPatientAsync(userId);
             if (patient == null)
             {
                 TempData["ErrorMessage"] = "Only patients can book appointments.";
                 return RedirectToAction("Index", "FindDoctor");
             }
 
-            var slot = await _context.AvailabilitySlots.FindAsync(slotId);
-            if (slot == null || slot.IsBooked || !slot.IsActive)
+            var slot = await _appointmentService.GetAvailableSlotAsync(slotId);
+            if (slot == null)
             {
                 TempData["ErrorMessage"] = "This time slot is no longer available.";
                 return RedirectToAction("Index", "FindDoctor");
             }
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var success = await _appointmentService.BookAppointmentAsync(userId, slot);
+            if (success)
             {
-                try
-                {
-                    // Reserve the slot
-                    slot.IsBooked = true;
-
-                    var appointment = new Appointment
-                    {
-                        PatientId = userId,
-                        DoctorId = slot.DoctorId,
-                        SlotId = slotId,
-                        AppointmentDateTime = slot.StartDateTime,
-                        Status = "Scheduled",
-                        ConsultationType = "Online",
-                        CreatedAt = DateTime.Now
-                    };
-
-                    _context.Appointments.Add(appointment);
-                    await _context.SaveChangesAsync();
-
-                    await transaction.CommitAsync();
-
-                    TempData["SuccessMessage"] = "Appointment booked successfully!";
-                    return RedirectToAction("Index");
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    TempData["ErrorMessage"] = "An error occurred while booking. Please try again.";
-                    return RedirectToAction("Details", "FindDoctor", new { id = slot.DoctorId });
-                }
+                TempData["SuccessMessage"] = "Appointment booked successfully!";
+                return RedirectToAction("Index");
             }
+
+            TempData["ErrorMessage"] = "An error occurred while booking. Please try again.";
+            return RedirectToAction("Details", "FindDoctor", new { id = slot.DoctorId });
         }
     }
 }

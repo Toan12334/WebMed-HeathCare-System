@@ -1,30 +1,23 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using WebMed_HeathCare_System.Interfaces;
 using WebMed_HeathCare_System.Models;
 
 namespace WebMed_HeathCare_System.Controllers
 {
     public class PharmacyController : Controller
     {
-        private readonly WebMedDbContext _context;
+        private readonly IPharmacyService _pharmacyService;
 
-        public PharmacyController(WebMedDbContext context)
+        public PharmacyController(IPharmacyService pharmacyService)
         {
-            _context = context;
+            _pharmacyService = pharmacyService;
         }
 
         // GET: /Pharmacy
         public async Task<IActionResult> Index(string keyword)
         {
-            var query = _context.Medicines.Where(m => m.IsActive);
-            
-            if (!string.IsNullOrEmpty(keyword))
-            {
-                query = query.Where(m => m.Name.Contains(keyword) || m.Category.Contains(keyword) || m.Description.Contains(keyword));
-            }
-
-            var medicines = await query.ToListAsync();
+            var medicines = await _pharmacyService.SearchMedicinesAsync(keyword);
             ViewBag.Keyword = keyword;
             return View(medicines);
         }
@@ -32,7 +25,7 @@ namespace WebMed_HeathCare_System.Controllers
         // GET: /Pharmacy/Details/{id}
         public async Task<IActionResult> Details(int id)
         {
-            var medicine = await _context.Medicines.FirstOrDefaultAsync(m => m.MedicineId == id && m.IsActive);
+            var medicine = await _pharmacyService.GetActiveMedicineAsync(id);
             if (medicine == null)
             {
                 return NotFound();
@@ -51,7 +44,7 @@ namespace WebMed_HeathCare_System.Controllers
         [HttpPost]
         public async Task<IActionResult> AddToCart(int medicineId, int quantity)
         {
-            var medicine = await _context.Medicines.FindAsync(medicineId);
+            var medicine = await _pharmacyService.GetMedicineAsync(medicineId);
             if (medicine == null || !medicine.IsActive)
             {
                 return NotFound();
@@ -116,7 +109,7 @@ namespace WebMed_HeathCare_System.Controllers
                 return RedirectToAction("RemoveFromCart", new { medicineId });
             }
 
-            var medicine = await _context.Medicines.FindAsync(medicineId);
+            var medicine = await _pharmacyService.GetMedicineAsync(medicineId);
             if (medicine == null) return NotFound();
 
             if (medicine.StockQuantity < quantity)

@@ -1,21 +1,16 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using WebMed_HeathCare_System.Interfaces;
-using WebMed_HeathCare_System.Models;
 
 namespace WebMed_HeathCare_System.Controllers
 {
     public class EmergencyRequestController : Controller
     {
         private readonly IEmergencyRequestService _emergencyRequestService;
-        private readonly WebMedDbContext _context;
 
-        public EmergencyRequestController(IEmergencyRequestService emergencyRequestService, WebMedDbContext context)
+        public EmergencyRequestController(IEmergencyRequestService emergencyRequestService)
         {
             _emergencyRequestService = emergencyRequestService;
-            _context = context;
         }
 
         [HttpGet]

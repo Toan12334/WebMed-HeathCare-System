@@ -20,12 +20,25 @@ namespace WebMed_HeathCare_System
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             // Register Service Layer
+            builder.Services.AddScoped<IAdminService, AdminService>();
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IAppointmentService, AppointmentService>();
+            builder.Services.AddScoped<ICheckoutService, CheckoutService>();
+            builder.Services.AddScoped<IConsultationService, ConsultationService>();
+            builder.Services.AddScoped<IDoctorPortalService, DoctorPortalService>();
+            builder.Services.AddScoped<IDoctorReviewService, DoctorReviewService>();
             builder.Services.AddScoped<IEmergencyRequestService, EmergencyRequestService>();
+            builder.Services.AddScoped<IFindDoctorService, FindDoctorService>();
             builder.Services.AddScoped<WebMed_HeathCare_System.Interfaces.IHealthCalculatorService, WebMed_HeathCare_System.Services.HealthCalculatorService>();
+            builder.Services.AddScoped<IMedicalInformationService, MedicalInformationService>();
+            builder.Services.AddScoped<IOrderTrackingService, OrderTrackingService>();
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
+            builder.Services.AddScoped<IPharmacistService, PharmacistService>();
+            builder.Services.AddScoped<IPharmacyService, PharmacyService>();
             
             // Register Insurance Guide Repositories
             builder.Services.AddScoped<IInsurancePlanRepository, InsurancePlanRepository>();
+            builder.Services.AddScoped<IInsuranceEnrollmentService, InsuranceEnrollmentService>();
             builder.Services.AddScoped<ICoverageRepository, CoverageRepository>();
             builder.Services.AddScoped<IPricingRepository, PricingRepository>();
             // Configure Cookie Authentication

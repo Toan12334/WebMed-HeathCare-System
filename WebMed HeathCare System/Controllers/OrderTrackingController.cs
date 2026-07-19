@@ -1,19 +1,18 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using WebMed_HeathCare_System.Models;
+using WebMed_HeathCare_System.Interfaces;
 
 namespace WebMed_HeathCare_System.Controllers
 {
     [Authorize]
     public class OrderTrackingController : Controller
     {
-        private readonly WebMedDbContext _context;
+        private readonly IOrderTrackingService _orderTrackingService;
 
-        public OrderTrackingController(WebMedDbContext context)
+        public OrderTrackingController(IOrderTrackingService orderTrackingService)
         {
-            _context = context;
+            _orderTrackingService = orderTrackingService;
         }
 
         // GET: /OrderTracking
@@ -26,12 +25,7 @@ namespace WebMed_HeathCare_System.Controllers
                 return RedirectToAction("Login", "Authentication");
             }
 
-            var orders = await _context.Orders
-                .Include(o => o.OrderDetails)
-                .ThenInclude(d => d.Medicine)
-                .Where(o => o.PatientId == userId)
-                .OrderByDescending(o => o.CreatedAt)
-                .ToListAsync();
+            var orders = await _orderTrackingService.GetOrdersForPatientAsync(userId);
 
             return View(orders);
         }
@@ -40,18 +34,14 @@ namespace WebMed_HeathCare_System.Controllers
         [HttpGet]
         public async Task<IActionResult> Track(int id)
         {
-            var order = await _context.Orders
-                .Include(o => o.OrderDetails)
-                .ThenInclude(d => d.Medicine)
-                .FirstOrDefaultAsync(o => o.OrderId == id);
-
-            if (order == null) return NotFound();
-
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!int.TryParse(userIdString, out int userId) || order.PatientId != userId)
+            if (!int.TryParse(userIdString, out int userId))
             {
                 return Forbid();
             }
+
+            var order = await _orderTrackingService.GetOrderForPatientAsync(id, userId);
+            if (order == null) return NotFound();
 
             return View(order);
         }
@@ -60,39 +50,16 @@ namespace WebMed_HeathCare_System.Controllers
         [HttpGet]
         public async Task<IActionResult> GetLiveStatus(int id)
         {
-            var order = await _context.Orders.FindAsync(id);
-            if (order == null) return NotFound();
-
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!int.TryParse(userIdString, out int userId) || order.PatientId != userId)
+            if (!int.TryParse(userIdString, out int userId))
             {
                 return Forbid();
             }
 
-            // Simulate shipping status changing dynamically or returning delivery parameters
-            double lat = 10.762622;
-            double lng = 106.660172;
-            string eta = "30 mins";
+            var status = await _orderTrackingService.GetLiveStatusAsync(id, userId);
+            if (status == null) return NotFound();
 
-            if (order.OrderStatus == "Shipping")
-            {
-                // Simulate courier moving dynamically towards destination (cycle every 2 minutes for demo)
-                double elapsedSeconds = (DateTime.Now - order.UpdatedAt).TotalSeconds;
-                double steps = (elapsedSeconds % 120) / 120.0; // Progression: 0 to 1
-                
-                lat = 10.762622 + (0.015 * steps);
-                lng = 106.660172 + (0.015 * steps);
-                eta = $"{(int)((1 - steps) * 15) + 1} mins";
-            }
-
-            return Json(new
-            {
-                status = order.OrderStatus,
-                eta = eta,
-                latitude = lat,
-                longitude = lng,
-                updatedAt = order.UpdatedAt.ToString("t")
-            });
+            return Json(status);
         }
     }
 }

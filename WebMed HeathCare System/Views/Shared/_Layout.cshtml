@@ -1,4 +1,4 @@
-@inject WebMed_HeathCare_System.Models.WebMedDbContext DbContext
+@inject WebMed_HeathCare_System.Interfaces.IDoctorPortalService DoctorPortalService
 @using System.Security.Claims
 <!DOCTYPE html>
 <html lang="en">
@@ -61,7 +61,7 @@
                             var isDoctorVerified = false;
                             if (int.TryParse(userIdString, out int userId))
                             {
-                                var doctor = DbContext.Doctors.Find(userId);
+                                var doctor = await DoctorPortalService.GetDoctorAsync(userId);
                                 isDoctorVerified = doctor?.IsVerified == true;
                             }
 

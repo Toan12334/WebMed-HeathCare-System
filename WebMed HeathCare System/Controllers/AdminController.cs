@@ -1,409 +1,122 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using WebMed_HeathCare_System.Models;
+using WebMed_HeathCare_System.Interfaces;
 
 namespace WebMed_HeathCare_System.Controllers
 {
     [Authorize]
     public class AdminController : Controller
     {
-        private readonly WebMedDbContext _context;
+        private readonly IAdminService _adminService;
 
-        public AdminController(WebMedDbContext context)
+        public AdminController(IAdminService adminService)
         {
-            _context = context;
+            _adminService = adminService;
         }
 
-        // ==========================================
-        // UC 27: USER MANAGEMENT
-        // ==========================================
-
-        // GET: /Admin/Users
         [HttpGet]
         public async Task<IActionResult> Users(string searchEmail)
         {
-            var query = _context.Users
-                .Include(u => u.Role)
-                .Where(u => u.AccountStatus != "SoftDeleted")
-                .AsQueryable();
-
-            if (!string.IsNullOrEmpty(searchEmail))
-            {
-                query = query.Where(u => u.Email.Contains(searchEmail) || u.FullName.Contains(searchEmail));
-            }
-
-            var users = await query.OrderByDescending(u => u.CreatedAt).ToListAsync();
             ViewBag.SearchEmail = searchEmail;
-            ViewBag.Roles = await _context.Roles.ToListAsync();
-
-            return View(users);
+            ViewBag.Roles = await _adminService.GetRolesAsync();
+            return View(await _adminService.GetUsersAsync(searchEmail));
         }
 
-        // GET: /Admin/GetUserDetails/5
         [HttpGet]
         public async Task<IActionResult> GetUserDetails(int id)
         {
-            var user = await _context.Users
-                .Include(u => u.Role)
-                .Include(u => u.Doctor)
-                .Include(u => u.Patient)
-                .FirstOrDefaultAsync(u => u.UserId == id);
-
+            var user = await _adminService.GetUserDetailsAsync(id);
             if (user == null) return NotFound();
 
-            return Json(new
-            {
-                userId = user.UserId,
-                username = user.Username,
-                fullName = user.FullName,
-                email = user.Email,
-                phoneNumber = user.PhoneNumber,
-                roleId = user.RoleId,
-                roleName = user.Role.RoleName,
-                isActive = user.IsActive,
-                accountStatus = user.AccountStatus,
-                doctor = user.Doctor != null ? new
-                {
-                    specialty = user.Doctor.Specialty,
-                    location = user.Doctor.Location,
-                    bio = user.Doctor.Bio
-                } : null,
-                patient = user.Patient != null ? new
-                {
-                    dob = user.Patient.DateOfBirth?.ToString("yyyy-MM-dd"),
-                    gender = user.Patient.Gender,
-                    address = user.Patient.Address,
-                    bloodType = user.Patient.BloodType
-                } : null
-            });
+            return Json(user);
         }
 
-        // POST: /Admin/CreateUser
         [HttpPost]
         public async Task<IActionResult> CreateUser(string username, string password, string fullName, string email, string phoneNumber, int roleId, string specialty, string location, string bio, string gender, string address, string bloodType, DateTime? dob)
         {
-            if (await _context.Users.AnyAsync(u => u.Username.ToLower() == username.ToLower() || u.Email.ToLower() == email.ToLower()))
-            {
-                TempData["ErrorMessage"] = "Username or Email already exists.";
-                return RedirectToAction("Users");
-            }
-
-            var role = await _context.Roles.FindAsync(roleId);
-            if (role == null)
-            {
-                TempData["ErrorMessage"] = "Invalid Role selected.";
-                return RedirectToAction("Users");
-            }
-
-            var user = new User
-            {
-                Username = username,
-                PasswordHash = password,
-                FullName = fullName,
-                Email = email,
-                PhoneNumber = phoneNumber,
-                RoleId = roleId,
-                AccountStatus = "Active",
-                IsActive = true,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            if (role.RoleName.Equals("Doctor", StringComparison.OrdinalIgnoreCase))
-            {
-                var doctor = new Doctor
-                {
-                    DoctorId = user.UserId,
-                    Specialty = specialty ?? "General Practitioner",
-                    Location = location ?? "Clinic",
-                    Bio = bio ?? "",
-                    AverageRating = 0,
-                    IsVerified = true,
-                    IsActive = true
-                };
-                _context.Doctors.Add(doctor);
-            }
-            else if (role.RoleName.Equals("Patient", StringComparison.OrdinalIgnoreCase))
-            {
-                var patient = new Patient
-                {
-                    PatientId = user.UserId,
-                    DateOfBirth = dob,
-                    Gender = gender,
-                    Address = address,
-                    BloodType = bloodType,
-                    IsActive = true
-                };
-                _context.Patients.Add(patient);
-            }
-
-            await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = $"User '{fullName}' created successfully as '{role.RoleName}'.";
+            var result = await _adminService.CreateUserAsync(username, password, fullName, email, phoneNumber, roleId, specialty, location, bio, gender, address, bloodType, dob);
+            SetTempMessage(result.Success, result.Message);
             return RedirectToAction("Users");
         }
 
-        // POST: /Admin/EditUser
         [HttpPost]
         public async Task<IActionResult> EditUser(int userId, string fullName, string email, string phoneNumber, int roleId, string password, string specialty, string location, string bio, string gender, string address, string bloodType, DateTime? dob)
         {
-            var user = await _context.Users
-                .Include(u => u.Role)
-                .Include(u => u.Doctor)
-                .Include(u => u.Patient)
-                .FirstOrDefaultAsync(u => u.UserId == userId);
-
-            if (user == null)
-            {
-                TempData["ErrorMessage"] = "User not found.";
-                return RedirectToAction("Users");
-            }
-
-            if (user.Email.ToLower() != email.ToLower())
-            {
-                if (await _context.Users.AnyAsync(u => u.Email.ToLower() == email.ToLower() && u.UserId != userId))
-                {
-                    TempData["ErrorMessage"] = "Email is already in use by another account.";
-                    return RedirectToAction("Users");
-                }
-            }
-
-            user.FullName = fullName;
-            user.Email = email;
-            user.PhoneNumber = phoneNumber;
-            user.RoleId = roleId;
-            user.UpdatedAt = DateTime.Now;
-
-            if (!string.IsNullOrWhiteSpace(password))
-            {
-                user.PasswordHash = password;
-            }
-
-            await _context.SaveChangesAsync();
-
-            var role = await _context.Roles.FindAsync(roleId);
-            if (role != null)
-            {
-                if (role.RoleName.Equals("Doctor", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (user.Patient != null) _context.Patients.Remove(user.Patient);
-
-                    if (user.Doctor == null)
-                    {
-                        var doctor = new Doctor
-                        {
-                            DoctorId = user.UserId,
-                            Specialty = specialty ?? "General Practitioner",
-                            Location = location ?? "Clinic",
-                            Bio = bio ?? "",
-                            AverageRating = 0,
-                            IsVerified = true,
-                            IsActive = true
-                        };
-                        _context.Doctors.Add(doctor);
-                    }
-                    else
-                    {
-                        user.Doctor.Specialty = specialty ?? "General Practitioner";
-                        user.Doctor.Location = location ?? "Clinic";
-                        user.Doctor.Bio = bio ?? "";
-                    }
-                }
-                else if (role.RoleName.Equals("Patient", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (user.Doctor != null) _context.Doctors.Remove(user.Doctor);
-
-                    if (user.Patient == null)
-                    {
-                        var patient = new Patient
-                        {
-                            PatientId = user.UserId,
-                            DateOfBirth = dob,
-                            Gender = gender,
-                            Address = address,
-                            BloodType = bloodType,
-                            IsActive = true
-                        };
-                        _context.Patients.Add(patient);
-                    }
-                    else
-                    {
-                        user.Patient.DateOfBirth = dob;
-                        user.Patient.Gender = gender;
-                        user.Patient.Address = address;
-                        user.Patient.BloodType = bloodType;
-                    }
-                }
-                else
-                {
-                    if (user.Doctor != null) _context.Doctors.Remove(user.Doctor);
-                    if (user.Patient != null) _context.Patients.Remove(user.Patient);
-                }
-            }
-
-            await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = $"User '{fullName}' updated successfully.";
+            var result = await _adminService.EditUserAsync(userId, fullName, email, phoneNumber, roleId, password, specialty, location, bio, gender, address, bloodType, dob);
+            SetTempMessage(result.Success, result.Message);
             return RedirectToAction("Users");
         }
 
-        // POST: /Admin/SuspendUser
         [HttpPost]
         public async Task<IActionResult> SuspendUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null) return NotFound();
+            var result = await _adminService.ToggleUserActiveAsync(id);
+            if (!result.Success) return NotFound();
 
-            user.IsActive = !user.IsActive;
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = $"User '{user.FullName}' account active status changed to {user.IsActive}.";
+            TempData["SuccessMessage"] = result.Message;
             return RedirectToAction("Users");
         }
 
-        // POST: /Admin/DeleteUser
         [HttpPost]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null) return NotFound();
+            var result = await _adminService.SoftDeleteUserAsync(id);
+            if (!result.Success) return NotFound();
 
-            user.IsActive = false;
-            user.AccountStatus = "SoftDeleted";
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = $"User '{user.FullName}' account has been deleted.";
+            TempData["SuccessMessage"] = result.Message;
             return RedirectToAction("Users");
         }
 
-
-        // ==========================================
-        // UC 30: DOCTOR VERIFICATION
-        // ==========================================
-
-        // GET: /Admin/Doctors
         [HttpGet]
         public async Task<IActionResult> Doctors()
         {
-            // Get pending licenses
-            var pendingLicenses = await _context.DoctorLicenses
-                .Include(l => l.Doctor)
-                .ThenInclude(d => d.DoctorNavigation)
-                .Where(l => l.VerificationStatus == "Pending")
-                .ToListAsync();
-
-            return View(pendingLicenses);
+            return View(await _adminService.GetPendingDoctorLicensesAsync());
         }
 
-        // POST: /Admin/VerifyDoctor
         [HttpPost]
         public async Task<IActionResult> VerifyDoctor(int licenseId, string status)
         {
-            var license = await _context.DoctorLicenses.FindAsync(licenseId);
-            if (license == null) return NotFound();
-
+            int? adminId = null;
             var adminIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (int.TryParse(adminIdString, out int adminId))
+            if (int.TryParse(adminIdString, out int parsedAdminId))
             {
-                license.ReviewedBy = adminId;
+                adminId = parsedAdminId;
             }
 
-            license.VerificationStatus = status; // "Approved" or "Rejected"
-            license.ReviewedAt = DateTime.Now;
-
-            // If approved, verify the doctor
-            var doctor = await _context.Doctors.FindAsync(license.DoctorId);
-            if (doctor != null)
-            {
-                doctor.IsVerified = status == "Approved";
-            }
-
-            await _context.SaveChangesAsync();
+            if (!await _adminService.VerifyDoctorAsync(licenseId, status, adminId)) return NotFound();
 
             TempData["SuccessMessage"] = $"Doctor license verification request has been {status}.";
             return RedirectToAction("Doctors");
         }
 
-
-        // ==========================================
-        // UC 31: REVIEW MODERATION
-        // ==========================================
-
-        // GET: /Admin/Reviews
         [HttpGet]
         public async Task<IActionResult> Reviews()
         {
-            var reviews = await _context.DoctorReviews
-                .Include(r => r.Patient).ThenInclude(p => p.PatientNavigation)
-                .Include(r => r.Doctor).ThenInclude(d => d.DoctorNavigation)
-                .OrderByDescending(r => r.CreatedAt)
-                .ToListAsync();
-
-            return View(reviews);
+            return View(await _adminService.GetReviewsAsync());
         }
 
-        // POST: /Admin/ModerateReview
         [HttpPost]
         public async Task<IActionResult> ModerateReview(int id, string status)
         {
-            var review = await _context.DoctorReviews.FindAsync(id);
-            if (review == null) return NotFound();
-
-            review.ModerationStatus = status; // "Approved" or "Rejected" / "Hidden"
-            await _context.SaveChangesAsync();
-
-            // Recalculate average rating for the doctor
-            var doctor = await _context.Doctors.FindAsync(review.DoctorId);
-            if (doctor != null)
-            {
-                var ratings = await _context.DoctorReviews
-                    .Where(r => r.DoctorId == doctor.DoctorId && r.ModerationStatus == "Approved")
-                    .Select(r => r.Rating)
-                    .ToListAsync();
-
-                if (ratings.Any())
-                {
-                    doctor.AverageRating = (decimal)ratings.Average();
-                }
-                else
-                {
-                    doctor.AverageRating = 0;
-                }
-                await _context.SaveChangesAsync();
-            }
+            if (!await _adminService.ModerateReviewAsync(id, status)) return NotFound();
 
             TempData["SuccessMessage"] = $"Review moderation status updated to {status}.";
             return RedirectToAction("Reviews");
         }
 
-
-        // ==========================================
-        // UC 28: HEALTH NEWS PUBLISHING
-        // ==========================================
-
-        // GET: /Admin/News
         [HttpGet]
         public async Task<IActionResult> News()
         {
-            var news = await _context.Articles
-                .Include(a => a.Author)
-                .OrderByDescending(a => a.PublishedAt)
-                .ToListAsync();
-
-            return View(news);
+            return View(await _adminService.GetNewsAsync());
         }
 
-        // GET: /Admin/CreateNews
         [HttpGet]
         public IActionResult CreateNews()
         {
             return View();
         }
 
-        // POST: /Admin/CreateNews
         [HttpPost]
         public async Task<IActionResult> CreateNews(string title, string category, string content, string imageUrl)
         {
@@ -416,179 +129,60 @@ namespace WebMed_HeathCare_System.Controllers
             var authorIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!int.TryParse(authorIdString, out int authorId)) return Forbid();
 
-            var article = new Article
-            {
-                Title = title,
-                Category = category ?? "General",
-                Content = content,
-                AuthorId = authorId,
-                IsPublished = true, // Directly publish for ease of testing
-                IsActive = true,
-                PublishedAt = DateTime.Now,
-                ImageUrl = imageUrl
-            };
-
-            _context.Articles.Add(article);
-            await _context.SaveChangesAsync();
+            await _adminService.CreateNewsAsync(title, category, content, imageUrl, authorId);
 
             TempData["SuccessMessage"] = "Health article published successfully!";
             return RedirectToAction("News");
         }
 
-        // ==========================================
-        // UC 29: MANAGE SYSTEM ROLES & PERMISSIONS
-        // ==========================================
-
-        // GET: /Admin/Roles
         [HttpGet]
         public async Task<IActionResult> Roles()
         {
-            var roles = await _context.Roles.ToListAsync();
-            return View(roles);
+            return View(await _adminService.GetRolesAsync());
         }
 
-        // POST: /Admin/CreateRole
         [HttpPost]
         public async Task<IActionResult> CreateRole(string roleName, string description)
         {
-            if (string.IsNullOrWhiteSpace(roleName))
-            {
-                TempData["ErrorMessage"] = "Role name is required.";
-                return RedirectToAction("Roles");
-            }
-
-            if (await _context.Roles.AnyAsync(r => r.RoleName.ToLower() == roleName.ToLower()))
-            {
-                TempData["ErrorMessage"] = $"Role '{roleName}' already exists.";
-                return RedirectToAction("Roles");
-            }
-
-            var role = new Role
-            {
-                RoleName = roleName,
-                Description = description
-            };
-
-            _context.Roles.Add(role);
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = $"Role '{roleName}' created successfully.";
+            var result = await _adminService.CreateRoleAsync(roleName, description);
+            SetTempMessage(result.Success, result.Message);
             return RedirectToAction("Roles");
         }
 
-        // POST: /Admin/EditRole
         [HttpPost]
         public async Task<IActionResult> EditRole(int roleId, string roleName, string description)
         {
-            var role = await _context.Roles.FindAsync(roleId);
-            if (role == null) return NotFound();
-
-            var systemRoles = new HashSet<string> { "Admin", "Doctor", "Pharmacist", "Patient" };
-            var isSystem = systemRoles.Contains(role.RoleName);
-
-            if (isSystem)
-            {
-                // Force name to stay the same for system core roles, only allow editing description
-                roleName = role.RoleName;
-            }
-            else
-            {
-                if (string.IsNullOrWhiteSpace(roleName))
-                {
-                    TempData["ErrorMessage"] = "Role name is required.";
-                    return RedirectToAction("Roles");
-                }
-
-                if (role.RoleName.ToLower() != roleName.ToLower())
-                {
-                    if (await _context.Roles.AnyAsync(r => r.RoleName.ToLower() == roleName.ToLower() && r.RoleId != roleId))
-                    {
-                        TempData["ErrorMessage"] = $"Role name '{roleName}' is already taken.";
-                        return RedirectToAction("Roles");
-                    }
-                }
-                role.RoleName = roleName;
-            }
-
-            role.Description = description;
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = $"Role '{roleName}' updated successfully.";
+            var result = await _adminService.EditRoleAsync(roleId, roleName, description);
+            SetTempMessage(result.Success, result.Message);
             return RedirectToAction("Roles");
         }
 
-        // POST: /Admin/DeleteRole
         [HttpPost]
         public async Task<IActionResult> DeleteRole(int id)
         {
-            var role = await _context.Roles.FindAsync(id);
-            if (role == null) return NotFound();
-
-            var systemRoles = new HashSet<string> { "Admin", "Doctor", "Pharmacist", "Patient" };
-            if (systemRoles.Contains(role.RoleName))
-            {
-                TempData["ErrorMessage"] = $"Cannot delete system core role '{role.RoleName}'.";
-                return RedirectToAction("Roles");
-            }
-
-            // Verify if any active/inactive users are assigned to this role
-            var hasUsers = await _context.Users.AnyAsync(u => u.RoleId == id && u.AccountStatus != "SoftDeleted");
-            if (hasUsers)
-            {
-                TempData["ErrorMessage"] = $"Cannot delete role '{role.RoleName}' because it is currently assigned to one or more user accounts.";
-                return RedirectToAction("Roles");
-            }
-
-            _context.Roles.Remove(role);
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = $"Role '{role.RoleName}' deleted successfully.";
+            var result = await _adminService.DeleteRoleAsync(id);
+            SetTempMessage(result.Success, result.Message);
             return RedirectToAction("Roles");
         }
 
-        // ==========================================
-        // UC 32: EMERGENCY AMBULANCE DISPATCH
-        // ==========================================
-
-        // GET: /Admin/Emergencies
         [HttpGet]
         public async Task<IActionResult> Emergencies()
         {
-            var requests = await _context.AmbulanceRequests
-                .OrderByDescending(r => r.RequestedAt)
-                .ToListAsync();
-
-            return View(requests);
+            return View(await _adminService.GetEmergencyRequestsAsync());
         }
 
-        // POST: /Admin/DispatchAmbulance
         [HttpPost]
         public async Task<IActionResult> DispatchAmbulance(int requestId, string vehicleNumber)
         {
-            var request = await _context.AmbulanceRequests.FindAsync(requestId);
-            if (request == null) return NotFound();
-
-            if (string.IsNullOrWhiteSpace(vehicleNumber))
-            {
-                vehicleNumber = "AMB-1024";
-            }
-
-            request.Status = "Assigned";
-            request.AssignedAmbulanceVehicle = vehicleNumber;
-
-            // Ambulance starts at a nearby hospital (simulated offset of -0.008)
-            decimal destLat = request.Latitude ?? 10.776m;
-            decimal destLng = request.Longitude ?? 106.700m;
-
-            request.AmbulanceLatitude = destLat - 0.008m;
-            request.AmbulanceLongitude = destLng - 0.008m;
-            request.Eta = "15 mins";
-            request.RequestedAt = DateTime.Now; // reset timer to start tracking progression
-
-            await _context.SaveChangesAsync();
+            if (!await _adminService.DispatchAmbulanceAsync(requestId, vehicleNumber)) return NotFound();
 
             TempData["SuccessMessage"] = $"Ambulance vehicle {vehicleNumber} dispatched successfully.";
             return RedirectToAction("Emergencies");
+        }
+
+        private void SetTempMessage(bool success, string message)
+        {
+            TempData[success ? "SuccessMessage" : "ErrorMessage"] = message;
         }
     }
 }

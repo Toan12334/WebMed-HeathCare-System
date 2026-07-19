@@ -1,29 +1,25 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using WebMed_HeathCare_System.Models;
+using WebMed_HeathCare_System.Interfaces;
 
 namespace WebMed_HeathCare_System.Controllers
 {
     [Authorize]
     public class PaymentController : Controller
     {
-        private readonly WebMedDbContext _context;
+        private readonly IPaymentService _paymentService;
 
-        public PaymentController(WebMedDbContext context)
+        public PaymentController(IPaymentService paymentService)
         {
-            _context = context;
+            _paymentService = paymentService;
         }
 
         // GET: /Payment?orderId=5
         [HttpGet]
         public async Task<IActionResult> Index(int orderId)
         {
-            var order = await _context.Orders
-                .Include(o => o.OrderDetails)
-                .ThenInclude(d => d.Medicine)
-                .FirstOrDefaultAsync(o => o.OrderId == orderId);
+            var order = await _paymentService.GetOrderForPaymentAsync(orderId);
 
             if (order == null)
             {
@@ -39,23 +35,7 @@ namespace WebMed_HeathCare_System.Controllers
             // If COD, we can auto-process or just show success
             if (order.PaymentMethod == "COD")
             {
-                // Create a payment record marked as Pending / COD
-                var paymentExists = await _context.Payments.AnyAsync(p => p.AssociatedId == orderId);
-                if (!paymentExists)
-                {
-                    var codPayment = new Payment
-                    {
-                        UserId = userId,
-                        Amount = order.TotalAmount,
-                        PaymentType = "COD",
-                        PaymentMethod = "COD",
-                        PaymentStatus = "Pending",
-                        AssociatedId = orderId,
-                        PaidAt = DateTime.Now
-                    };
-                    _context.Payments.Add(codPayment);
-                    await _context.SaveChangesAsync();
-                }
+                await _paymentService.CreateCodPaymentIfNeededAsync(orderId, userId, order.TotalAmount);
 
                 return View("Receipt", order);
             }
@@ -67,65 +47,40 @@ namespace WebMed_HeathCare_System.Controllers
         [HttpPost]
         public async Task<IActionResult> ProcessPayment(int orderId)
         {
-            var order = await _context.Orders.FindAsync(orderId);
-            if (order == null) return NotFound();
-
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!int.TryParse(userIdString, out int userId) || order.PatientId != userId)
+            if (!int.TryParse(userIdString, out int userId))
             {
                 return Forbid();
             }
 
-            // Simulate Payment Gateway success
-            order.OrderStatus = "Paid";
-            order.UpdatedAt = DateTime.Now;
-
-            var payment = new Payment
+            var success = await _paymentService.ProcessPaymentAsync(orderId, userId);
+            if (!success)
             {
-                UserId = userId,
-                Amount = order.TotalAmount,
-                PaymentType = "Order",
-                PaymentMethod = order.PaymentMethod,
-                TransactionReference = "TXN-" + new Random().Next(100000, 999999),
-                PaymentStatus = "Completed",
-                AssociatedId = orderId,
-                PaidAt = DateTime.Now
-            };
-
-            _context.Payments.Add(payment);
-            await _context.SaveChangesAsync();
+                return Forbid();
+            }
 
             TempData["SuccessMessage"] = "Payment processed successfully!";
-            return RedirectToAction("Index", new { orderId = order.OrderId });
+            return RedirectToAction("Index", new { orderId });
         }
 
         // POST: /Payment/FailPayment
         [HttpPost]
         public async Task<IActionResult> FailPayment(int orderId)
         {
-            var order = await _context.Orders.FindAsync(orderId);
-            if (order == null) return NotFound();
-
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!int.TryParse(userIdString, out int userId) || order.PatientId != userId)
+            if (!int.TryParse(userIdString, out int userId))
             {
                 return Forbid();
             }
 
-            var payment = new Payment
+            var success = await _paymentService.FailPaymentAsync(orderId, userId);
+            if (!success)
             {
-                UserId = userId,
-                Amount = order.TotalAmount,
-                PaymentType = "Order",
-                PaymentMethod = order.PaymentMethod,
-                PaymentStatus = "Failed",
-                AssociatedId = orderId,
-                PaidAt = DateTime.Now
-            };
+                return Forbid();
+            }
 
-            _context.Payments.Add(payment);
-            await _context.SaveChangesAsync();
-
+            var order = await _paymentService.GetOrderForPaymentAsync(orderId);
+            if (order == null) return NotFound();
             ViewBag.Error = "Payment failed. Please choose another method or retry.";
             return View("Index", order);
         }

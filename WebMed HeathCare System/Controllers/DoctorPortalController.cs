@@ -1,21 +1,20 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.IO;
 using Microsoft.AspNetCore.Http;
-using WebMed_HeathCare_System.Models;
+using WebMed_HeathCare_System.Interfaces;
 
 namespace WebMed_HeathCare_System.Controllers
 {
     [Authorize]
     public class DoctorPortalController : Controller
     {
-        private readonly WebMedDbContext _context;
+        private readonly IDoctorPortalService _doctorPortalService;
 
-        public DoctorPortalController(WebMedDbContext context)
+        public DoctorPortalController(IDoctorPortalService doctorPortalService)
         {
-            _context = context;
+            _doctorPortalService = doctorPortalService;
         }
 
         public override async Task OnActionExecutionAsync(Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext context, Microsoft.AspNetCore.Mvc.Filters.ActionExecutionDelegate next)
@@ -30,8 +29,7 @@ namespace WebMed_HeathCare_System.Controllers
                     var actionName = context.ActionDescriptor.RouteValues["action"]?.ToLower();
                     if (actionName != "license" && actionName != "submitlicense" && actionName != "paymentlicense" && actionName != "paylicense")
                     {
-                        var doctor = await _context.Doctors.FindAsync(userId);
-                        if (doctor != null && !doctor.IsVerified)
+                        if (await _doctorPortalService.IsUnverifiedDoctorAsync(userId))
                         {
                             TempData["ErrorMessage"] = "You must submit and get your professional license approved by the administrator before accessing other features.";
                             context.Result = RedirectToAction("License");
@@ -51,17 +49,14 @@ namespace WebMed_HeathCare_System.Controllers
             if (!int.TryParse(userIdString, out int userId)) return RedirectToAction("Login", "Authentication");
 
             // Verify if doctor
-            var doctor = await _context.Doctors.FindAsync(userId);
+            var doctor = await _doctorPortalService.GetDoctorAsync(userId);
             if (doctor == null)
             {
                 TempData["ErrorMessage"] = "Only doctors can access the portal.";
                 return RedirectToAction("Index", "Home");
             }
 
-            var licenses = await _context.DoctorLicenses
-                .Where(l => l.DoctorId == userId)
-                .OrderByDescending(l => l.SubmittedAt)
-                .ToListAsync();
+            var licenses = await _doctorPortalService.GetLicensesAsync(userId);
 
             ViewBag.Licenses = licenses;
             ViewBag.License = licenses.FirstOrDefault(); // Pass latest license as current status context
@@ -76,7 +71,7 @@ namespace WebMed_HeathCare_System.Controllers
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!int.TryParse(userIdString, out int userId)) return RedirectToAction("Login", "Authentication");
 
-            var doctor = await _context.Doctors.FindAsync(userId);
+            var doctor = await _doctorPortalService.GetDoctorAsync(userId);
             if (doctor == null) return Forbid();
 
             if (string.IsNullOrWhiteSpace(licenseNumber))
@@ -92,9 +87,7 @@ namespace WebMed_HeathCare_System.Controllers
             }
 
             // Check if there is already a pending application (either Pending verification or Pending payment)
-            var hasPending = await _context.DoctorLicenses.AnyAsync(l => l.DoctorId == userId && 
-                (l.VerificationStatus == "Pending" || l.PaymentStatus == "Pending"));
-            if (hasPending)
+            if (await _doctorPortalService.HasPendingLicenseAsync(userId))
             {
                 TempData["ErrorMessage"] = "You already have a pending license application under review or awaiting payment.";
                 return RedirectToAction("License");
@@ -116,19 +109,7 @@ namespace WebMed_HeathCare_System.Controllers
             }
             documentUrl = "/uploads/" + uniqueFileName;
 
-            var license = new DoctorLicense
-            {
-                DoctorId = userId,
-                LicenseNumber = licenseNumber,
-                DocumentUrl = documentUrl,
-                FeeAmount = feeAmount > 0 ? feeAmount : 150000m,
-                PaymentStatus = "Pending",
-                VerificationStatus = "Pending",
-                SubmittedAt = DateTime.Now
-            };
-
-            _context.DoctorLicenses.Add(license);
-            await _context.SaveChangesAsync();
+            var license = await _doctorPortalService.SubmitLicenseAsync(userId, licenseNumber, documentUrl, feeAmount);
 
             return RedirectToAction("PaymentLicense", new { licenseId = license.LicenseId });
         }
@@ -137,7 +118,7 @@ namespace WebMed_HeathCare_System.Controllers
         [HttpGet]
         public async Task<IActionResult> PaymentLicense(int licenseId)
         {
-            var license = await _context.DoctorLicenses.FindAsync(licenseId);
+            var license = await _doctorPortalService.GetLicenseAsync(licenseId);
             if (license == null) return NotFound();
 
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -153,7 +134,7 @@ namespace WebMed_HeathCare_System.Controllers
         [HttpPost]
         public async Task<IActionResult> PayLicense(int licenseId)
         {
-            var license = await _context.DoctorLicenses.FindAsync(licenseId);
+            var license = await _doctorPortalService.GetLicenseAsync(licenseId);
             if (license == null) return NotFound();
 
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -162,18 +143,7 @@ namespace WebMed_HeathCare_System.Controllers
                 return Forbid();
             }
 
-            // Simulate success
-            license.PaymentStatus = "Paid";
-            license.VerificationStatus = "Pending"; // Changes to Pending, waiting for Admin approval!
-
-            // Update doctor verification status (remains false until admin approves)
-            var doctor = await _context.Doctors.FindAsync(userId);
-            if (doctor != null)
-            {
-                doctor.IsVerified = false;
-            }
-
-            await _context.SaveChangesAsync();
+            await _doctorPortalService.PayLicenseAsync(licenseId, userId);
 
             TempData["SuccessMessage"] = "Verification fee paid successfully! Your licensing documents are now pending administrator approval.";
             return RedirectToAction("License");
@@ -186,10 +156,7 @@ namespace WebMed_HeathCare_System.Controllers
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!int.TryParse(userIdString, out int userId)) return RedirectToAction("Login", "Authentication");
 
-            var slots = await _context.AvailabilitySlots
-                .Where(s => s.DoctorId == userId && s.IsActive)
-                .OrderBy(s => s.StartDateTime)
-                .ToListAsync();
+            var slots = await _doctorPortalService.GetAvailabilitySlotsAsync(userId);
 
             return View(slots);
         }
@@ -214,29 +181,13 @@ namespace WebMed_HeathCare_System.Controllers
             }
 
             // Check conflicts with existing slots
-            var conflict = await _context.AvailabilitySlots
-                .AnyAsync(s => s.DoctorId == userId && s.IsActive &&
-                               ((startDateTime >= s.StartDateTime && startDateTime < s.EndDateTime) ||
-                                (endDateTime > s.StartDateTime && endDateTime <= s.EndDateTime) ||
-                                (startDateTime <= s.StartDateTime && endDateTime >= s.EndDateTime)));
-
-            if (conflict)
+            if (await _doctorPortalService.HasSlotConflictAsync(userId, startDateTime, endDateTime))
             {
                 TempData["ErrorMessage"] = "This time slot conflicts with an existing slot.";
                 return RedirectToAction("Availability");
             }
 
-            var slot = new AvailabilitySlot
-            {
-                DoctorId = userId,
-                StartDateTime = startDateTime,
-                EndDateTime = endDateTime,
-                IsBooked = false,
-                IsActive = true
-            };
-
-            _context.AvailabilitySlots.Add(slot);
-            await _context.SaveChangesAsync();
+            await _doctorPortalService.AddSlotAsync(userId, startDateTime, endDateTime);
 
             TempData["SuccessMessage"] = "Availability slot added successfully.";
             return RedirectToAction("Availability");
@@ -246,7 +197,7 @@ namespace WebMed_HeathCare_System.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteSlot(int slotId)
         {
-            var slot = await _context.AvailabilitySlots.FindAsync(slotId);
+            var slot = await _doctorPortalService.GetSlotAsync(slotId);
             if (slot == null) return NotFound();
 
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -261,8 +212,7 @@ namespace WebMed_HeathCare_System.Controllers
                 return RedirectToAction("Availability");
             }
 
-            slot.IsActive = false; // Soft delete
-            await _context.SaveChangesAsync();
+            await _doctorPortalService.DeleteSlotAsync(slotId, userId);
 
             TempData["SuccessMessage"] = "Slot removed successfully.";
             return RedirectToAction("Availability");
@@ -275,14 +225,10 @@ namespace WebMed_HeathCare_System.Controllers
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (!int.TryParse(userIdString, out int userId)) return RedirectToAction("Login", "Authentication");
 
-            var doctor = await _context.Doctors.FindAsync(userId);
+            var doctor = await _doctorPortalService.GetDoctorAsync(userId);
             if (doctor == null) return Forbid();
 
-            var reviews = await _context.DoctorReviews
-                .Include(r => r.Patient).ThenInclude(p => p.PatientNavigation)
-                .Where(r => r.DoctorId == userId && r.ModerationStatus == "Approved")
-                .OrderByDescending(r => r.CreatedAt)
-                .ToListAsync();
+            var reviews = await _doctorPortalService.GetApprovedReviewsAsync(userId);
 
             ViewBag.Doctor = doctor;
             return View(reviews);

@@ -1,37 +1,25 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
-using WebMed_HeathCare_System.Models;
+using WebMed_HeathCare_System.Interfaces;
 
 namespace WebMed_HeathCare_System.Controllers
 {
     [Authorize]
     public class PharmacistController : Controller
     {
-        private readonly WebMedDbContext _context;
+        private readonly IPharmacistService _pharmacistService;
 
-        public PharmacistController(WebMedDbContext context)
+        public PharmacistController(IPharmacistService pharmacistService)
         {
-            _context = context;
+            _pharmacistService = pharmacistService;
         }
 
         // GET: /Pharmacist
         [HttpGet]
         public async Task<IActionResult> Index(string statusFilter)
         {
-            var query = _context.Orders
-                .Include(o => o.Patient)
-                .ThenInclude(p => p.PatientNavigation)
-                .Where(o => o.OrderStatus != "Pending" || o.PaymentMethod == "COD")
-                .AsQueryable();
-
-            if (!string.IsNullOrEmpty(statusFilter))
-            {
-                query = query.Where(o => o.OrderStatus == statusFilter);
-            }
-
-            var orders = await query.OrderByDescending(o => o.CreatedAt).ToListAsync();
+            var orders = await _pharmacistService.GetOrdersAsync(statusFilter);
 
             ViewBag.StatusFilter = statusFilter;
             return View(orders);
@@ -41,12 +29,7 @@ namespace WebMed_HeathCare_System.Controllers
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
-            var order = await _context.Orders
-                .Include(o => o.Patient)
-                .ThenInclude(p => p.PatientNavigation)
-                .Include(o => o.OrderDetails)
-                .ThenInclude(d => d.Medicine)
-                .FirstOrDefaultAsync(o => o.OrderId == id);
+            var order = await _pharmacistService.GetOrderDetailsAsync(id);
 
             if (order == null) return NotFound();
 
@@ -64,25 +47,19 @@ namespace WebMed_HeathCare_System.Controllers
         [HttpPost]
         public async Task<IActionResult> StartPreparation(int id)
         {
-            var order = await _context.Orders.FindAsync(id);
-            if (order == null) return NotFound();
+            int? pharmacistId = null;
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (int.TryParse(userIdString, out int userId))
+            {
+                pharmacistId = userId;
+            }
 
-            // Backend verification: Prevent pharmacist from preparing unpaid online orders
-            if (order.OrderStatus == "Pending" && order.PaymentMethod != "COD")
+            var success = await _pharmacistService.StartPreparationAsync(id, pharmacistId);
+            if (!success)
             {
                 TempData["ErrorMessage"] = "Cannot prepare unpaid online orders.";
                 return RedirectToAction("Index");
             }
-
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (int.TryParse(userIdString, out int userId))
-            {
-                order.PharmacistId = userId;
-            }
-
-            order.OrderStatus = "Preparing";
-            order.UpdatedAt = DateTime.Now;
-            await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = $"Order #{id} status updated to Preparing.";
             return RedirectToAction("Details", new { id });
@@ -92,49 +69,14 @@ namespace WebMed_HeathCare_System.Controllers
         [HttpPost]
         public async Task<IActionResult> ConfirmPacked(int id)
         {
-            var order = await _context.Orders
-                .Include(o => o.OrderDetails)
-                .FirstOrDefaultAsync(o => o.OrderId == id);
-
-            if (order == null) return NotFound();
-
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var result = await _pharmacistService.ConfirmPackedAsync(id);
+            if (result.Success)
             {
-                try
-                {
-                    // Verify and deduct stock quantity
-                    foreach (var detail in order.OrderDetails)
-                    {
-                        var med = await _context.Medicines.FindAsync(detail.MedicineId);
-                        if (med == null)
-                        {
-                            TempData["ErrorMessage"] = $"Medicine not found for ID: {detail.MedicineId}";
-                            return RedirectToAction("Details", new { id });
-                        }
-
-                        if (med.StockQuantity < detail.Quantity)
-                        {
-                            TempData["ErrorMessage"] = $"Insufficient stock for medicine '{med.Name}'. Available: {med.StockQuantity}, Requested: {detail.Quantity}";
-                            return RedirectToAction("Details", new { id });
-                        }
-
-                        // Deduct stock quantity here to satisfy UC 19
-                        med.StockQuantity -= detail.Quantity;
-                    }
-
-                    order.OrderStatus = "Packed";
-                    order.UpdatedAt = DateTime.Now;
-                    await _context.SaveChangesAsync();
-
-                    await transaction.CommitAsync();
-
-                    TempData["SuccessMessage"] = $"Order #{id} packed successfully. Stock quantities deducted and ready for shipping.";
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    TempData["ErrorMessage"] = "An error occurred while confirming order preparation.";
-                }
+                TempData["SuccessMessage"] = $"Order #{id} packed successfully. Stock quantities deducted and ready for shipping.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = result.ErrorMessage;
             }
 
             return RedirectToAction("Details", new { id });
@@ -144,12 +86,7 @@ namespace WebMed_HeathCare_System.Controllers
         [HttpPost]
         public async Task<IActionResult> DispatchOrder(int id)
         {
-            var order = await _context.Orders.FindAsync(id);
-            if (order == null) return NotFound();
-
-            order.OrderStatus = "Shipping";
-            order.UpdatedAt = DateTime.Now;
-            await _context.SaveChangesAsync();
+            if (!await _pharmacistService.UpdateOrderStatusAsync(id, "Shipping")) return NotFound();
 
             TempData["SuccessMessage"] = $"Order #{id} has been dispatched to the courier.";
             return RedirectToAction("Details", new { id });
@@ -159,12 +96,7 @@ namespace WebMed_HeathCare_System.Controllers
         [HttpPost]
         public async Task<IActionResult> CompleteOrder(int id)
         {
-            var order = await _context.Orders.FindAsync(id);
-            if (order == null) return NotFound();
-
-            order.OrderStatus = "Completed";
-            order.UpdatedAt = DateTime.Now;
-            await _context.SaveChangesAsync();
+            if (!await _pharmacistService.UpdateOrderStatusAsync(id, "Completed")) return NotFound();
 
             TempData["SuccessMessage"] = $"Order #{id} completed (Delivered).";
             return RedirectToAction("Details", new { id });
@@ -174,9 +106,7 @@ namespace WebMed_HeathCare_System.Controllers
         [HttpGet]
         public async Task<IActionResult> Inventory()
         {
-            var medicines = await _context.Medicines
-                .OrderBy(m => m.StockQuantity)
-                .ToListAsync();
+            var medicines = await _pharmacistService.GetInventoryAsync();
 
             return View(medicines);
         }
@@ -191,14 +121,10 @@ namespace WebMed_HeathCare_System.Controllers
                 return RedirectToAction("Inventory");
             }
 
-            var medicine = await _context.Medicines.FindAsync(medicineId);
-            if (medicine == null) return NotFound();
+            var success = await _pharmacistService.RestockAsync(medicineId, quantityToAdd);
+            if (!success) return NotFound();
 
-            medicine.StockQuantity += quantityToAdd;
-            medicine.IsActive = true; // reactivate if it was deactivated due to out of stock
-            await _context.SaveChangesAsync();
-
-            TempData["SuccessMessage"] = $"Successfully restocked {quantityToAdd} units of '{medicine.Name}'. Total stock is now {medicine.StockQuantity}.";
+            TempData["SuccessMessage"] = $"Successfully restocked {quantityToAdd} units.";
             return RedirectToAction("Inventory");
         }
     }
