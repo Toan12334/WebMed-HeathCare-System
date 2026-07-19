@@ -37,10 +37,10 @@ namespace WebMed_HeathCare_System
             builder.Services.AddScoped<IPharmacyService, PharmacyService>();
             
             // Register Insurance Guide Repositories
-            builder.Services.AddScoped<IInsurancePlanRepository, InsurancePlanRepository>();
             builder.Services.AddScoped<IInsuranceEnrollmentService, InsuranceEnrollmentService>();
-            builder.Services.AddScoped<ICoverageRepository, CoverageRepository>();
-            builder.Services.AddScoped<IPricingRepository, PricingRepository>();
+            builder.Services.AddScoped<IInsurancePlanRepository, WebMed_HeathCare_System.Repositories.InsurancePlanRepository>();
+            builder.Services.AddScoped<ICoverageRepository, WebMed_HeathCare_System.Repositories.CoverageRepository>();
+            builder.Services.AddScoped<IPricingRepository, WebMed_HeathCare_System.Repositories.PricingRepository>();
             // Configure Cookie Authentication
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>

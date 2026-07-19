@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using WebMed_HeathCare_System.Interfaces;
 using WebMed_HeathCare_System.Models;
 
-namespace WebMed_HeathCare_System.Services
+namespace WebMed_HeathCare_System.Repositories
 {
     public class PricingRepository : IPricingRepository
     {
