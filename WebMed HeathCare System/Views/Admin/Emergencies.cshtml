@@ -1,20 +1,20 @@
 @model IEnumerable<WebMed_HeathCare_System.Models.AmbulanceRequest>
 
 @{
-    ViewData["Title"] = "Emergency Dispatch - Admin Panel";
+    ViewData["Title"] = "Điều Phối Cấp Cứu - Bảng Điều Khiển Admin";
 }
 
 <div class="container-fluid mt-4 px-4 mb-5">
     <!-- Header Block -->
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 border-bottom pb-3">
-        <h1 class="fw-extrabold mb-0 text-dark"><i class="bi bi-shield-fill-exclamation text-danger"></i> Emergency Dispatch Control</h1>
+        <h1 class="fw-extrabold mb-0 text-dark"><i class="bi bi-shield-fill-exclamation text-danger"></i> Quản Lý Điều Phối Cấp Cứu</h1>
         <div class="btn-group shadow-sm">
-            <a asp-action="Users" class="btn btn-outline-primary">Users</a>
-            <a asp-action="Doctors" class="btn btn-outline-primary">Doctor Verification</a>
-            <a asp-action="Reviews" class="btn btn-outline-primary">Review Moderation</a>
-            <a asp-action="News" class="btn btn-outline-primary">Health News</a>
-            <a asp-action="Roles" class="btn btn-outline-primary">System Roles</a>
-            <a asp-action="Emergencies" class="btn btn-primary active">Emergency Dispatch</a>
+            <a asp-action="Users" class="btn btn-outline-primary">Người dùng</a>
+            <a asp-action="Doctors" class="btn btn-outline-primary">Xác thực bác sĩ</a>
+            <a asp-action="Reviews" class="btn btn-outline-primary">Kiểm duyệt đánh giá</a>
+            <a asp-action="News" class="btn btn-outline-primary">Tin tức sức khỏe</a>
+            <a asp-action="Roles" class="btn btn-outline-primary">Vai trò hệ thống</a>
+            <a asp-action="Emergencies" class="btn btn-primary active">Điều phối cấp cứu</a>
         </div>
     </div>
 
@@ -35,13 +35,13 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th class="p-3">Request ID</th>
-                                <th class="p-3">Patient / Requestor</th>
-                                <th class="p-3">Pickup Location</th>
-                                <th class="p-3">Details / Symptoms</th>
-                                <th class="p-3 text-center">Status</th>
-                                <th class="p-3">Assigned Vehicle</th>
-                                <th class="p-3 text-center" style="width: 320px;">Dispatch Action</th>
+                                <th class="p-3">Mã yêu cầu</th>
+                                <th class="p-3">Bệnh nhân / Người yêu cầu</th>
+                                <th class="p-3">Vị trí đón</th>
+                                <th class="p-3">Chi tiết / Triệu chứng</th>
+                                <th class="p-3 text-center">Trạng thái</th>
+                                <th class="p-3">Xe được phân công</th>
+                                <th class="p-3 text-center" style="width: 320px;">Hành động điều phối</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -53,32 +53,32 @@
                                         @if (request.Patient != null)
                                         {
                                             <div class="fw-bold text-dark">@request.Patient.PatientNavigation.FullName</div>
-                                            <small class="text-muted">Registered Patient</small>
+                                            <small class="text-muted">Bệnh nhân đã đăng ký</small>
                                         }
                                         else
                                         {
-                                            <div class="fw-bold text-danger">Anonymous Request</div>
-                                            <small class="text-muted">Guest / Bystander</small>
+                                            <div class="fw-bold text-danger">Yêu cầu ẩn danh</div>
+                                            <small class="text-muted">Khách / Người qua đường</small>
                                         }
                                     </td>
                                     <td class="p-3 text-muted fs-7">
                                         <i class="bi bi-geo-alt-fill text-danger"></i> @request.PickupLocation
                                     </td>
                                     <td class="p-3 text-muted fs-7">
-                                        @(request.EmergencyDetails ?? "No details provided.")
+                                        @(request.EmergencyDetails ?? "Không có chi tiết nào được cung cấp.")
                                     </td>
                                     <td class="p-3 text-center">
                                         @if (request.Status == "Pending")
                                         {
-                                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-1.5 rounded-pill fw-bold">Awaiting Dispatch</span>
+                                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-1.5 rounded-pill fw-bold">Chờ điều phối</span>
                                         }
                                         else if (request.Status == "Assigned")
                                         {
-                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1.5 rounded-pill fw-bold">Dispatched</span>
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1.5 rounded-pill fw-bold">Đã điều phối</span>
                                         }
                                         else if (request.Status == "Arrived")
                                         {
-                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 rounded-pill fw-bold">Arrived</span>
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 rounded-pill fw-bold">Đã đến nơi</span>
                                         }
                                         else
                                         {
@@ -93,7 +93,7 @@
                                         }
                                         else
                                         {
-                                            <span class="text-muted italic">None</span>
+                                            <span class="text-muted italic">Chưa có</span>
                                         }
                                     </td>
                                     <td class="p-3">
@@ -101,13 +101,13 @@
                                         {
                                             <form asp-action="DispatchAmbulance" method="post" class="d-flex gap-2">
                                                 <input type="hidden" name="requestId" value="@request.RequestId" />
-                                                <input type="text" name="vehicleNumber" class="form-control form-control-sm" placeholder="e.g. AMB-1024" value="AMB-1024" required style="max-width: 130px;" />
-                                                <button type="submit" class="btn btn-danger btn-sm rounded-3 fw-bold px-3 text-nowrap"><i class="bi bi-send-fill"></i> Dispatch</button>
+                                                <input type="text" name="vehicleNumber" class="form-control form-control-sm" placeholder="Ví dụ: AMB-1024" value="AMB-1024" required style="max-width: 130px;" />
+                                                <button type="submit" class="btn btn-danger btn-sm rounded-3 fw-bold px-3 text-nowrap"><i class="bi bi-send-fill"></i> Điều phối</button>
                                             </form>
                                         }
                                         else
                                         {
-                                            <button class="btn btn-outline-secondary btn-sm rounded-3 w-100 fw-bold" disabled><i class="bi bi-check2-all"></i> Already Dispatched</button>
+                                            <button class="btn btn-outline-secondary btn-sm rounded-3 w-100 fw-bold" disabled><i class="bi bi-check2-all"></i> Đã điều phối</button>
                                         }
                                     </td>
                                 </tr>
@@ -120,8 +120,8 @@
             {
                 <div class="py-5 text-center">
                     <i class="bi bi-shield-check text-muted" style="font-size: 4rem;"></i>
-                    <h3 class="fw-bold mt-3">No active emergency requests</h3>
-                    <p class="text-muted">All quiet. No ambulance requests at this moment.</p>
+                    <h3 class="fw-bold mt-3">Không có yêu cầu cấp cứu nào đang hoạt động</h3>
+                    <p class="text-muted">Mọi thứ đều yên tĩnh. Hiện tại không có yêu cầu xe cứu thương nào.</p>
                 </div>
             }
         </div>

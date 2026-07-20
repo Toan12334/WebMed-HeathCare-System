@@ -1,52 +1,52 @@
 @model WebMed_HeathCare_System.Models.InsurancePlanCompareViewModel
 
 @{
-    ViewData["Title"] = "Compare Plans";
+    ViewData["Title"] = "So Sánh Các Gói";
     var p1 = Model.Plan1;
     var p2 = Model.Plan2;
 }
 
 <div class="container mt-4">
-    <a asp-action="Index" class="btn btn-secondary mb-3">&larr; Back to Plans</a>
-    <h2 class="mb-4 text-center">Plan Comparison</h2>
+    <a asp-action="Index" class="btn btn-secondary mb-3">&larr; Quay lại các gói</a>
+    <h2 class="mb-4 text-center">Bảng So Sánh Các Gói Bảo Hiểm</h2>
 
     <div class="table-responsive">
         <table class="table table-bordered table-striped text-center align-middle">
             <thead class="table-dark">
                 <tr>
-                    <th width="20%">Feature</th>
+                    <th width="20%">Tính năng</th>
                     <th width="40%" class="fs-4">@p1.Plan.PlanName</th>
                     <th width="40%" class="fs-4">@p2.Plan.PlanName</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td class="fw-bold text-start">Price</td>
+                    <td class="fw-bold text-start">Phí định kỳ</td>
                     <td class="fs-5 text-success fw-bold">@(p1.Pricing != null ? p1.Pricing.Premium.ToString("N0") : "N/A") VND</td>
                     <td class="fs-5 text-success fw-bold">@(p2.Pricing != null ? p2.Pricing.Premium.ToString("N0") : "N/A") VND</td>
                 </tr>
                 <tr>
-                    <td class="fw-bold text-start">Duration</td>
-                    <td>@p1.Plan.DurationMonths months</td>
-                    <td>@p2.Plan.DurationMonths months</td>
+                    <td class="fw-bold text-start">Thời hạn</td>
+                    <td>@p1.Plan.DurationMonths tháng</td>
+                    <td>@p2.Plan.DurationMonths tháng</td>
                 </tr>
                 <tr>
-                    <td class="fw-bold text-start">Description</td>
+                    <td class="fw-bold text-start">Mô tả</td>
                     <td>@(p1.Plan.Description ?? "N/A")</td>
                     <td>@(p2.Plan.Description ?? "N/A")</td>
                 </tr>
                 <tr>
-                    <td class="fw-bold text-start">Deductible</td>
+                    <td class="fw-bold text-start">Khấu trừ</td>
                     <td>@(p1.Pricing?.Deductible != null ? p1.Pricing.Deductible.Value.ToString("N0") + " VND" : "N/A")</td>
                     <td>@(p2.Pricing?.Deductible != null ? p2.Pricing.Deductible.Value.ToString("N0") + " VND" : "N/A")</td>
                 </tr>
                 <tr>
-                    <td class="fw-bold text-start">Copay</td>
+                    <td class="fw-bold text-start">Đồng thanh toán</td>
                     <td>@(p1.Pricing?.Copay != null ? p1.Pricing.Copay.Value.ToString("N0") + " VND" : "N/A")</td>
                     <td>@(p2.Pricing?.Copay != null ? p2.Pricing.Copay.Value.ToString("N0") + " VND" : "N/A")</td>
                 </tr>
                 <tr>
-                    <td class="fw-bold text-start">Coverage</td>
+                    <td class="fw-bold text-start">Quyền lợi bảo vệ</td>
                     <td>
                         <p class="text-start">@(p1.Coverage?.CoverageDetails ?? "N/A")</p>
                     </td>
@@ -55,7 +55,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="fw-bold text-start">Benefits</td>
+                    <td class="fw-bold text-start">Quyền lợi bổ sung</td>
                     <td>
                         <ul class="list-unstyled mb-0 text-start">
                             @if(p1.Benefits != null) { foreach(var b in p1.Benefits) { <li><i class="bi bi-star-fill text-warning"></i> @b.BenefitName</li> } }
@@ -69,8 +69,8 @@
                 </tr>
                 <tr>
                     <td></td>
-                    <td><a asp-action="Enroll" asp-route-planId="@p1.Plan.PlanId" class="btn btn-primary w-50">Select</a></td>
-                    <td><a asp-action="Enroll" asp-route-planId="@p2.Plan.PlanId" class="btn btn-primary w-50">Select</a></td>
+                    <td><a asp-action="Enroll" asp-route-planId="@p1.Plan.PlanId" class="btn btn-primary w-50">Chọn</a></td>
+                    <td><a asp-action="Enroll" asp-route-planId="@p2.Plan.PlanId" class="btn btn-primary w-50">Chọn</a></td>
                 </tr>
             </tbody>
         </table>

@@ -1,10 +1,10 @@
 @{
-    ViewData["Title"] = "Professional Doctor License";
+    ViewData["Title"] = "Giấy Phép Hành Nghề Bác Sĩ";
     var license = (WebMed_HeathCare_System.Models.DoctorLicense?)ViewBag.License;
 }
 
 <div class="container mt-5 mb-5">
-    <h1 class="fw-extrabold mb-4"><i class="bi bi-patch-check"></i> Professional Licensing</h1>
+    <h1 class="fw-extrabold mb-4"><i class="bi bi-patch-check"></i> Cấp Phép Hành Nghề</h1>
 
     @if (TempData["SuccessMessage"] != null)
     {
@@ -26,24 +26,24 @@
         <!-- License info / status -->
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
-                <h4 class="fw-bold text-dark border-bottom pb-2 mb-4">Verification Status</h4>
+                <h4 class="fw-bold text-dark border-bottom pb-2 mb-4">Trạng Thái Xác Thực</h4>
                 
                 @if (license != null)
                 {
                     <div class="bg-light p-4 rounded-4 mb-4">
                         <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
-                            <span class="text-muted">License Number:</span>
+                            <span class="text-muted">Số giấy phép:</span>
                             <span class="fw-bold">@license.LicenseNumber</span>
                         </div>
                         <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
-                            <span class="text-muted">Verification Status:</span>
+                            <span class="text-muted">Trạng thái xác thực:</span>
                             @if (license.VerificationStatus == "Approved")
                             {
-                                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill fw-bold">Approved</span>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill fw-bold">Đã duyệt</span>
                             }
                             else if (license.VerificationStatus == "Pending")
                             {
-                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-1 rounded-pill fw-bold">Pending Review</span>
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-1 rounded-pill fw-bold">Chờ kiểm duyệt</span>
                             }
                             else
                             {
@@ -51,18 +51,18 @@
                             }
                         </div>
                         <div class="d-flex justify-content-between mb-3 border-bottom pb-2">
-                            <span class="text-muted">Payment:</span>
+                            <span class="text-muted">Thanh toán:</span>
                             @if (license.PaymentStatus == "Paid")
                             {
-                                <span class="badge bg-success text-white px-3 py-1 rounded-pill fw-bold">Paid</span>
+                                <span class="badge bg-success text-white px-3 py-1 rounded-pill fw-bold">Đã thanh toán</span>
                             }
                             else
                             {
-                                <span class="badge bg-danger text-white px-3 py-1 rounded-pill fw-bold">Pending</span>
+                                <span class="badge bg-danger text-white px-3 py-1 rounded-pill fw-bold">Chờ thanh toán</span>
                             }
                         </div>
                         <div class="d-flex justify-content-between">
-                            <span class="text-muted">Submitted Date:</span>
+                            <span class="text-muted">Ngày gửi:</span>
                             <span class="fw-semibold text-dark">@license.SubmittedAt.ToString("d")</span>
                         </div>
                     </div>
@@ -70,33 +70,33 @@
                     @if (license.PaymentStatus == "Pending")
                     {
                         <div class="alert alert-warning rounded-3">
-                            <i class="bi bi-info-circle-fill"></i> Please complete payment for the licensing review fee to start the verification process.
+                            <i class="bi bi-info-circle-fill"></i> Vui lòng hoàn tất thanh toán phí thẩm định giấy phép để bắt đầu quá trình xác thực.
                         </div>
-                        <a asp-action="PaymentLicense" asp-route-licenseId="@license.LicenseId" class="btn btn-warning btn-lg w-100 rounded-3 fw-bold py-3"><i class="bi bi-credit-card"></i> Pay License Fee (@license.FeeAmount.ToString("N0") VND)</a>
+                        <a asp-action="PaymentLicense" asp-route-licenseId="@license.LicenseId" class="btn btn-warning btn-lg w-100 rounded-3 fw-bold py-3"><i class="bi bi-credit-card"></i> Thanh toán Phí Thẩm Định (@license.FeeAmount.ToString("N0") VND)</a>
                     }
                     else if (license.VerificationStatus == "Approved")
                     {
                         <div class="alert alert-success rounded-3 text-center mb-0">
-                            <i class="bi bi-shield-fill-check"></i> Verification complete. You can now configure your schedule availability and take online sessions.
+                            <i class="bi bi-shield-fill-check"></i> Xác thực hoàn tất. Bạn có thể cấu hình lịch làm việc trống và thực hiện các ca khám trực tuyến.
                         </div>
                     }
                     else if (license.VerificationStatus == "Pending")
                     {
                         <div class="alert alert-warning rounded-3 text-center mb-0">
-                            <i class="bi bi-hourglass-split"></i> Payment received. Your license is pending verification review by administrators.
+                            <i class="bi bi-hourglass-split"></i> Đã nhận thanh toán. Giấy phép của bạn đang chờ quản trị viên duyệt xác thực.
                         </div>
                     }
                     else
                     {
                         <div class="alert alert-danger rounded-3 text-center mb-0">
-                            <i class="bi bi-x-circle-fill"></i> License verification rejected. Please contact administrator support.
+                            <i class="bi bi-x-circle-fill"></i> Yêu cầu xác thực giấy phép bị từ chối. Vui lòng liên hệ bộ phận hỗ trợ quản trị viên.
                         </div>
                     }
                 }
                 else
                 {
                     <div class="alert alert-info rounded-3 text-center">
-                        <i class="bi bi-info-circle-fill"></i> You have not submitted professional license details yet. Please fill the form to register.
+                        <i class="bi bi-info-circle-fill"></i> Bạn chưa gửi thông tin giấy phép hành nghề. Vui lòng điền vào biểu mẫu để đăng ký.
                     </div>
                 }
             </div>
@@ -105,42 +105,42 @@
         <!-- Submission Form -->
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
-                <h4 class="fw-bold text-dark border-bottom pb-2 mb-4">Submit Credentials</h4>
+                <h4 class="fw-bold text-dark border-bottom pb-2 mb-4">Gửi Hồ Sơ Chứng Chỉ</h4>
                 
                 @if (license == null || license.VerificationStatus == "Approved" || license.VerificationStatus == "Rejected")
                 {
                     <form asp-action="SubmitLicense" method="post" enctype="multipart/form-data">
                         <!-- License No -->
                         <div class="mb-3">
-                            <label class="form-label fw-bold text-secondary">Medical License Number (ID)</label>
-                            <input type="text" name="licenseNumber" class="form-control rounded-3" required placeholder="e.g. LIC-12345678" />
+                            <label class="form-label fw-bold text-secondary">Số Giấy Phép Y Khoa (ID)</label>
+                            <input type="text" name="licenseNumber" class="form-control rounded-3" required placeholder="Ví dụ: LIC-12345678" />
                         </div>
 
                         <!-- Supporting document upload mock -->
                         <div class="mb-4">
-                            <label class="form-label fw-bold text-secondary">Supporting Certificate Documents (.pdf, .png, .jpg, .jpeg)</label>
+                            <label class="form-label fw-bold text-secondary">Tài Liệu Chứng Chỉ Đính Kèm (.pdf, .png, .jpg, .jpeg)</label>
                             <input type="file" name="licenseFile" class="form-control rounded-3" accept=".pdf,.png,.jpg,.jpeg" required />
-                            <small class="text-muted">Upload copy of your medical certificate or license.</small>
+                            <small class="text-muted">Tải lên bản sao chứng chỉ y khoa hoặc giấy phép hành nghề.</small>
                         </div>
 
                         <!-- Fee mock -->
                         <div class="mb-4 bg-light p-3 rounded-3">
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-muted">Processing Verification Fee:</span>
+                                <span class="text-muted">Lệ phí thẩm định hồ sơ:</span>
                                 <strong class="text-success fs-5">150,000 VND</strong>
                             </div>
                             <input type="hidden" name="feeAmount" value="150000" />
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 fw-bold py-3"><i class="bi bi-file-earmark-arrow-up-fill"></i> Submit License Details</button>
+                        <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 fw-bold py-3"><i class="bi bi-file-earmark-arrow-up-fill"></i> Gửi Thông Tin Giấy Phép</button>
                     </form>
                 }
                 else
                 {
                     <div class="text-center py-5">
                         <i class="bi bi-file-earmark-lock-fill text-warning animate-pulse" style="font-size: 4rem;"></i>
-                        <h5 class="fw-bold mt-3">Application Under Review</h5>
-                        <p class="text-muted">You have a pending application awaiting payment or review. You cannot submit new credentials until it is processed.</p>
+                        <h5 class="fw-bold mt-3">Hồ Sơ Đang Trong Quá Trình Kiểm Duyệt</h5>
+                        <p class="text-muted">Bạn có một hồ sơ đang chờ thanh toán hoặc đang chờ duyệt. Bạn không thể gửi hồ sơ mới cho đến khi hồ sơ cũ được xử lý.</p>
                     </div>
                 }
             </div>
@@ -151,15 +151,15 @@
     @if (ViewBag.Licenses != null && ((List<WebMed_HeathCare_System.Models.DoctorLicense>)ViewBag.Licenses).Any())
     {
         <div class="card border-0 shadow-sm rounded-4 p-4 mt-5">
-            <h4 class="fw-bold text-dark border-bottom pb-2 mb-4"><i class="bi bi-clock-history"></i> License Submission History</h4>
+            <h4 class="fw-bold text-dark border-bottom pb-2 mb-4"><i class="bi bi-clock-history"></i> Lịch Sử Gửi Yêu Cầu Giấy Phép</h4>
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th class="p-3">License Number</th>
-                            <th class="p-3">Submitted Date</th>
-                            <th class="p-3">Fee Status</th>
-                            <th class="p-3">Verification Status</th>
+                            <th class="p-3">Số giấy phép</th>
+                            <th class="p-3">Ngày gửi</th>
+                            <th class="p-3">Phí thẩm định</th>
+                            <th class="p-3">Trạng thái xác thực</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -171,21 +171,21 @@
                                 <td class="p-3">
                                     @if (lic.PaymentStatus == "Paid")
                                     {
-                                        <span class="badge bg-success text-white px-2.5 py-1 rounded">Paid</span>
+                                        <span class="badge bg-success text-white px-2.5 py-1 rounded">Đã thanh toán</span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-danger text-white px-2.5 py-1 rounded">Pending</span>
+                                        <span class="badge bg-danger text-white px-2.5 py-1 rounded">Chờ thanh toán</span>
                                     }
                                 </td>
                                 <td class="p-3">
                                     @if (lic.VerificationStatus == "Approved")
                                     {
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 rounded">Approved</span>
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 rounded">Đã duyệt</span>
                                     }
                                     else if (lic.VerificationStatus == "Pending")
                                     {
-                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2.5 py-1 rounded">Pending Review</span>
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2.5 py-1 rounded">Chờ kiểm duyệt</span>
                                     }
                                     else
                                     {

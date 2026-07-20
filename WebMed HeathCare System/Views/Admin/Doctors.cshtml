@@ -1,20 +1,20 @@
 @model IEnumerable<WebMed_HeathCare_System.Models.DoctorLicense>
 
 @{
-    ViewData["Title"] = "Doctor Verification Requests - Admin Console";
+    ViewData["Title"] = "Yêu Cầu Xác Thực Bác Sĩ - Bảng Điều Khiển Admin";
 }
 
 <div class="container-fluid mt-4 px-4 mb-5">
     <!-- Header Block -->
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 border-bottom pb-3">
-        <h1 class="fw-extrabold mb-0 text-dark"><i class="bi bi-patch-check-fill text-primary"></i> Doctor Verification</h1>
+        <h1 class="fw-extrabold mb-0 text-dark"><i class="bi bi-patch-check-fill text-primary"></i> Xác Thực Bác Sĩ</h1>
         <div class="btn-group shadow-sm">
-            <a asp-action="Users" class="btn btn-outline-primary">Users</a>
-            <a asp-action="Doctors" class="btn btn-primary active">Doctor Verification</a>
-            <a asp-action="Reviews" class="btn btn-outline-primary">Review Moderation</a>
-            <a asp-action="News" class="btn btn-outline-primary">Health News</a>
-            <a asp-action="Roles" class="btn btn-outline-primary">System Roles</a>
-            <a asp-action="Emergencies" class="btn btn-outline-primary">Emergency Dispatch</a>
+            <a asp-action="Users" class="btn btn-outline-primary">Người dùng</a>
+            <a asp-action="Doctors" class="btn btn-primary active">Xác thực bác sĩ</a>
+            <a asp-action="Reviews" class="btn btn-outline-primary">Kiểm duyệt đánh giá</a>
+            <a asp-action="News" class="btn btn-outline-primary">Tin tức sức khỏe</a>
+            <a asp-action="Roles" class="btn btn-outline-primary">Vai trò hệ thống</a>
+            <a asp-action="Emergencies" class="btn btn-outline-primary">Điều phối khẩn cấp</a>
         </div>
     </div>
 
@@ -35,13 +35,13 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th class="p-3">License ID</th>
-                                <th class="p-3">Doctor Name</th>
-                                <th class="p-3">Specialty</th>
-                                <th class="p-3">License Number</th>
-                                <th class="p-3">Uploaded Document</th>
-                                <th class="p-3 text-center">Submitted At</th>
-                                <th class="p-3 text-center" style="width: 250px;">Actions</th>
+                                <th class="p-3">Mã chứng chỉ</th>
+                                <th class="p-3">Tên bác sĩ</th>
+                                <th class="p-3">Chuyên khoa</th>
+                                <th class="p-3">Số giấy phép</th>
+                                <th class="p-3">Tài liệu đã tải lên</th>
+                                <th class="p-3 text-center">Ngày nộp</th>
+                                <th class="p-3 text-center" style="width: 250px;">Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -53,7 +53,7 @@
                                     <td class="p-3 text-muted">@request.Doctor.Specialty</td>
                                     <td class="p-3"><code class="text-dark">@request.LicenseNumber</code></td>
                                     <td class="p-3">
-                                        <a href="@request.DocumentUrl" target="_blank" class="text-decoration-none"><i class="bi bi-file-pdf text-danger"></i> View Certificate</a>
+                                        <a href="@request.DocumentUrl" target="_blank" class="text-decoration-none"><i class="bi bi-file-pdf text-danger"></i> Xem chứng chỉ</a>
                                     </td>
                                     <td class="p-3 text-center text-muted">@request.SubmittedAt.ToString("d")</td>
                                     <td class="p-3 text-center">
@@ -61,12 +61,12 @@
                                             <form asp-action="VerifyDoctor" method="post" class="w-50">
                                                 <input type="hidden" name="licenseId" value="@request.LicenseId" />
                                                 <input type="hidden" name="status" value="Approved" />
-                                                <button type="submit" class="btn btn-success btn-sm w-100 rounded-3 fw-bold"><i class="bi bi-check-lg"></i> Approve</button>
+                                                <button type="submit" class="btn btn-success btn-sm w-100 rounded-3 fw-bold"><i class="bi bi-check-lg"></i> Duyệt</button>
                                             </form>
                                             <form asp-action="VerifyDoctor" method="post" class="w-50">
                                                 <input type="hidden" name="licenseId" value="@request.LicenseId" />
                                                 <input type="hidden" name="status" value="Rejected" />
-                                                <button type="submit" class="btn btn-danger btn-sm w-100 rounded-3 fw-bold"><i class="bi bi-x-lg"></i> Reject</button>
+                                                <button type="submit" class="btn btn-danger btn-sm w-100 rounded-3 fw-bold"><i class="bi bi-x-lg"></i> Từ chối</button>
                                             </form>
                                         </div>
                                     </td>
@@ -80,8 +80,8 @@
             {
                 <div class="py-5 text-center">
                     <i class="bi bi-shield-fill-check text-success" style="font-size: 4rem;"></i>
-                    <h3 class="fw-bold mt-3">All profiles verified</h3>
-                    <p class="text-muted">No pending doctor verification requests at the moment.</p>
+                    <h3 class="fw-bold mt-3">Tất cả hồ sơ đã được xác thực</h3>
+                    <p class="text-muted">Hiện tại không có yêu cầu xác thực bác sĩ nào đang chờ.</p>
                 </div>
             }
         </div>

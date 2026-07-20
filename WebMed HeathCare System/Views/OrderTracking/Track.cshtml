@@ -1,19 +1,19 @@
 @model WebMed_HeathCare_System.Models.Order
 
 @{
-    ViewData["Title"] = "Track Order #" + Model.OrderId;
+    ViewData["Title"] = "Theo dõi đơn hàng #" + Model.OrderId;
 }
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
 <div class="container mt-5 mb-5">
-    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 mb-4"><i class="bi bi-arrow-left"></i> Back to Orders</a>
+    <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 mb-4"><i class="bi bi-arrow-left"></i> Quay lại Đơn hàng</a>
 
     <div class="row g-4">
         <!-- Status Timeline -->
         <div class="col-lg-7">
             <div class="card border-0 shadow-sm rounded-4 p-4">
-                <h4 class="fw-bold text-dark border-bottom pb-2 mb-4"><i class="bi bi-compass text-primary animate-spin"></i> Delivery Progress</h4>
+                <h4 class="fw-bold text-dark border-bottom pb-2 mb-4"><i class="bi bi-compass text-primary animate-spin"></i> Tiến độ giao hàng</h4>
 
                 <div class="tracking-timeline position-relative ps-4 py-2">
                     <!-- Step 1: Pending (Order Placed) -->
@@ -21,8 +21,8 @@
                         <div class="timeline-marker position-absolute top-0 start-0 translate-middle-x rounded-circle border d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; left: -12px; z-index: 2;">
                             <i class="bi bi-circle-fill fs-9"></i>
                         </div>
-                        <h6 class="fw-bold mb-0">Order Placed</h6>
-                        <small class="text-muted">Order received by WebMed systems</small>
+                        <h6 class="fw-bold mb-0">Đã đặt hàng</h6>
+                        <small class="text-muted">Hệ thống WebMed đã ghi nhận đơn hàng</small>
                     </div>
 
                     <!-- Step 2: Paid -->
@@ -30,8 +30,8 @@
                         <div class="timeline-marker position-absolute top-0 start-0 translate-middle-x rounded-circle border d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; left: -12px; z-index: 2;">
                             <i class="bi bi-circle-fill fs-9"></i>
                         </div>
-                        <h6 class="fw-bold mb-0">Payment Confirmed</h6>
-                        <small class="text-muted">Transaction completed successfully</small>
+                        <h6 class="fw-bold mb-0">Xác nhận thanh toán</h6>
+                        <small class="text-muted">Giao dịch hoàn tất thành công</small>
                     </div>
 
                     <!-- Step 3: Preparing -->
@@ -39,8 +39,8 @@
                         <div class="timeline-marker position-absolute top-0 start-0 translate-middle-x rounded-circle border d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; left: -12px; z-index: 2;">
                             <i class="bi bi-circle-fill fs-9"></i>
                         </div>
-                        <h6 class="fw-bold mb-0">Pharmacist Preparing</h6>
-                        <small class="text-muted">Medicines are being prepared & checked</small>
+                        <h6 class="fw-bold mb-0">Dược sĩ đang chuẩn bị</h6>
+                        <small class="text-muted">Các loại thuốc đang được đóng gói & kiểm tra</small>
                     </div>
 
                     <!-- Step 4: Packed -->
@@ -48,8 +48,8 @@
                         <div class="timeline-marker position-absolute top-0 start-0 translate-middle-x rounded-circle border d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; left: -12px; z-index: 2;">
                             <i class="bi bi-circle-fill fs-9"></i>
                         </div>
-                        <h6 class="fw-bold mb-0">Packed & Dispatched</h6>
-                        <small class="text-muted">Package handed over to courier service</small>
+                        <h6 class="fw-bold mb-0">Đã đóng gói & Gửi hàng</h6>
+                        <small class="text-muted">Đơn hàng đã bàn giao cho đơn vị vận chuyển</small>
                     </div>
 
                     <!-- Step 5: Shipping -->
@@ -57,8 +57,8 @@
                         <div class="timeline-marker position-absolute top-0 start-0 translate-middle-x rounded-circle border d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; left: -12px; z-index: 2;">
                             <i class="bi bi-circle-fill fs-9"></i>
                         </div>
-                        <h6 class="fw-bold mb-0">In Transit</h6>
-                        <small class="text-muted">Courier is delivering package to your location</small>
+                        <h6 class="fw-bold mb-0">Đang vận chuyển</h6>
+                        <small class="text-muted">Shipper đang giao hàng đến địa chỉ của bạn</small>
                     </div>
 
                     <!-- Step 6: Completed -->
@@ -66,8 +66,8 @@
                         <div class="timeline-marker position-absolute top-0 start-0 translate-middle-x rounded-circle border d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; left: -12px; z-index: 2;">
                             <i class="bi bi-circle-fill fs-9"></i>
                         </div>
-                        <h6 class="fw-bold mb-0">Delivered</h6>
-                        <small class="text-muted">Order successfully received</small>
+                        <h6 class="fw-bold mb-0">Đã giao hàng</h6>
+                        <small class="text-muted">Đã nhận đơn hàng thành công</small>
                     </div>
                 </div>
             </div>
@@ -77,22 +77,22 @@
         <div class="col-lg-5">
             <!-- Order Details -->
             <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
-                <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Order Details</h5>
-                <p class="mb-1 fs-7"><strong>Order ID:</strong> #@Model.OrderId</p>
-                <p class="mb-1 fs-7"><strong>Shipping Address:</strong> @Model.ShippingAddress</p>
-                <p class="mb-1 fs-7"><strong>Contact Phone:</strong> @Model.ShippingPhone</p>
-                <p class="mb-3 fs-7"><strong>Payment Method:</strong> @Model.PaymentMethod</p>
+                <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Chi tiết Đơn hàng</h5>
+                <p class="mb-1 fs-7"><strong>Mã Đơn hàng:</strong> #@Model.OrderId</p>
+                <p class="mb-1 fs-7"><strong>Địa chỉ giao hàng:</strong> @Model.ShippingAddress</p>
+                <p class="mb-1 fs-7"><strong>Số điện thoại:</strong> @Model.ShippingPhone</p>
+                <p class="mb-3 fs-7"><strong>Phương thức thanh toán:</strong> @Model.PaymentMethod</p>
                 
                 <div class="alert alert-info rounded-3 text-center mb-0">
-                    <h6 class="alert-heading text-uppercase fw-bold fs-8 mb-1">Estimated Arrival</h6>
-                    <h3 class="display-6 fw-extrabold m-0 text-primary" id="etaDisplay">Checking...</h3>
+                    <h6 class="alert-heading text-uppercase fw-bold fs-8 mb-1">Thời gian giao dự kiến</h6>
+                    <h3 class="display-6 fw-extrabold m-0 text-primary" id="etaDisplay">Đang kiểm tra...</h3>
                 </div>
             </div>
 
             <!-- Live GPS map -->
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden" id="gpsCard" style="display: none;">
                 <div class="bg-primary text-white p-3 d-flex align-items-center">
-                    <i class="bi bi-geo-alt-fill me-2"></i> <h6 class="fw-bold mb-0">Live Delivery Courier Tracking</h6>
+                    <i class="bi bi-geo-alt-fill me-2"></i> <h6 class="fw-bold mb-0">Theo dõi hành trình Shipper trực tuyến</h6>
                 </div>
                 <div class="p-0 position-relative" style="height: 350px;">
                     <div id="map" style="height: 100%; width: 100%; z-index: 1;"></div>
@@ -121,11 +121,11 @@
 
             // Add Hospital Origin Marker
             hospitalMarker = L.marker([10.762622, 106.660172]).addTo(map)
-                .bindPopup('<b>WebMed Central Pharmacy</b><br>Shipment dispatched from here.').openPopup();
+                .bindPopup('<b>Nhà thuốc Trung tâm WebMed</b><br>Đơn hàng được gửi từ đây.').openPopup();
 
             // Add Courier Live Marker
             courierMarker = L.marker([lat, lng]).addTo(map)
-                .bindPopup('<b>Delivery Courier</b><br>In transit to destination.').openPopup();
+                .bindPopup('<b>Shipper WebMed</b><br>Đang giao hàng tới bạn.').openPopup();
         }
 
         function updateCourierLocation(lat, lng) {

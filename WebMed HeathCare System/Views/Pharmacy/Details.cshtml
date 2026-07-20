@@ -1,12 +1,12 @@
 @model WebMed_HeathCare_System.Models.Medicine
 
 @{
-    ViewData["Title"] = Model.Name + " - Medicine Details";
+    ViewData["Title"] = Model.Name + " - Chi Tiết Thuốc";
 }
 
 <div class="container mt-5">
     <!-- Back Navigation -->
-    <a asp-action="Index" class="btn btn-link text-decoration-none text-muted mb-4"><i class="bi bi-arrow-left"></i> Back to Pharmacy</a>
+    <a asp-action="Index" class="btn btn-link text-decoration-none text-muted mb-4"><i class="bi bi-arrow-left"></i> Quay lại Nhà Thuốc</a>
 
     @if (TempData["ErrorMessage"] != null)
     {
@@ -35,32 +35,32 @@
                         
                         @if (Model.IsPrescriptionRequired)
                         {
-                            <span class="badge bg-danger text-white px-3 py-2 rounded-pill fw-bold"><i class="bi bi-file-earmark-medical"></i> Requires Prescription</span>
+                            <span class="badge bg-danger text-white px-3 py-2 rounded-pill fw-bold"><i class="bi bi-file-earmark-medical"></i> Cần Đơn Thuốc</span>
                         }
                     </div>
                     
                     <h3 class="text-success fw-extrabold mb-4">@Model.Price.ToString("N0") <span class="fs-5 fw-normal">VND</span></h3>
                     
-                    <h5 class="fw-bold text-secondary mb-2">Description</h5>
+                    <h5 class="fw-bold text-secondary mb-2">Mô tả sản phẩm</h5>
                     <p class="text-muted mb-4" style="line-height: 1.6;">
                         @Model.Description
                     </p>
 
                     <div class="row mb-4 bg-light p-3 rounded-3 g-2">
                         <div class="col-6">
-                            <small class="text-muted d-block">Stock Available</small>
+                            <small class="text-muted d-block">Hàng còn trong kho</small>
                             @if (Model.StockQuantity > 0)
                             {
-                                <strong class="text-dark"><i class="bi bi-box-seam text-success"></i> @Model.StockQuantity units</strong>
+                                <strong class="text-dark"><i class="bi bi-box-seam text-success"></i> @Model.StockQuantity đơn vị</strong>
                             }
                             else
                             {
-                                <strong class="text-danger"><i class="bi bi-x-circle"></i> Out of stock</strong>
+                                <strong class="text-danger"><i class="bi bi-x-circle"></i> Hết hàng</strong>
                             }
                         </div>
                         <div class="col-6">
-                            <small class="text-muted d-block">Type</small>
-                            <strong class="text-dark">OTC / Pharmacy</strong>
+                            <small class="text-muted d-block">Loại sản phẩm</small>
+                            <strong class="text-dark">Không kê đơn / Nhà thuốc</strong>
                         </div>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
                             <input type="hidden" name="medicineId" value="@Model.MedicineId" />
                             
                             <div class="col-sm-4">
-                                <label class="form-label fw-bold text-secondary">Quantity</label>
+                                <label class="form-label fw-bold text-secondary">Số lượng</label>
                                 <div class="input-group">
                                     <button type="button" class="btn btn-outline-secondary" onclick="decrement()">-</button>
                                     <input type="number" id="qtyInput" name="quantity" class="form-control text-center" value="1" min="1" max="@Model.StockQuantity" required />
@@ -82,14 +82,14 @@
                             </div>
                             
                             <div class="col-sm-8">
-                                <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 fw-bold py-3"><i class="bi bi-cart-plus"></i> Add to Cart</button>
+                                <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 fw-bold py-3"><i class="bi bi-cart-plus"></i> Thêm vào giỏ hàng</button>
                             </div>
                         </form>
                     }
                     else
                     {
                         <div class="alert alert-warning text-center rounded-3">
-                            <i class="bi bi-bell-fill me-2"></i> This medicine is currently out of stock. We will restock it soon.
+                            <i class="bi bi-bell-fill me-2"></i> Sản phẩm thuốc này hiện tại đã hết hàng. Chúng tôi sẽ sớm bổ sung.
                         </div>
                     }
                 </div>

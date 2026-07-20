@@ -1,20 +1,20 @@
 @model IEnumerable<WebMed_HeathCare_System.Models.Article>
 
 @{
-    ViewData["Title"] = "Health News Articles - Admin Console";
+    ViewData["Title"] = "Bài Viết Tin Tức Sức Khỏe - Bảng Điều Khiển Admin";
 }
 
 <div class="container-fluid mt-4 px-4 mb-5">
     <!-- Header Block -->
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 border-bottom pb-3">
-        <h1 class="fw-extrabold mb-0 text-dark"><i class="bi bi-newspaper text-primary"></i> Health News</h1>
+        <h1 class="fw-extrabold mb-0 text-dark"><i class="bi bi-newspaper text-primary"></i> Tin Tức Sức Khỏe</h1>
         <div class="btn-group shadow-sm">
-            <a asp-action="Users" class="btn btn-outline-primary">Users</a>
-            <a asp-action="Doctors" class="btn btn-outline-primary">Doctor Verification</a>
-            <a asp-action="Reviews" class="btn btn-outline-primary">Review Moderation</a>
-            <a asp-action="News" class="btn btn-primary active">Health News</a>
-            <a asp-action="Roles" class="btn btn-outline-primary">System Roles</a>
-            <a asp-action="Emergencies" class="btn btn-outline-primary">Emergency Dispatch</a>
+            <a asp-action="Users" class="btn btn-outline-primary">Người dùng</a>
+            <a asp-action="Doctors" class="btn btn-outline-primary">Xác thực bác sĩ</a>
+            <a asp-action="Reviews" class="btn btn-outline-primary">Kiểm duyệt đánh giá</a>
+            <a asp-action="News" class="btn btn-primary active">Tin tức sức khỏe</a>
+            <a asp-action="Roles" class="btn btn-outline-primary">Vai trò hệ thống</a>
+            <a asp-action="Emergencies" class="btn btn-outline-primary">Điều phối cấp cứu</a>
         </div>
     </div>
 
@@ -28,7 +28,7 @@
 
     <!-- Action Bar -->
     <div class="mb-4">
-        <a asp-action="CreateNews" class="btn btn-primary rounded-pill px-4 fw-bold"><i class="bi bi-plus-lg"></i> Create News Article</a>
+        <a asp-action="CreateNews" class="btn btn-primary rounded-pill px-4 fw-bold"><i class="bi bi-plus-lg"></i> Tạo Bài Viết Tin Tức</a>
     </div>
 
     <!-- Health News List -->
@@ -40,12 +40,12 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th class="p-3">ID</th>
-                                <th class="p-3">Article Title</th>
-                                <th class="p-3">Category</th>
-                                <th class="p-3">Author</th>
-                                <th class="p-3 text-center">Published Date</th>
-                                <th class="p-3 text-center">Status</th>
+                                <th class="p-3">Mã tin</th>
+                                <th class="p-3">Tiêu đề Bài viết</th>
+                                <th class="p-3">Chuyên mục</th>
+                                <th class="p-3">Tác giả</th>
+                                <th class="p-3 text-center">Ngày đăng</th>
+                                <th class="p-3 text-center">Trạng thái</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -60,11 +60,11 @@
                                     <td class="p-3 text-center">
                                         @if (article.IsPublished)
                                         {
-                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 rounded-pill fw-bold">Published</span>
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 rounded-pill fw-bold">Đã xuất bản</span>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-1.5 rounded-pill fw-bold">Draft</span>
+                                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-1.5 rounded-pill fw-bold">Bản nháp</span>
                                         }
                                     </td>
                                 </tr>
@@ -77,9 +77,9 @@
             {
                 <div class="py-5 text-center">
                     <i class="bi bi-file-earmark-medical text-muted" style="font-size: 4rem;"></i>
-                    <h3 class="fw-bold mt-3">No articles found</h3>
-                    <p class="text-muted">You haven't written or published any health articles yet.</p>
-                    <a asp-action="CreateNews" class="btn btn-primary rounded-pill px-4 mt-2">Write Article</a>
+                    <h3 class="fw-bold mt-3">Không tìm thấy bài viết nào</h3>
+                    <p class="text-muted">Bạn chưa viết hoặc xuất bản bất kỳ bài viết sức khỏe nào.</p>
+                    <a asp-action="CreateNews" class="btn btn-primary rounded-pill px-4 mt-2">Viết bài viết</a>
                 </div>
             }
         </div>

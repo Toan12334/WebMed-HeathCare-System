@@ -1,14 +1,14 @@
 @model IEnumerable<WebMed_HeathCare_System.Models.Doctor>
 
 @{
-    ViewData["Title"] = "Medical Specialist Team - WebMed";
+    ViewData["Title"] = "Đội Ngũ Bác Sĩ Chuyên Khoa - WebMed";
 }
 
 <div class="container mt-4 pb-5">
     <!-- Header Block -->
     <div class="text-center mb-5">
         <h2 class="fw-bold text-dark text-uppercase tracking-wide" style="font-size: 2rem; letter-spacing: 1px;">
-            Medical Specialist Team
+            Đội Ngũ Bác Sĩ Chuyên Khoa
         </h2>
         <div class="mx-auto bg-emerald mb-3" style="width: 60px; height: 4px; border-radius: 2px;"></div>
     </div>
@@ -25,7 +25,7 @@
                     <div class="input-group">
                         <span class="input-group-text bg-light border-0"><i class="bi bi-geo-alt text-muted"></i></span>
                         <select name="location" class="form-select bg-light border-0 py-2 fs-7" onchange="this.form.submit()">
-                            <option value="">All Locations</option>
+                            <option value="">Tất cả khu vực</option>
                             @foreach (var loc in (List<string>)ViewBag.Locations)
                             {
                                 <!option value="@loc" @(ViewBag.SelectedLocation == loc ? "selected" : "")>@loc</!option>
@@ -39,11 +39,11 @@
                     <div class="input-group">
                         <span class="input-group-text bg-light border-0"><i class="bi bi-briefcase text-muted"></i></span>
                         <select name="position" class="form-select bg-light border-0 py-2 fs-7" onchange="this.form.submit()">
-                            <option value="">All Positions</option>
+                            <option value="">Tất cả chức vụ</option>
                             @foreach (var pos in (List<string>)ViewBag.Positions)
                             {
                                 <!option value="@pos" @(ViewBag.SelectedPosition == pos ? "selected" : "")>
-                                    @(pos == "director" ? "Director/Manager" : pos == "expert" ? "Expert Advisor" : pos == "specialist" ? "Specialist" : "Advisor")
+                                    @(pos == "director" ? "Giám đốc / Quản lý" : pos == "expert" ? "Cố vấn chuyên gia" : pos == "specialist" ? "Bác sĩ chuyên khoa" : "Cố vấn")
                                 </!option>
                             }
                         </select>
@@ -55,7 +55,7 @@
                     <div class="input-group">
                         <span class="input-group-text bg-light border-0"><i class="bi bi-mortarboard text-muted"></i></span>
                         <select name="rank" class="form-select bg-light border-0 py-2 fs-7" onchange="this.form.submit()">
-                            <option value="">Rank / Degree</option>
+                            <option value="">Học hàm / Học vị</option>
                             @foreach (var rk in (List<string>)ViewBag.Ranks)
                             {
                                 <!option value="@rk" @(ViewBag.SelectedRank == rk ? "selected" : "")>@rk</!option>
@@ -69,7 +69,7 @@
                     <div class="input-group">
                         <span class="input-group-text bg-light border-0"><i class="bi bi-search text-muted"></i></span>
                         <input type="text" name="searchTerm" class="form-control bg-light border-0 py-2 fs-7" 
-                               placeholder="Search doctor by name or biography..." value="@ViewBag.SearchTerm" />
+                               placeholder="Tìm kiếm bác sĩ theo tên hoặc tiểu sử..." value="@ViewBag.SearchTerm" />
                         <button type="submit" class="btn btn-emerald px-3"><i class="bi bi-search"></i></button>
                     </div>
                 </div>
@@ -79,45 +79,45 @@
             @if (!string.IsNullOrEmpty(ViewBag.SelectedLocation) || !string.IsNullOrEmpty(ViewBag.SelectedPosition) || !string.IsNullOrEmpty(ViewBag.SelectedRank) || !string.IsNullOrEmpty(ViewBag.SearchTerm) || !string.IsNullOrEmpty(ViewBag.SelectedSpecialty))
             {
                 <div class="d-flex flex-wrap gap-2 align-items-center mt-3 pt-3 border-top border-light">
-                    <span class="small text-muted me-2">Active Filters:</span>
+                    <span class="small text-muted me-2">Bộ lọc đang áp dụng:</span>
                     
                     @if (!string.IsNullOrEmpty(ViewBag.SelectedSpecialty))
                     {
                         <span class="badge bg-emerald-100 text-emerald-800 px-3 py-1 rounded-pill">
-                            Specialty: @ViewBag.SelectedSpecialty
+                            Chuyên khoa: @ViewBag.SelectedSpecialty
                             <a href="?specialty=&location=@ViewBag.SelectedLocation&position=@ViewBag.SelectedPosition&rank=@ViewBag.SelectedRank&searchTerm=@ViewBag.SearchTerm" class="text-emerald-800 ms-1"><i class="bi bi-x-circle-fill"></i></a>
                         </span>
                     }
                     @if (!string.IsNullOrEmpty(ViewBag.SelectedLocation))
                     {
                         <span class="badge bg-light text-dark px-3 py-1 rounded-pill border">
-                            Location: @ViewBag.SelectedLocation
+                            Khu vực: @ViewBag.SelectedLocation
                             <a href="?specialty=@ViewBag.SelectedSpecialty&location=&position=@ViewBag.SelectedPosition&rank=@ViewBag.SelectedRank&searchTerm=@ViewBag.SearchTerm" class="text-dark ms-1"><i class="bi bi-x-circle-fill"></i></a>
                         </span>
                     }
                     @if (!string.IsNullOrEmpty(ViewBag.SelectedPosition))
                     {
                         <span class="badge bg-light text-dark px-3 py-1 rounded-pill border">
-                            Position: @ViewBag.SelectedPosition
+                            Chức vụ: @(ViewBag.SelectedPosition == "director" ? "Giám đốc / Quản lý" : ViewBag.SelectedPosition == "expert" ? "Cố vấn chuyên gia" : ViewBag.SelectedPosition == "specialist" ? "Bác sĩ chuyên khoa" : "Cố vấn")
                             <a href="?specialty=@ViewBag.SelectedSpecialty&location=@ViewBag.SelectedLocation&position=&rank=@ViewBag.SelectedRank&searchTerm=@ViewBag.SearchTerm" class="text-dark ms-1"><i class="bi bi-x-circle-fill"></i></a>
                         </span>
                     }
                     @if (!string.IsNullOrEmpty(ViewBag.SelectedRank))
                     {
                         <span class="badge bg-light text-dark px-3 py-1 rounded-pill border">
-                            Degree: @ViewBag.SelectedRank
+                            Học vị: @ViewBag.SelectedRank
                             <a href="?specialty=@ViewBag.SelectedSpecialty&location=@ViewBag.SelectedLocation&position=@ViewBag.SelectedPosition&rank=&searchTerm=@ViewBag.SearchTerm" class="text-dark ms-1"><i class="bi bi-x-circle-fill"></i></a>
                         </span>
                     }
                     @if (!string.IsNullOrEmpty(ViewBag.SearchTerm))
                     {
                         <span class="badge bg-light text-dark px-3 py-1 rounded-pill border">
-                            Keyword: "@ViewBag.SearchTerm"
+                            Từ khóa: "@ViewBag.SearchTerm"
                             <a href="?specialty=@ViewBag.SelectedSpecialty&location=@ViewBag.SelectedLocation&position=@ViewBag.SelectedPosition&rank=@ViewBag.SelectedRank&searchTerm=" class="text-dark ms-1"><i class="bi bi-x-circle-fill"></i></a>
                         </span>
                     }
                     
-                    <a href="?" class="btn btn-link btn-sm text-danger p-0 ms-auto">Clear all filters</a>
+                    <a href="?" class="btn btn-link btn-sm text-danger p-0 ms-auto">Xóa tất cả bộ lọc</a>
                 </div>
             }
         </div>
@@ -129,13 +129,13 @@
         <div class="col-md-3 mb-4">
             <div class="bg-white rounded-4 shadow-sm border border-light overflow-hidden">
                 <div class="p-3 bg-light border-bottom">
-                    <h5 class="fw-bold text-dark mb-0 fs-6"><i class="bi bi-filter-left me-2"></i>Specialties</h5>
+                    <h5 class="fw-bold text-dark mb-0 fs-6"><i class="bi bi-filter-left me-2"></i>Chuyên Khoa</h5>
                 </div>
                 <div class="list-group list-group-flush specialty-sidebar-list">
                     <!-- All Specialties -->
                     <a href="?specialty=&location=@ViewBag.SelectedLocation&position=@ViewBag.SelectedPosition&rank=@ViewBag.SelectedRank&searchTerm=@ViewBag.SearchTerm" 
                        class="list-group-item list-group-item-action py-3 px-4 fw-bold fs-7 @(string.IsNullOrEmpty(ViewBag.SelectedSpecialty) ? "active-specialty" : "")">
-                        All Specialties
+                        Tất cả chuyên khoa
                     </a>
                     
                     @foreach (var spec in (List<string>)ViewBag.Specialties)
@@ -170,7 +170,7 @@
                                         @if (doctor.IsVerified)
                                         {
                                             <span class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center border border-2 border-white" 
-                                                  style="width: 24px; height: 24px; font-size: 0.75rem;" title="Verified Expert">
+                                                  style="width: 24px; height: 24px; font-size: 0.75rem;" title="Bác sĩ chuyên gia đã xác thực">
                                                 <i class="bi bi-patch-check-fill"></i>
                                             </span>
                                         }
@@ -189,14 +189,14 @@
 
                                     <!-- Bio/Position description -->
                                     <p class="text-muted fs-7 mb-4 px-1 flex-grow-1" style="min-height: 60px; line-height: 1.5;">
-                                        @(doctor.Bio?.Length > 120 ? doctor.Bio.Substring(0, 117) + "..." : doctor.Bio ?? "No bio description provided.")
+                                        @(doctor.Bio?.Length > 120 ? doctor.Bio.Substring(0, 117) + "..." : doctor.Bio ?? "Chưa cập nhật tiểu sử bác sĩ.")
                                     </p>
 
                                     <!-- Action Button -->
                                     <a asp-action="Details" asp-route-id="@doctor.DoctorId" 
                                        class="btn btn-dark w-100 rounded-pill py-2.5 fw-bold text-white shadow-sm mt-auto transition-all d-flex align-items-center justify-content-center gap-2"
                                        style="background: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%); border: none;">
-                                        <i class="bi bi-calendar-check-fill fs-8"></i> Book Now
+                                        <i class="bi bi-calendar-check-fill fs-8"></i> Đặt Lịch Ngay
                                     </a>
                                 </div>
                             </div>
@@ -207,9 +207,9 @@
                 {
                     <div class="col-12 text-center py-5">
                         <i class="bi bi-people text-muted mb-3" style="font-size: 3.5rem;"></i>
-                        <h3 class="fw-bold">No doctors found</h3>
-                        <p class="text-muted px-4">We couldn't find any specialist matching your criteria. Try resetting all filters or changing locations.</p>
-                        <a href="?" class="btn btn-emerald rounded-pill px-4 mt-2">Reset All Filters</a>
+                        <h3 class="fw-bold">Không tìm thấy bác sĩ nào</h3>
+                        <p class="text-muted px-4">Chúng tôi không tìm thấy chuyên gia y tế nào khớp với tiêu chí tìm kiếm của bạn. Hãy thử xóa bộ lọc hoặc đổi khu vực khác.</p>
+                        <a href="?" class="btn btn-emerald rounded-pill px-4 mt-2">Đặt lại bộ lọc</a>
                     </div>
                 }
             </div>

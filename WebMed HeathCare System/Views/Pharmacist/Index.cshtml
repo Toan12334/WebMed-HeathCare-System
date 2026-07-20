@@ -1,12 +1,12 @@
 @model IEnumerable<WebMed_HeathCare_System.Models.Order>
 
 @{
-    ViewData["Title"] = "Pharmacist Order Management";
+    ViewData["Title"] = "Quản Lý Đơn Hàng Dược Sĩ";
     string currentFilter = ViewBag.StatusFilter ?? "";
 }
 
 <div class="container-fluid mt-4 px-4 mb-5">
-    <h1 class="fw-extrabold mb-4 text-dark"><i class="bi bi-prescription2"></i> Pharmacist Order Dashboard</h1>
+    <h1 class="fw-extrabold mb-4 text-dark"><i class="bi bi-prescription2"></i> Bảng Điều Khiển Đơn Hàng Dược Sĩ</h1>
 
     <!-- Summary Widgets -->
     <div class="row g-3 mb-4">
@@ -14,7 +14,7 @@
             <div class="card border-0 shadow-sm rounded-4 p-3 bg-warning-subtle text-warning-emphasis">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="mb-1 text-uppercase fw-bold fs-8">Pending Orders</h6>
+                        <h6 class="mb-1 text-uppercase fw-bold fs-8">Đơn Hàng Chờ Xử Lý</h6>
                         <h3 class="fw-extrabold mb-0">@Model.Count(o => o.OrderStatus == "Pending" || o.OrderStatus == "Paid")</h3>
                     </div>
                     <i class="bi bi-clock-history fs-1"></i>
@@ -25,7 +25,7 @@
             <div class="card border-0 shadow-sm rounded-4 p-3 bg-primary-subtle text-primary-emphasis">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="mb-1 text-uppercase fw-bold fs-8">Preparing</h6>
+                        <h6 class="mb-1 text-uppercase fw-bold fs-8">Đang Chuẩn Bị</h6>
                         <h3 class="fw-extrabold mb-0">@Model.Count(o => o.OrderStatus == "Preparing")</h3>
                     </div>
                     <i class="bi bi-box-seam fs-1"></i>
@@ -36,7 +36,7 @@
             <div class="card border-0 shadow-sm rounded-4 p-3 bg-info-subtle text-info-emphasis">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="mb-1 text-uppercase fw-bold fs-8">Dispatched (Shipping)</h6>
+                        <h6 class="mb-1 text-uppercase fw-bold fs-8">Đang Vận Chuyển</h6>
                         <h3 class="fw-extrabold mb-0">@Model.Count(o => o.OrderStatus == "Shipping")</h3>
                     </div>
                     <i class="bi bi-truck fs-1"></i>
@@ -47,7 +47,7 @@
             <div class="card border-0 shadow-sm rounded-4 p-3 bg-success-subtle text-success-emphasis">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="mb-1 text-uppercase fw-bold fs-8">Completed</h6>
+                        <h6 class="mb-1 text-uppercase fw-bold fs-8">Đã Hoàn Thành</h6>
                         <h3 class="fw-extrabold mb-0">@Model.Count(o => o.OrderStatus == "Completed")</h3>
                     </div>
                     <i class="bi bi-check-circle-fill fs-1"></i>
@@ -61,22 +61,22 @@
         <div class="card-header bg-white border-0 pt-3">
             <ul class="nav nav-pills card-header-pills">
                 <li class="nav-item">
-                    <a class="nav-link @(currentFilter == "" ? "active" : "")" asp-action="Index">All Orders</a>
+                    <a class="nav-link @(currentFilter == "" ? "active" : "")" asp-action="Index">Tất cả đơn hàng</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link @(currentFilter == "Paid" ? "active" : "")" asp-action="Index" asp-route-statusFilter="Paid">Paid</a>
+                    <a class="nav-link @(currentFilter == "Paid" ? "active" : "")" asp-action="Index" asp-route-statusFilter="Paid">Đã thanh toán</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link @(currentFilter == "Preparing" ? "active" : "")" asp-action="Index" asp-route-statusFilter="Preparing">Preparing</a>
+                    <a class="nav-link @(currentFilter == "Preparing" ? "active" : "")" asp-action="Index" asp-route-statusFilter="Preparing">Đang chuẩn bị</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link @(currentFilter == "Packed" ? "active" : "")" asp-action="Index" asp-route-statusFilter="Packed">Packed</a>
+                    <a class="nav-link @(currentFilter == "Packed" ? "active" : "")" asp-action="Index" asp-route-statusFilter="Packed">Đã đóng gói</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link @(currentFilter == "Shipping" ? "active" : "")" asp-action="Index" asp-route-statusFilter="Shipping">Shipping</a>
+                    <a class="nav-link @(currentFilter == "Shipping" ? "active" : "")" asp-action="Index" asp-route-statusFilter="Shipping">Đang giao</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link @(currentFilter == "Completed" ? "active" : "")" asp-action="Index" asp-route-statusFilter="Completed">Completed</a>
+                    <a class="nav-link @(currentFilter == "Completed" ? "active" : "")" asp-action="Index" asp-route-statusFilter="Completed">Đã hoàn thành</a>
                 </li>
             </ul>
         </div>
@@ -91,13 +91,13 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th class="p-3">Order ID</th>
-                                <th class="p-3">Patient Name</th>
-                                <th class="p-3">Date</th>
-                                <th class="p-3">Amount</th>
-                                <th class="p-3">Payment</th>
-                                <th class="p-3 text-center">Status</th>
-                                <th class="p-3 text-center" style="width: 150px;">Actions</th>
+                                <th class="p-3">Mã Đơn</th>
+                                <th class="p-3">Tên bệnh nhân</th>
+                                <th class="p-3">Ngày đặt</th>
+                                <th class="p-3">Tổng tiền</th>
+                                <th class="p-3">Thanh toán</th>
+                                <th class="p-3 text-center">Trạng thái</th>
+                                <th class="p-3 text-center" style="width: 150px;">Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -117,32 +117,32 @@
                                     <td class="p-3 text-center">
                                         @if (order.OrderStatus == "Pending")
                                         {
-                                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-1.5 rounded-pill">Pending</span>
+                                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-1.5 rounded-pill">Chờ thanh toán</span>
                                         }
                                         else if (order.OrderStatus == "Paid")
                                         {
-                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 rounded-pill">Paid</span>
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1.5 rounded-pill">Đã thanh toán</span>
                                         }
                                         else if (order.OrderStatus == "Preparing")
                                         {
-                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1.5 rounded-pill">Preparing</span>
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1.5 rounded-pill">Đang chuẩn bị</span>
                                         }
                                         else if (order.OrderStatus == "Packed")
                                         {
-                                            <span class="badge bg-info-subtle text-info border border-info-subtle px-3 py-1.5 rounded-pill">Packed</span>
+                                            <span class="badge bg-info-subtle text-info border border-info-subtle px-3 py-1.5 rounded-pill">Đã đóng gói</span>
                                         }
                                         else if (order.OrderStatus == "Shipping")
                                         {
-                                            <span class="badge bg-info text-white px-3 py-1.5 rounded-pill"><i class="bi bi-truck animate-bounce"></i> Shipping</span>
+                                            <span class="badge bg-info text-white px-3 py-1.5 rounded-pill"><i class="bi bi-truck animate-bounce"></i> Đang giao hàng</span>
                                         }
                                         else if (order.OrderStatus == "Completed")
                                         {
-                                            <span class="badge bg-success text-white px-3 py-1.5 rounded-pill">Completed</span>
+                                            <span class="badge bg-success text-white px-3 py-1.5 rounded-pill">Đã giao hàng</span>
                                         }
                                     </td>
                                     <td class="p-3 text-center">
                                         <a asp-action="Details" asp-route-id="@order.OrderId" class="btn btn-outline-primary btn-sm rounded-3 fw-bold w-100">
-                                            <i class="bi bi-eye-fill"></i> View Order
+                                            <i class="bi bi-eye-fill"></i> Xem đơn hàng
                                         </a>
                                     </td>
                                 </tr>
@@ -155,8 +155,8 @@
             {
                 <div class="py-5 text-center">
                     <i class="bi bi-clipboard2-x text-muted" style="font-size: 4rem;"></i>
-                    <h3 class="fw-bold mt-3">No orders found</h3>
-                    <p class="text-muted">No orders match the current status filter.</p>
+                    <h3 class="fw-bold mt-3">Không tìm thấy đơn hàng nào</h3>
+                    <p class="text-muted">Không có đơn hàng nào khớp với bộ lọc trạng thái hiện tại.</p>
                 </div>
             }
         </div>

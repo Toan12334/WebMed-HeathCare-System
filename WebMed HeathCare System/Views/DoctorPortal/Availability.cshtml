@@ -1,11 +1,11 @@
 @model IEnumerable<WebMed_HeathCare_System.Models.AvailabilitySlot>
 
 @{
-    ViewData["Title"] = "Configure Availability - Doctor Portal";
+    ViewData["Title"] = "Cấu Hình Lịch Trống - Cổng Bác Sĩ";
 }
 
 <div class="container mt-5 mb-5">
-    <h1 class="fw-extrabold mb-4"><i class="bi bi-calendar-check-fill text-emerald"></i> Configure Availability Schedule</h1>
+    <h1 class="fw-extrabold mb-4"><i class="bi bi-calendar-check-fill text-emerald"></i> Cấu Hình Lịch Trống Hẹn Khám</h1>
 
     @if (TempData["SuccessMessage"] != null)
     {
@@ -27,7 +27,7 @@
         <!-- Availability Slots List -->
         <div class="col-lg-7">
             <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
-                <h4 class="fw-bold text-dark border-bottom pb-2 mb-3">Your Availability Slots</h4>
+                <h4 class="fw-bold text-dark border-bottom pb-2 mb-3">Danh Sách Khung Giờ Trống Của Bạn</h4>
                 
                 @if (Model != null && Model.Any())
                 {
@@ -35,9 +35,9 @@
                         <table class="table align-middle">
                             <thead class="table-light">
                                 <tr class="fs-8 text-muted">
-                                    <th>Date</th>
-                                    <th>Time Range</th>
-                                    <th class="text-center">Status</th>
+                                    <th>Ngày</th>
+                                    <th>Thời gian</th>
+                                    <th class="text-center">Trạng thái</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -45,16 +45,16 @@
                                 @foreach (var slot in Model)
                                 {
                                     <tr>
-                                        <td><strong>@slot.StartDateTime.ToString("MMMM dd, yyyy")</strong></td>
+                                        <td><strong>@slot.StartDateTime.ToString("dd/MM/yyyy")</strong></td>
                                         <td class="text-muted">@slot.StartDateTime.ToString("hh:mm tt") - @slot.EndDateTime.ToString("hh:mm tt")</td>
                                         <td class="text-center">
                                             @if (slot.IsBooked)
                                             {
-                                                <span class="badge bg-danger-subtle text-danger px-3 py-1 rounded-pill fw-bold">Booked</span>
+                                                <span class="badge bg-danger-subtle text-danger px-3 py-1 rounded-pill fw-bold">Đã đặt</span>
                                             }
                                             else
                                             {
-                                                <span class="badge bg-success-subtle text-success px-3 py-1 rounded-pill fw-bold">Available</span>
+                                                <span class="badge bg-success-subtle text-success px-3 py-1 rounded-pill fw-bold">Còn trống</span>
                                             }
                                         </td>
                                         <td class="text-end">
@@ -62,12 +62,12 @@
                                             {
                                                 <form asp-action="DeleteSlot" method="post" class="d-inline">
                                                     <input type="hidden" name="slotId" value="@slot.SlotId" />
-                                                    <button type="submit" class="btn btn-outline-danger btn-sm border-0"><i class="bi bi-trash-fill"></i> Delete</button>
+                                                    <button type="submit" class="btn btn-outline-danger btn-sm border-0"><i class="bi bi-trash-fill"></i> Xóa</button>
                                                 </form>
                                             }
                                             else
                                             {
-                                                <span class="text-muted fs-8">In Appointment</span>
+                                                <span class="text-muted fs-8">Đã lên lịch hẹn</span>
                                             }
                                         </td>
                                     </tr>
@@ -80,7 +80,7 @@
                 {
                     <div class="text-center py-5">
                         <i class="bi bi-calendar-x text-muted" style="font-size: 3rem;"></i>
-                        <p class="text-muted mt-2">You haven't configured any availability slots yet.</p>
+                        <p class="text-muted mt-2">Bạn chưa cấu hình khung giờ trống nào.</p>
                     </div>
                 }
             </div>
@@ -89,22 +89,22 @@
         <!-- Add Slot Form -->
         <div class="col-lg-5">
             <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
-                <h4 class="fw-bold text-dark border-bottom pb-2 mb-4">Add Time Slot</h4>
+                <h4 class="fw-bold text-dark border-bottom pb-2 mb-4">Thêm Khung Giờ</h4>
                 
                 <form asp-action="AddSlot" method="post">
                     <!-- Start DateTime -->
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-secondary">Start Date & Time</label>
+                        <label class="form-label fw-bold text-secondary">Ngày & Giờ Bắt Đầu</label>
                         <input type="datetime-local" name="startDateTime" class="form-control rounded-3" required />
                     </div>
 
                     <!-- End DateTime -->
                     <div class="mb-4">
-                        <label class="form-label fw-bold text-secondary">End Date & Time</label>
+                        <label class="form-label fw-bold text-secondary">Ngày & Giờ Kết Thúc</label>
                         <input type="datetime-local" name="endDateTime" class="form-control rounded-3" required />
                     </div>
 
-                    <button type="submit" class="btn btn-emerald btn-lg w-100 rounded-3 fw-bold py-3" style="background-color: #059669; color: white;"><i class="bi bi-calendar-plus"></i> Add Availability Slot</button>
+                    <button type="submit" class="btn btn-emerald btn-lg w-100 rounded-3 fw-bold py-3" style="background-color: #059669; color: white;"><i class="bi bi-calendar-plus"></i> Thêm Khung Giờ Trống</button>
                 </form>
             </div>
         </div>

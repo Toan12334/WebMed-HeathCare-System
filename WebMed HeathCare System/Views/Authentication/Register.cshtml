@@ -9,7 +9,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Register - WebMed Healthcare</title>
+    <title>Đăng ký - WebMed Healthcare</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -305,8 +305,8 @@
                     <path d="M19 10.5h-5.5V5c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v5.5H5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5h5.5V19c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-5.5H19c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5z"/>
                 </svg>
             </div>
-            <h1 class="logo-title">Join WebMed</h1>
-            <p class="logo-subtitle">Patient Registration System</p>
+            <h1 class="logo-title">Tham gia WebMed</h1>
+            <p class="logo-subtitle">Hệ thống Đăng ký Bệnh nhân</p>
         </div>
 
         <form asp-action="Register" method="post">
@@ -326,9 +326,9 @@
             <div class="form-grid">
                 <!-- Username -->
                 <div class="form-group">
-                    <label asp-for="Username" class="form-label"></label>
+                    <label asp-for="Username" class="form-label">Tên đăng nhập</label>
                     <div class="input-wrapper">
-                        <input asp-for="Username" class="form-input" placeholder="johndoe" autocomplete="username" />
+                        <input asp-for="Username" class="form-input" placeholder="Tên đăng nhập" autocomplete="username" />
                         <div class="input-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -341,7 +341,7 @@
 
                 <!-- Email -->
                 <div class="form-group">
-                    <label asp-for="Email" class="form-label"></label>
+                    <label asp-for="Email" class="form-label">Email</label>
                     <div class="input-wrapper">
                         <input asp-for="Email" type="email" class="form-input" placeholder="john@example.com" />
                         <div class="input-icon">
@@ -356,7 +356,7 @@
 
                 <!-- Password -->
                 <div class="form-group">
-                    <label asp-for="Password" class="form-label"></label>
+                    <label asp-for="Password" class="form-label">Mật khẩu</label>
                     <div class="input-wrapper">
                         <input asp-for="Password" class="form-input" placeholder="••••••••" autocomplete="new-password" />
                         <div class="input-icon">
@@ -371,7 +371,7 @@
 
                 <!-- Confirm Password -->
                 <div class="form-group">
-                    <label asp-for="ConfirmPassword" class="form-label"></label>
+                    <label asp-for="ConfirmPassword" class="form-label">Xác nhận mật khẩu</label>
                     <div class="input-wrapper">
                         <input asp-for="ConfirmPassword" class="form-input" placeholder="••••••••" autocomplete="new-password" />
                         <div class="input-icon">
@@ -386,9 +386,9 @@
 
                 <!-- Full Name -->
                 <div class="form-group">
-                    <label asp-for="FullName" class="form-label"></label>
+                    <label asp-for="FullName" class="form-label">Họ và tên</label>
                     <div class="input-wrapper">
-                        <input asp-for="FullName" class="form-input" placeholder="John Doe" />
+                        <input asp-for="FullName" class="form-input" placeholder="Nguyễn Văn A" />
                         <div class="input-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M12 2a5 5 0 1 0 5 5 5 5 0 0 0-5-5zm0 12c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5z"/>
@@ -400,9 +400,9 @@
 
                 <!-- Phone Number -->
                 <div class="form-group">
-                    <label asp-for="PhoneNumber" class="form-label"></label>
+                    <label asp-for="PhoneNumber" class="form-label">Số điện thoại</label>
                     <div class="input-wrapper">
-                        <input asp-for="PhoneNumber" class="form-input" placeholder="+1234567890" />
+                        <input asp-for="PhoneNumber" class="form-input" placeholder="0901234567" />
                         <div class="input-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
@@ -414,13 +414,13 @@
 
                 <!-- Gender -->
                 <div class="form-group">
-                    <label asp-for="Gender" class="form-label"></label>
+                    <label asp-for="Gender" class="form-label">Giới tính</label>
                     <div class="input-wrapper">
                         <select asp-for="Gender" class="form-input">
-                            <option value="">Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
+                            <option value="">Chọn giới tính</option>
+                            <option value="Male">Nam</option>
+                            <option value="Female">Nữ</option>
+                            <option value="Other">Khác</option>
                         </select>
                         <div class="input-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -435,7 +435,7 @@
 
                 <!-- Date of Birth -->
                 <div class="form-group">
-                    <label asp-for="DateOfBirth" class="form-label"></label>
+                    <label asp-for="DateOfBirth" class="form-label">Ngày sinh</label>
                     <div class="input-wrapper">
                         <input asp-for="DateOfBirth" type="date" class="form-input" />
                         <div class="input-icon">
@@ -452,10 +452,10 @@
 
                 <!-- Blood Type -->
                 <div class="form-group">
-                    <label asp-for="BloodType" class="form-label"></label>
+                    <label asp-for="BloodType" class="form-label">Nhóm máu</label>
                     <div class="input-wrapper">
                         <select asp-for="BloodType" class="form-input">
-                            <option value="">Select Blood Type</option>
+                            <option value="">Chọn nhóm máu</option>
                             <option value="A+">A+</option>
                             <option value="A-">A-</option>
                             <option value="B+">B+</option>
@@ -476,9 +476,9 @@
 
                 <!-- Address -->
                 <div class="form-group">
-                    <label asp-for="Address" class="form-label"></label>
+                    <label asp-for="Address" class="form-label">Địa chỉ</label>
                     <div class="input-wrapper">
-                        <input asp-for="Address" class="form-input" placeholder="123 Health St." />
+                        <input asp-for="Address" class="form-input" placeholder="Số nhà, tên đường, phường/xã..." />
                         <div class="input-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
@@ -491,7 +491,7 @@
             </div>
 
             <button type="submit" class="btn-submit">
-                <span>Sign Up</span>
+                <span>Đăng ký</span>
                 <!-- Check Icon SVG -->
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="20 6 9 17 4 12"></polyline>
@@ -500,7 +500,7 @@
         </form>
 
         <p class="footer-text">
-            Already have an account? <a href="/Authentication/Login">Sign In</a>
+            Đã có tài khoản? <a href="/Authentication/Login">Đăng nhập</a>
         </p>
     </div>
 </div>

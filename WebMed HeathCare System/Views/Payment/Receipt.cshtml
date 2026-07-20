@@ -1,7 +1,7 @@
 @model WebMed_HeathCare_System.Models.Order
 
 @{
-    ViewData["Title"] = "Order Confirmation & Receipt";
+    ViewData["Title"] = "Xác Nhận Đơn Hàng & Hóa Đơn";
 }
 
 <div class="container mt-5 mb-5">
@@ -11,36 +11,36 @@
                 <!-- Success Header -->
                 <div class="bg-success text-white p-5 text-center">
                     <i class="bi bi-patch-check-fill" style="font-size: 5rem;"></i>
-                    <h1 class="fw-extrabold mt-3">Thank You For Your Order!</h1>
-                    <p class="lead mb-0">Your order has been received and is now processing.</p>
+                    <h1 class="fw-extrabold mt-3">Cảm Ơn Bạn Đã Đặt Hàng!</h1>
+                    <p class="lead mb-0">Đơn hàng của bạn đã được tiếp nhận và đang được xử lý.</p>
                 </div>
                 
                 <div class="card-body p-5">
                     <div class="row mb-4">
                         <div class="col-sm-6">
-                            <h5 class="text-muted mb-2">Order Information</h5>
-                            <p class="mb-1"><strong>Order ID:</strong> #@Model.OrderId</p>
-                            <p class="mb-1"><strong>Date:</strong> @Model.CreatedAt.ToString("g")</p>
-                            <p class="mb-1"><strong>Status:</strong> <span class="badge bg-success">@Model.OrderStatus</span></p>
+                            <h5 class="text-muted mb-2">Thông tin Đơn hàng</h5>
+                            <p class="mb-1"><strong>Mã Đơn hàng:</strong> #@Model.OrderId</p>
+                            <p class="mb-1"><strong>Ngày đặt:</strong> @Model.CreatedAt.ToString("g")</p>
+                            <p class="mb-1"><strong>Trạng thái:</strong> <span class="badge bg-success">@Model.OrderStatus</span></p>
                         </div>
                         <div class="col-sm-6">
-                            <h5 class="text-muted mb-2">Delivery Details</h5>
-                            <p class="mb-1"><strong>Phone:</strong> @Model.ShippingPhone</p>
-                            <p class="mb-1"><strong>Address:</strong> @Model.ShippingAddress</p>
-                            <p class="mb-1"><strong>Payment:</strong> @Model.PaymentMethod</p>
+                            <h5 class="text-muted mb-2">Thông tin Giao hàng</h5>
+                            <p class="mb-1"><strong>Số điện thoại:</strong> @Model.ShippingPhone</p>
+                            <p class="mb-1"><strong>Địa chỉ:</strong> @Model.ShippingAddress</p>
+                            <p class="mb-1"><strong>Thanh toán:</strong> @Model.PaymentMethod</p>
                         </div>
                     </div>
 
-                    <h4 class="fw-bold text-dark border-bottom pb-2 mb-3">Order Receipt</h4>
+                    <h4 class="fw-bold text-dark border-bottom pb-2 mb-3">Hóa đơn chi tiết</h4>
                     
                     <div class="table-responsive mb-4">
                         <table class="table table-borderless">
                             <thead>
                                 <tr class="border-bottom text-muted">
-                                    <th>Product</th>
-                                    <th class="text-center">Qty</th>
-                                    <th class="text-end">Price</th>
-                                    <th class="text-end">Total</th>
+                                    <th>Sản phẩm</th>
+                                    <th class="text-center">SL</th>
+                                    <th class="text-end">Giá</th>
+                                    <th class="text-end">Tổng</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -54,7 +54,7 @@
                                     </tr>
                                 }
                                 <tr class="border-top fw-bold text-dark fs-5">
-                                    <td colspan="3" class="text-end">Grand Total:</td>
+                                    <td colspan="3" class="text-end">Tổng tiền đơn hàng:</td>
                                     <td class="text-end text-success fw-extrabold">@Model.TotalAmount.ToString("N0") VND</td>
                                 </tr>
                             </tbody>
@@ -62,8 +62,8 @@
                     </div>
 
                     <div class="d-flex justify-content-center gap-3 mt-4">
-                        <a asp-controller="Pharmacy" asp-action="Index" class="btn btn-outline-primary rounded-pill px-4 py-2fw-semibold">Continue Shopping</a>
-                        <a href="/" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold">Back to Home</a>
+                        <a asp-controller="Pharmacy" asp-action="Index" class="btn btn-outline-primary rounded-pill px-4 py-2 fw-semibold">Tiếp tục mua sắm</a>
+                        <a href="/" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold">Quay lại Trang chủ</a>
                     </div>
                 </div>
             </div>

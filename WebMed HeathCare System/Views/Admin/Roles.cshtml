@@ -1,7 +1,7 @@
 @model IEnumerable<WebMed_HeathCare_System.Models.Role>
 
 @{
-    ViewData["Title"] = "System Roles & Permissions - Admin Console";
+    ViewData["Title"] = "Vai Trò & Quyền Hệ Thống - Bảng Điều Khiển Admin";
     var systemRoles = new HashSet<string> { "Admin", "Doctor", "Pharmacist", "Patient" };
 }
 
@@ -24,21 +24,21 @@
 
     <!-- Header Block -->
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 border-bottom pb-3">
-        <h1 class="fw-bold mb-0 text-dark"><i class="bi bi-shield-lock-fill text-primary"></i> System Roles</h1>
+        <h1 class="fw-bold mb-0 text-dark"><i class="bi bi-shield-lock-fill text-primary"></i> Vai Trò Hệ Thống</h1>
         <div class="btn-group shadow-sm">
-            <a asp-action="Users" class="btn btn-outline-primary">Users</a>
-            <a asp-action="Doctors" class="btn btn-outline-primary">Doctor Verification</a>
-            <a asp-action="Reviews" class="btn btn-outline-primary">Review Moderation</a>
-            <a asp-action="News" class="btn btn-outline-primary">Health News</a>
-            <a asp-action="Roles" class="btn btn-primary active">System Roles</a>
-            <a asp-action="Emergencies" class="btn btn-outline-primary">Emergency Dispatch</a>
+            <a asp-action="Users" class="btn btn-outline-primary">Người dùng</a>
+            <a asp-action="Doctors" class="btn btn-outline-primary">Xác thực bác sĩ</a>
+            <a asp-action="Reviews" class="btn btn-outline-primary">Kiểm duyệt đánh giá</a>
+            <a asp-action="News" class="btn btn-outline-primary">Tin tức sức khỏe</a>
+            <a asp-action="Roles" class="btn btn-primary active">Vai trò hệ thống</a>
+            <a asp-action="Emergencies" class="btn btn-outline-primary">Điều phối cấp cứu</a>
         </div>
     </div>
 
     <!-- Action Bar -->
     <div class="mb-4">
         <button class="btn btn-success rounded-pill px-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#createRoleModal">
-            <i class="bi bi-plus-lg me-1"></i> Add New Role
+            <i class="bi bi-plus-lg me-1"></i> Thêm Vai Trò Mới
         </button>
     </div>
 
@@ -51,11 +51,11 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th class="p-3">Role ID</th>
-                                <th class="p-3">Role Name</th>
-                                <th class="p-3">Description</th>
-                                <th class="p-3 text-center">Type</th>
-                                <th class="p-3 text-end">Action</th>
+                                <th class="p-3">Mã vai trò</th>
+                                <th class="p-3">Tên vai trò</th>
+                                <th class="p-3">Mô tả</th>
+                                <th class="p-3 text-center">Loại</th>
+                                <th class="p-3 text-end">Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -73,29 +73,29 @@
                                     <td class="p-3 text-center">
                                         @if (isSystem)
                                         {
-                                            <span class="badge bg-primary-subtle text-primary border px-2.5 py-1 rounded">System Core</span>
+                                            <span class="badge bg-primary-subtle text-primary border px-2.5 py-1 rounded">Hệ thống chính</span>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-light text-secondary border px-2.5 py-1 rounded">Custom</span>
+                                            <span class="badge bg-light text-secondary border px-2.5 py-1 rounded">Tùy chỉnh</span>
                                         }
                                     </td>
                                     <td class="p-3 text-end">
                                         <button type="button" class="btn btn-outline-dark btn-sm rounded-3 px-3 me-1 fw-semibold" 
                                                 data-bs-toggle="modal" data-bs-target="#editRoleModal-@role.RoleId">
-                                            <i class="bi bi-pencil-square me-1"></i> Edit
+                                            <i class="bi bi-pencil-square me-1"></i> Sửa
                                         </button>
                                         @if (!isSystem)
                                         {
                                             <button type="button" class="btn btn-outline-danger btn-sm rounded-3 px-3 fw-semibold" 
                                                     data-bs-toggle="modal" data-bs-target="#deleteRoleModal-@role.RoleId">
-                                                <i class="bi bi-trash-fill me-1"></i> Delete
+                                                <i class="bi bi-trash-fill me-1"></i> Xóa
                                             </button>
                                         }
                                         else
                                         {
-                                            <button type="button" class="btn btn-outline-secondary btn-sm rounded-3 px-3 fw-semibold" disabled title="System Core Roles cannot be deleted">
-                                                <i class="bi bi-trash-fill me-1"></i> Locked
+                                            <button type="button" class="btn btn-outline-secondary btn-sm rounded-3 px-3 fw-semibold" disabled title="Không thể xóa vai trò chính của hệ thống">
+                                                <i class="bi bi-trash-fill me-1"></i> Đã khóa
                                             </button>
                                         }
                                     </td>
@@ -109,7 +109,7 @@
             {
                 <div class="p-5 text-center text-muted">
                     <i class="bi bi-shield-slash fs-1 d-block mb-3"></i>
-                    <h3 class="fw-bold">No system roles found</h3>
+                    <h3 class="fw-bold">Không tìm thấy vai trò hệ thống nào</h3>
                 </div>
             }
         </div>
@@ -128,18 +128,18 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content border-0 shadow-lg rounded-4">
                     <div class="modal-header border-0 bg-light p-3">
-                        <h5 class="modal-title fw-bold text-dark"><i class="bi bi-pencil-square text-primary me-2"></i>Edit Role</h5>
+                        <h5 class="modal-title fw-bold text-dark"><i class="bi bi-pencil-square text-primary me-2"></i>Chỉnh Sửa Vai Trò</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <form asp-action="EditRole" method="post">
                         <input type="hidden" name="roleId" value="@role.RoleId" />
                         <div class="modal-body p-4">
                             <div class="mb-3">
-                                <label class="form-label fw-bold text-secondary">Role Name</label>
+                                <label class="form-label fw-bold text-secondary">Tên vai trò</label>
                                 @if (isSystem)
                                 {
                                     <input type="text" name="roleName" class="form-control rounded-3" value="@role.RoleName" readonly style="background-color: #f8fafc;" />
-                                    <div class="form-text text-danger"><i class="bi bi-info-circle"></i> System core roles cannot be renamed to prevent application routing issues.</div>
+                                    <div class="form-text text-danger"><i class="bi bi-info-circle"></i> Không thể đổi tên vai trò chính của hệ thống để tránh các vấn đề về phân luồng ứng dụng.</div>
                                 }
                                 else
                                 {
@@ -147,13 +147,13 @@
                                 }
                             </div>
                             <div class="mb-3">
-                                <label class="form-label fw-bold text-secondary">Description</label>
+                                <label class="form-label fw-bold text-secondary">Mô tả</label>
                                 <textarea name="description" class="form-control rounded-3" rows="3" required>@role.Description</textarea>
                             </div>
                         </div>
                         <div class="modal-footer border-0 p-3 bg-light">
-                            <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Save Changes</button>
+                            <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">Lưu thay đổi</button>
                         </div>
                     </form>
                 </div>
@@ -167,19 +167,19 @@
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content border-0 shadow-lg rounded-4">
                         <div class="modal-header border-0 bg-light p-3">
-                            <h5 class="modal-title fw-bold text-danger"><i class="bi bi-trash-fill me-2"></i>Delete Role</h5>
+                            <h5 class="modal-title fw-bold text-danger"><i class="bi bi-trash-fill me-2"></i>Xóa Vai Trò</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <form asp-action="DeleteRole" method="post">
                             <input type="hidden" name="id" value="@role.RoleId" />
                             <div class="modal-body p-4 text-center">
                                 <i class="bi bi-exclamation-octagon-fill text-danger fs-1 mb-3 d-block"></i>
-                                <p class="mb-0 text-dark fw-semibold">Are you sure you want to delete the role <span class="badge bg-danger px-3 py-1.5 rounded-pill text-white">@role.RoleName</span>?</p>
-                                <p class="small text-muted mt-2">This action cannot be undone and is only allowed if no users are currently assigned to this role.</p>
+                                <p class="mb-0 text-dark fw-semibold">Bạn có chắc chắn muốn xóa vai trò <span class="badge bg-danger px-3 py-1.5 rounded-pill text-white">@role.RoleName</span>?</p>
+                                <p class="small text-muted mt-2">Hành động này không thể hoàn tác và chỉ được cho phép nếu hiện tại không có người dùng nào được gán vai trò này.</p>
                             </div>
                             <div class="modal-footer border-0 p-3 bg-light justify-content-center">
-                                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">Delete Permanent</button>
+                                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                                <button type="submit" class="btn btn-danger rounded-pill px-4 fw-bold">Xóa vĩnh viễn</button>
                             </div>
                         </form>
                     </div>
@@ -194,23 +194,23 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4">
             <div class="modal-header border-0 bg-light p-3">
-                <h5 class="modal-title fw-bold text-dark"><i class="bi bi-shield-plus text-success me-2"></i>Add New System Role</h5>
+                <h5 class="modal-title fw-bold text-dark"><i class="bi bi-shield-plus text-success me-2"></i>Thêm Vai Trò Hệ Thống Mới</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form asp-action="CreateRole" method="post">
                 <div class="modal-body p-4">
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-secondary">Role Name</label>
-                        <input type="text" name="roleName" class="form-control rounded-3" required placeholder="e.g. Nurse" />
+                        <label class="form-label fw-bold text-secondary">Tên vai trò</label>
+                        <input type="text" name="roleName" class="form-control rounded-3" required placeholder="Ví dụ: Y tá" />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-secondary">Description</label>
-                        <textarea name="description" class="form-control rounded-3" rows="3" required placeholder="Brief summary of role permissions..."></textarea>
+                        <label class="form-label fw-bold text-secondary">Mô tả</label>
+                        <textarea name="description" class="form-control rounded-3" rows="3" required placeholder="Tóm tắt ngắn gọn về quyền hạn của vai trò..."></textarea>
                     </div>
                 </div>
                 <div class="modal-footer border-0 p-3 bg-light">
-                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold">Create Role</button>
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-success rounded-pill px-4 fw-bold">Tạo vai trò</button>
                 </div>
             </form>
         </div>

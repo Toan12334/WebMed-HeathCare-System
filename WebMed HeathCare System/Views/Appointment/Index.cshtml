@@ -2,17 +2,17 @@
 @using System.Security.Claims
 
 @{
-    ViewData["Title"] = "My Appointments - WebMed";
+    ViewData["Title"] = "Lịch Hẹn Của Tôi - WebMed";
     var userRole = User.FindFirstValue(ClaimTypes.Role);
 }
 
 <div class="container mt-5 mb-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="fw-extrabold mb-0"><i class="bi bi-calendar-event"></i> Consultation Appointments</h1>
+        <h1 class="fw-extrabold mb-0"><i class="bi bi-calendar-event"></i> Lịch Hẹn Tư Vấn Y Khoa</h1>
         @if (userRole == "Patient")
         {
             <a asp-controller="FindDoctor" asp-action="Index" class="btn btn-emerald rounded-pill px-4" style="background-color: #059669; color: white;">
-                <i class="bi bi-plus-lg"></i> Book New Appointment
+                <i class="bi bi-plus-lg"></i> Đặt Lịch Hẹn Mới
             </a>
         }
     </div>
@@ -41,11 +41,11 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th class="p-3">@(userRole == "Doctor" ? "Patient" : "Doctor")</th>
-                                <th class="p-3">Appointment Date & Time</th>
-                                <th class="p-3">Type</th>
-                                <th class="p-3 text-center">Status</th>
-                                <th class="p-3 text-center" style="width: 220px;">Actions</th>
+                                <th class="p-3">@(userRole == "Doctor" ? "Bệnh nhân" : "Bác sĩ")</th>
+                                <th class="p-3">Thời Gian Hẹn Khám</th>
+                                <th class="p-3">Hình thức</th>
+                                <th class="p-3 text-center">Trạng thái</th>
+                                <th class="p-3 text-center" style="width: 220px;">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -63,14 +63,14 @@
                                                 }
                                                 else
                                                 {
-                                                    <small class="text-muted">Patient Profile</small>
+                                                    <small class="text-muted">Hồ sơ bệnh nhân</small>
                                                 }
                                             </div>
                                         </div>
                                     </td>
                                     <td class="p-3">
                                         <div class="fw-semibold">@app.AppointmentDateTime.ToString("f")</div>
-                                        <small class="text-muted">Duration: 30 mins</small>
+                                        <small class="text-muted">Thời lượng: 30 phút</small>
                                     </td>
                                     <td class="p-3">
                                         <span class="badge bg-light text-dark border"><i class="bi bi-laptop"></i> @app.ConsultationType</span>
@@ -78,11 +78,11 @@
                                     <td class="p-3 text-center">
                                         @if (app.Status == "Scheduled")
                                         {
-                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill">Scheduled</span>
+                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-2 rounded-pill">Đã lên lịch</span>
                                         }
                                         else if (app.Status == "Completed")
                                         {
-                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill">Completed</span>
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill">Hoàn thành</span>
                                         }
                                         else
                                         {
@@ -93,26 +93,26 @@
                                         @if (app.Status == "Scheduled")
                                         {
                                             <a asp-controller="Consultation" asp-action="Session" asp-route-appointmentId="@app.AppointmentId" class="btn btn-primary rounded-3 w-100 fw-bold">
-                                                <i class="bi bi-camera-video-fill me-1"></i> @(userRole == "Doctor" ? "Start Consult" : "Join Consult")
+                                                <i class="bi bi-camera-video-fill me-1"></i> @(userRole == "Doctor" ? "Bắt đầu tư vấn" : "Vào phòng khám")
                                             </a>
                                         }
                                         else if (app.Status == "Completed")
                                         {
                                             <div class="d-grid gap-1">
                                                 <a asp-controller="Consultation" asp-action="Receipt" asp-route-appointmentId="@app.AppointmentId" class="btn btn-outline-secondary btn-sm rounded-3 fw-semibold">
-                                                    <i class="bi bi-file-earmark-medical"></i> View Record
+                                                    <i class="bi bi-file-earmark-medical"></i> Xem bệnh án
                                                 </a>
                                                 @if (userRole == "Patient")
                                                 {
                                                     <a asp-controller="DoctorReview" asp-action="Create" asp-route-appointmentId="@app.AppointmentId" class="btn btn-outline-warning btn-sm rounded-3 fw-bold text-dark">
-                                                        <i class="bi bi-star-fill text-warning"></i> Write Review
+                                                        <i class="bi bi-star-fill text-warning"></i> Viết đánh giá
                                                     </a>
                                                 }
                                             </div>
                                         }
                                         else
                                         {
-                                            <button class="btn btn-secondary btn-sm w-100 rounded-3" disabled>No Action</button>
+                                            <button class="btn btn-secondary btn-sm w-100 rounded-3" disabled>Không có thao tác</button>
                                         }
                                     </td>
                                 </tr>
@@ -125,11 +125,11 @@
             {
                 <div class="py-5 text-center">
                     <i class="bi bi-calendar-x text-muted" style="font-size: 4rem;"></i>
-                    <h3 class="fw-bold mt-3">No appointments found</h3>
-                    <p class="text-muted">You do not have any appointments scheduled.</p>
+                    <h3 class="fw-bold mt-3">Không tìm thấy lịch hẹn nào</h3>
+                    <p class="text-muted">Bạn hiện chưa có lịch hẹn tư vấn nào được lên lịch.</p>
                     @if (userRole == "Patient")
                     {
-                        <a asp-controller="FindDoctor" asp-action="Index" class="btn btn-emerald rounded-pill px-4 mt-2" style="background-color: #059669; color: white;">Find a Specialist</a>
+                        <a asp-controller="FindDoctor" asp-action="Index" class="btn btn-emerald rounded-pill px-4 mt-2" style="background-color: #059669; color: white;">Tìm kiếm chuyên gia</a>
                     }
                 </div>
             }

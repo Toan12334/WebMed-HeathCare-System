@@ -1,12 +1,12 @@
 @model WebMed_HeathCare_System.Models.Doctor
 
 @{
-    ViewData["Title"] = Model.DoctorNavigation.FullName + " - Specialist Details";
+    ViewData["Title"] = Model.DoctorNavigation.FullName + " - Chi Tiết Bác Sĩ";
     decimal fee = ViewBag.Fee;
 }
 
 <div class="container mt-5 mb-5">
-    <a asp-action="Index" class="btn btn-link text-decoration-none text-muted mb-4"><i class="bi bi-arrow-left"></i> Back to Doctor Directory</a>
+    <a asp-action="Index" class="btn btn-link text-decoration-none text-muted mb-4"><i class="bi bi-arrow-left"></i> Quay lại Danh Sách Bác Sĩ</a>
 
     @if (TempData["ErrorMessage"] != null)
     {
@@ -30,21 +30,21 @@
                 <div class="d-flex justify-content-center align-items-center mb-3">
                     <span class="text-warning me-1"><i class="bi bi-star-fill"></i></span>
                     <strong class="fs-5">@Model.AverageRating.ToString("F1")</strong>
-                    <span class="text-muted ms-1">/ 5.0 Rating</span>
+                    <span class="text-muted ms-1">/ 5.0 Đánh Giá</span>
                 </div>
 
                 <div class="bg-light p-3 rounded-3 mb-4 text-start">
                     <div class="d-flex justify-content-between mb-2">
-                        <span class="text-muted"><i class="bi bi-geo-alt-fill text-danger me-1"></i> Location:</span>
+                        <span class="text-muted"><i class="bi bi-geo-alt-fill text-danger me-1"></i> Khu Vực:</span>
                         <strong class="text-dark">@Model.Location</strong>
                     </div>
                     <div class="d-flex justify-content-between">
-                        <span class="text-muted"><i class="bi bi-credit-card-fill text-success me-1"></i> Consult Fee:</span>
+                        <span class="text-muted"><i class="bi bi-credit-card-fill text-success me-1"></i> Phí Tư Vấn:</span>
                         <strong class="text-success">@fee.ToString("N0") VND</strong>
                     </div>
                 </div>
 
-                <h5 class="fw-bold text-dark text-start mb-2">About & Bio</h5>
+                <h5 class="fw-bold text-dark text-start mb-2">Giới Thiệu & Tiểu Sử</h5>
                 <p class="text-muted text-start fs-7 mb-0" style="line-height: 1.6;">
                     @Model.Bio
                 </p>
@@ -54,11 +54,11 @@
         <!-- Right Side: Schedule & Slots selection -->
         <div class="col-lg-7">
             <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
-                <h4 class="fw-bold text-dark mb-4 border-bottom pb-2"><i class="bi bi-calendar-check text-emerald"></i> Available Consultation Slots</h4>
+                <h4 class="fw-bold text-dark mb-4 border-bottom pb-2"><i class="bi bi-calendar-check text-emerald"></i> Lịch Hẹn Khám Sẵn Có</h4>
                 
                 @if (Model.AvailabilitySlots != null && Model.AvailabilitySlots.Any())
                 {
-                    <p class="text-muted fs-7 mb-4">Select an available time slot below to schedule your online appointment.</p>
+                    <p class="text-muted fs-7 mb-4">Chọn một khung thời gian rảnh dưới đây để đặt lịch hẹn trực tuyến của bạn.</p>
                     
                     <div class="row g-3">
                         @foreach (var slot in Model.AvailabilitySlots)
@@ -74,7 +74,7 @@
                                     
                                     <form asp-controller="Appointment" asp-action="Book" method="post">
                                         <input type="hidden" name="slotId" value="@slot.SlotId" />
-                                        <button type="submit" class="btn btn-emerald btn-sm w-100 rounded-pill fw-bold" style="background-color: #059669; color: white;">Book This Slot</button>
+                                        <button type="submit" class="btn btn-emerald btn-sm w-100 rounded-pill fw-bold" style="background-color: #059669; color: white;">Đặt Lịch Khung Giờ Này</button>
                                     </form>
                                 </div>
                             </div>
@@ -85,8 +85,8 @@
                 {
                     <div class="text-center py-5">
                         <i class="bi bi-calendar-x text-muted mb-3" style="font-size: 3rem;"></i>
-                        <h5 class="fw-bold">No available slots</h5>
-                        <p class="text-muted">This specialist does not have any upcoming slots scheduled. Please check back later or choose another doctor.</p>
+                        <h5 class="fw-bold">Không có lịch hẹn nào</h5>
+                        <p class="text-muted">Chuyên gia này chưa đăng ký lịch trống sắp tới. Vui lòng quay lại sau hoặc chọn một bác sĩ khác.</p>
                     </div>
                 }
             </div>

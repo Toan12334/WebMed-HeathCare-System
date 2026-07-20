@@ -9,7 +9,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login - WebMed Healthcare</title>
+    <title>Đăng nhập - WebMed Healthcare</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -356,7 +356,7 @@
                 </svg>
             </div>
             <h1 class="logo-title">WebMed</h1>
-            <p class="logo-subtitle">Healthcare Management System</p>
+            <p class="logo-subtitle">Hệ thống Quản lý Y tế</p>
         </div>
 
         <form asp-action="Login" method="post">
@@ -386,9 +386,9 @@
             }
 
             <div class="form-group">
-                <label asp-for="Username" class="form-label"></label>
+                <label asp-for="Username" class="form-label">Tên đăng nhập</label>
                 <div class="input-wrapper">
-                    <input asp-for="Username" class="form-input" placeholder="Enter your username" autocomplete="username" />
+                    <input asp-for="Username" class="form-input" placeholder="Nhập tên đăng nhập" autocomplete="username" />
                     <div class="input-icon">
                         <!-- User SVG Icon -->
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -401,7 +401,7 @@
             </div>
 
             <div class="form-group">
-                <label asp-for="Password" class="form-label"></label>
+                <label asp-for="Password" class="form-label">Mật khẩu</label>
                 <div class="input-wrapper">
                     <input asp-for="Password" class="form-input" placeholder="••••••••" autocomplete="current-password" />
                     <div class="input-icon">
@@ -419,13 +419,13 @@
                 <label class="checkbox-container">
                     <input asp-for="RememberMe" />
                     <div class="custom-checkbox"></div>
-                    Remember me
+                    Ghi nhớ tôi
                 </label>
-                <a href="#" class="forgot-link">Forgot password?</a>
+                <a href="#" class="forgot-link">Quên mật khẩu?</a>
             </div>
 
             <button type="submit" class="btn-submit">
-                <span>Sign In</span>
+                <span>Đăng nhập</span>
                 <!-- Sign in Arrow SVG -->
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -435,7 +435,7 @@
         </form>
 
         <p class="footer-text">
-            Don't have an account? <a href="/Authentication/Register">Create Account</a>
+            Chưa có tài khoản? <a href="/Authentication/Register">Tạo tài khoản</a>
         </p>
     </div>
 </div>

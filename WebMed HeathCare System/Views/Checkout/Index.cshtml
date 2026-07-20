@@ -1,11 +1,11 @@
 @{
-    ViewData["Title"] = "Checkout - WebMed";
+    ViewData["Title"] = "Thanh toán - WebMed";
     var cart = (List<WebMed_HeathCare_System.Models.CartItem>)ViewBag.Cart;
     decimal total = ViewBag.Total;
 }
 
 <div class="container mt-5">
-    <h1 class="fw-extrabold mb-5 text-center"><i class="bi bi-wallet2"></i> Checkout</h1>
+    <h1 class="fw-extrabold mb-5 text-center"><i class="bi bi-wallet2"></i> Thanh toán</h1>
 
     @if (TempData["ErrorMessage"] != null)
     {
@@ -19,39 +19,39 @@
         <!-- Delivery Form -->
         <div class="col-md-7">
             <div class="card border-0 shadow-sm rounded-4 p-4">
-                <h4 class="fw-bold text-dark mb-4 border-bottom pb-2">Shipping Information</h4>
+                <h4 class="fw-bold text-dark mb-4 border-bottom pb-2">Thông tin vận chuyển</h4>
                 
                 <form asp-action="PlaceOrder" method="post">
                     <!-- Shipping Phone -->
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-secondary">Contact Phone Number</label>
-                        <input type="tel" name="shippingPhone" class="form-control form-control-lg rounded-3" value="@ViewBag.Phone" required placeholder="e.g. 0901234567" />
+                        <label class="form-label fw-bold text-secondary">Số điện thoại liên hệ</label>
+                        <input type="tel" name="shippingPhone" class="form-control form-control-lg rounded-3" value="@ViewBag.Phone" required placeholder="Ví dụ: 0901234567" />
                     </div>
 
                     <!-- Shipping Address -->
                     <div class="mb-4">
-                        <label class="form-label fw-bold text-secondary">Delivery Address</label>
-                        <textarea name="shippingAddress" class="form-control form-control-lg rounded-3" rows="3" required placeholder="Enter street name, house number, ward, city...">@ViewBag.Address</textarea>
+                        <label class="form-label fw-bold text-secondary">Địa chỉ giao hàng</label>
+                        <textarea name="shippingAddress" class="form-control form-control-lg rounded-3" rows="3" required placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố..."></textarea>
                     </div>
 
-                    <h4 class="fw-bold text-dark mb-4 border-bottom pb-2">Payment Method</h4>
+                    <h4 class="fw-bold text-dark mb-4 border-bottom pb-2">Phương thức thanh toán</h4>
                     <!-- Payment Methods -->
                     <div class="mb-4">
                         <div class="form-check p-3 border rounded-3 mb-2 hover-light">
                             <input class="form-check-input ms-0 me-3" type="radio" name="paymentMethod" id="paymentCOD" value="COD" checked />
                             <label class="form-check-label fw-semibold" for="paymentCOD">
-                                <i class="bi bi-cash-stack me-2 text-success"></i> Cash on Delivery (COD)
+                                <i class="bi bi-cash-stack me-2 text-success"></i> Thanh toán khi nhận hàng (COD)
                             </label>
                         </div>
                         <div class="form-check p-3 border rounded-3 mb-2 hover-light">
                             <input class="form-check-input ms-0 me-3" type="radio" name="paymentMethod" id="paymentOnline" value="Online" />
                             <label class="form-check-label fw-semibold" for="paymentOnline">
-                                <i class="bi bi-credit-card me-2 text-primary"></i> Online Banking / Card Payment
+                                <i class="bi bi-credit-card me-2 text-primary"></i> Chuyển khoản ngân hàng / Thẻ ATM
                             </label>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 fw-bold py-3"><i class="bi bi-shield-lock-fill me-2"></i> Confirm Order & Pay</button>
+                    <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 fw-bold py-3"><i class="bi bi-shield-lock-fill me-2"></i> Xác nhận đơn hàng & Thanh toán</button>
                 </form>
             </div>
         </div>
@@ -59,7 +59,7 @@
         <!-- Order Summary -->
         <div class="col-md-5">
             <div class="card border-0 shadow-sm rounded-4 p-4 bg-light">
-                <h4 class="fw-bold text-dark mb-4 border-bottom pb-2">Order Items</h4>
+                <h4 class="fw-bold text-dark mb-4 border-bottom pb-2">Sản phẩm đơn hàng</h4>
                 
                 <div class="mb-4" style="max-height: 300px; overflow-y: auto;">
                     @foreach (var item in cart)
@@ -67,7 +67,7 @@
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div>
                                 <h6 class="fw-bold mb-0">@item.Name</h6>
-                                <small class="text-muted">Qty: @item.Quantity</small>
+                                <small class="text-muted">SL: @item.Quantity</small>
                             </div>
                             <span class="fw-semibold text-dark">@((item.Price * item.Quantity).ToString("N0")) VND</span>
                         </div>
@@ -77,18 +77,18 @@
                 <hr class="my-3" />
 
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="text-muted">Subtotal</span>
+                    <span class="text-muted">Tạm tính</span>
                     <span class="fw-semibold">@total.ToString("N0") VND</span>
                 </div>
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="text-muted">Shipping</span>
-                    <span class="text-success fw-bold">FREE</span>
+                    <span class="text-muted">Phí giao hàng</span>
+                    <span class="text-success fw-bold">MIỄN PHÍ</span>
                 </div>
 
                 <hr class="my-3" />
 
                 <div class="d-flex justify-content-between align-items-center">
-                    <span class="fs-5 fw-bold text-dark">Total</span>
+                    <span class="fs-5 fw-bold text-dark">Tổng tiền</span>
                     <span class="fs-4 fw-extrabold text-success">@total.ToString("N0") VND</span>
                 </div>
             </div>

@@ -1,23 +1,23 @@
 @{
-    ViewData["Title"] = "Write Doctor Review";
+    ViewData["Title"] = "Viết Đánh Giá Bác Sĩ";
     var appointment = (WebMed_HeathCare_System.Models.Appointment)ViewBag.Appointment;
     int consultationId = ViewBag.ConsultationId;
 }
 
 <div class="container mt-5 mb-5">
-    <a asp-controller="Appointment" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 mb-4"><i class="bi bi-arrow-left"></i> Back to Appointments</a>
+    <a asp-controller="Appointment" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 mb-4"><i class="bi bi-arrow-left"></i> Quay lại Lịch Hẹn</a>
 
     <div class="row justify-content-center">
         <div class="col-md-7">
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
                 <div class="bg-gradient text-white p-4 text-center" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
                     <i class="bi bi-star-fill text-warning" style="font-size: 3rem;"></i>
-                    <h3 class="fw-bold mt-2">Rate Your Specialist</h3>
-                    <p class="mb-0 text-white-50">Share your consultation experience to help other patients.</p>
+                    <h3 class="fw-bold mt-2">Đánh Giá Chuyên Gia Của Bạn</h3>
+                    <p class="mb-0 text-white-50">Chia sẻ trải nghiệm khám bệnh của bạn để giúp đỡ những bệnh nhân khác.</p>
                 </div>
                 <div class="card-body p-4">
                     <div class="bg-light p-3 rounded-3 mb-4 text-center">
-                        <small class="text-muted d-block text-uppercase fw-bold fs-8">Medical Doctor</small>
+                        <small class="text-muted d-block text-uppercase fw-bold fs-8">Bác sĩ điều trị</small>
                         <h4 class="fw-bold mb-1">@appointment.Doctor.DoctorNavigation.FullName</h4>
                         <span class="badge bg-primary-subtle text-primary border px-3 py-1 rounded-pill fw-bold text-uppercase">@appointment.Doctor.Specialty</span>
                     </div>
@@ -28,7 +28,7 @@
 
                         <!-- Interactive Star Selector -->
                         <div class="mb-4 text-center">
-                            <label class="form-label d-block fw-bold text-secondary mb-3">Overall Satisfaction Rating</label>
+                            <label class="form-label d-block fw-bold text-secondary mb-3">Đánh giá mức độ hài lòng chung</label>
                             <div class="star-rating d-inline-flex flex-row-reverse">
                                 <input type="radio" id="star5" name="rating" value="5" class="d-none" required />
                                 <label for="star5" class="bi bi-star fs-1 px-1 cursor-pointer text-muted hover-star"></label>
@@ -49,11 +49,11 @@
 
                         <!-- Feedback Comment -->
                         <div class="mb-4">
-                            <label class="form-label fw-bold text-secondary">Your Feedback & Comments</label>
-                            <textarea name="comment" class="form-control rounded-3" rows="4" placeholder="How was the communication? Did the doctor address your concerns clearly?..." required></textarea>
+                            <label class="form-label fw-bold text-secondary">Phản hồi & Nhận xét của bạn</label>
+                            <textarea name="comment" class="form-control rounded-3" rows="4" placeholder="Giao tiếp như thế nào? Bác sĩ có giải thích rõ ràng các thắc mắc của bạn không?..." required></textarea>
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 fw-bold py-3"><i class="bi bi-send-fill"></i> Submit Review</button>
+                        <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 fw-bold py-3"><i class="bi bi-send-fill"></i> Gửi Đánh Giá</button>
                     </form>
                 </div>
             </div>

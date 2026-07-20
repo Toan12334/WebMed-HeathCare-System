@@ -29,28 +29,28 @@
                         @if (User.Identity?.IsAuthenticated == false || User.IsInRole("Patient"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Pharmacy" asp-action="Index">Online Pharmacy</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Pharmacy" asp-action="Index">Nhà Thuốc Trực Tuyến</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="FindDoctor" asp-action="Index">Find a Doctor</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="FindDoctor" asp-action="Index">Tìm Bác Sĩ</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Appointment" asp-action="Index">Appointments</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Appointment" asp-action="Index">Lịch Hẹn Của Tôi</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="OrderTracking" asp-action="Index">My Orders</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="OrderTracking" asp-action="Index">Đơn Hàng Của Tôi</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="MedicalInformation" asp-action="Search">Medical Information</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="MedicalInformation" asp-action="Search">Tra Cứu Sức Khỏe</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="HealthCalculator" asp-action="Index">Health Calculator</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="HealthCalculator" asp-action="Index">Tính Toán Sức Khỏe</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="InsuranceGuide" asp-action="Index">Insurance Guide</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="InsuranceGuide" asp-action="Index">Hướng Dẫn Bảo Hiểm</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-danger fw-bold" asp-area="" asp-controller="EmergencyRequest" asp-action="Index">🚑 Emergency</a>
+                                <a class="nav-link text-danger fw-bold" asp-area="" asp-controller="EmergencyRequest" asp-action="Index">🚑 Cấp Cứu</a>
                             </li>
                         }
 
@@ -68,28 +68,29 @@
                             if (isDoctorVerified)
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="Appointment" asp-action="Index">Consultation Schedule</a>
+                                    <a class="nav-link text-dark" asp-controller="Appointment" asp-action="Index">Lịch Tư Vấn</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="DoctorPortal" asp-action="Availability">My Availability</a>
+                                    <a class="nav-link text-dark" asp-controller="DoctorPortal" asp-action="Availability">Thời Gian Rảnh Của Tôi</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-controller="DoctorPortal" asp-action="Reviews">Patient Reviews</a>
+                                    <a class="nav-link text-dark" asp-controller="DoctorPortal" asp-action="Reviews">Đánh Giá Của Bệnh Nhân</a>
                                 </li>
                             }
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="DoctorPortal" asp-action="License">Licensing</a>
+                                <a class="nav-link text-dark" asp-controller="DoctorPortal" asp-action="License">Chứng Chỉ Hành Nghề</a>
                             </li>
+
                         }
 
                         <!-- Pharmacist Specific Navigation -->
                         @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Pharmacist"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Pharmacist" asp-action="Index">Pharmacist Dashboard</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Pharmacist" asp-action="Index">Bảng Điều Khiển Dược Sĩ</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Pharmacist" asp-action="Inventory">Manage Inventory</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Pharmacist" asp-action="Inventory">Quản Lý Kho Thuốc</a>
                             </li>
                         }
 
@@ -97,19 +98,19 @@
                         @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Users">Admin Console</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Users">Bảng Quản Trị</a>
                             </li>
                         }
 
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Quyền Riêng Tư</a>
                         </li>
                     </ul>
                     <ul class="navbar-nav">
                         @if (User.Identity?.IsAuthenticated == false || User.IsInRole("Patient"))
                         {
                             <li class="nav-item me-2">
-                                <a class="nav-link text-dark" asp-controller="Pharmacy" asp-action="Cart"><i class="bi bi-cart3"></i> Cart</a>
+                                <a class="nav-link text-dark" asp-controller="Pharmacy" asp-action="Cart"><i class="bi bi-cart3"></i> Giỏ Hàng</a>
                             </li>
                         }
                         @if (User.Identity?.IsAuthenticated == true)
@@ -118,13 +119,13 @@
                                 <span class="nav-link text-dark fw-bold"><i class="bi bi-person-circle"></i> @User.Identity.Name</span>
                             </li>
                             <li class="nav-item">
-                                <a class="btn btn-outline-danger rounded-pill px-4" asp-area="" asp-controller="Authentication" asp-action="Logout">Logout</a>
+                                <a class="btn btn-outline-danger rounded-pill px-4" asp-area="" asp-controller="Authentication" asp-action="Logout">Đăng Xuất</a>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="btn btn-primary rounded-pill px-4 text-white" asp-area="" asp-controller="Authentication" asp-action="Login">Login</a>
+                                <a class="btn btn-primary rounded-pill px-4 text-white" asp-area="" asp-controller="Authentication" asp-action="Login">Đăng Nhập</a>
                             </li>
                         }
                     </ul>
@@ -142,10 +143,10 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start">
-                    <span class="fw-bold text-white"><i class="bi bi-heart-pulse-fill text-emerald"></i> WebMed</span> Hospital Systems
+                    <span class="fw-bold text-white"><i class="bi bi-heart-pulse-fill text-emerald"></i> WebMed</span> Hệ Thống Bệnh Viện
                 </div>
                 <div class="col-md-6 text-center text-md-end fs-7 mt-2 mt-md-0">
-                    &copy; 2026 - WebMed - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a>
+                    &copy; 2026 - WebMed - <a asp-area="" asp-controller="Home" asp-action="Privacy">Chính Sách Quyền Riêng Tư</a>
                 </div>
             </div>
         </div>

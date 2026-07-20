@@ -1,26 +1,26 @@
 @model WebMed_HeathCare_System.Models.AmbulanceRequest
 
 @{
-    ViewData["Title"] = "Track Ambulance";
+    ViewData["Title"] = "Theo Dõi Xe Cứu Thương";
 }
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
 <div class="container mt-4">
-    <h2>Ambulance Tracking</h2>
+    <h2>Theo Dõi Xe Cứu Thương</h2>
     <hr />
 
     <div class="row">
         <div class="col-md-5">
             <div class="card shadow-sm mb-4">
                 <div class="card-body">
-                    <h5 class="card-title text-primary">Status: <span id="statusBadge" class="badge bg-warning text-dark">@Model.Status</span></h5>
-                    <p class="mt-3"><strong>Request ID:</strong> #@Model.RequestId</p>
-                    <p><strong>Pickup Location:</strong> @Model.PickupLocation</p>
-                    <p><strong>Assigned Vehicle:</strong> <span id="vehicleNo">@Model.AssignedAmbulanceVehicle</span></p>
+                    <h5 class="card-title text-primary">Trạng thái: <span id="statusBadge" class="badge bg-warning text-dark">@Model.Status</span></h5>
+                    <p class="mt-3"><strong>Mã yêu cầu:</strong> #@Model.RequestId</p>
+                    <p><strong>Điểm đón bệnh nhân:</strong> @Model.PickupLocation</p>
+                    <p><strong>Xe cứu thương được điều động:</strong> <span id="vehicleNo">@Model.AssignedAmbulanceVehicle</span></p>
                     
                     <div class="alert alert-info mt-4">
-                        <h4 class="alert-heading">Estimated Time of Arrival (ETA)</h4>
+                        <h4 class="alert-heading">Thời gian dự kiến đến nơi (ETA)</h4>
                         <h2 id="etaDisplay" class="display-5 text-center">@Model.Eta</h2>
                     </div>
                 </div>
@@ -75,11 +75,11 @@
 
             // Add Patient Pickup Marker with custom green icon
             patientMarker = L.marker([patientLat, patientLng], { icon: patientIcon }).addTo(map)
-                .bindPopup('<b>Patient Pickup Location</b><br>@Model.PickupLocation').openPopup();
+                .bindPopup('<b>Địa điểm đón Bệnh nhân</b><br>@Model.PickupLocation').openPopup();
 
             // Add Ambulance Marker with custom ambulance icon
             ambulanceMarker = L.marker([ambLat, ambLng], { icon: ambulanceIcon }).addTo(map)
-                .bindPopup('<b>Ambulance @Model.AssignedAmbulanceVehicle</b><br>Currently en route.');
+                .bindPopup('<b>Xe Cứu Thương @Model.AssignedAmbulanceVehicle</b><br>Đang trên đường đến.');
 
             // Draw line connecting them
             routeLine = L.polyline([[ambLat, ambLng], [patientLat, patientLng]], {

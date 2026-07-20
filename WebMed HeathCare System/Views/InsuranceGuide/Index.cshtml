@@ -1,11 +1,11 @@
 @model IEnumerable<WebMed_HeathCare_System.Models.InsurancePlan>
 
 @{
-    ViewData["Title"] = "Insurance Guide";
+    ViewData["Title"] = "Hướng Dẫn Bảo Hiểm";
 }
 
 <div class="container mt-4">
-    <h2 class="mb-4">Health Insurance Plans</h2>
+    <h2 class="mb-4">Các Gói Bảo Hiểm Sức Khỏe</h2>
     
     @if (TempData["SuccessMessage"] != null)
     {
@@ -33,10 +33,10 @@
                     <div class="card-body text-center">
                         <h1 class="card-title pricing-card-title">@(plan.Pricing != null ? plan.Pricing.Premium.ToString("N0") : "N/A") <small class="text-muted">VND</small></h1>
                         <ul class="list-unstyled mt-3 mb-4">
-                            <li>Duration: @plan.DurationMonths months</li>
-                            <li>Status: @(plan.IsActive == true ? "Active" : "Inactive")</li>
+                            <li>Thời hạn: @plan.DurationMonths tháng</li>
+                            <li>Trạng thái: @(plan.IsActive == true ? "Hoạt động" : "Không hoạt động")</li>
                         </ul>
-                        <a asp-action="Details" asp-route-id="@plan.PlanId" class="btn btn-lg btn-block btn-outline-primary w-100">View Details</a>
+                        <a asp-action="Details" asp-route-id="@plan.PlanId" class="btn btn-lg btn-block btn-outline-primary w-100">Xem Chi Tiết</a>
                     </div>
                 </div>
             </div>
@@ -47,10 +47,10 @@
     {
         <div class="card mt-4 bg-light">
             <div class="card-body">
-                <h5 class="card-title">Compare Plans</h5>
+                <h5 class="card-title">So Sánh Các Gói</h5>
                 <form asp-action="Compare" method="get" class="row align-items-end">
                     <div class="col-md-4">
-                        <label>Select Plan 1:</label>
+                        <label>Chọn Gói 1:</label>
                         <select name="plan1" class="form-select">
                             @foreach (var p in Model)
                             {
@@ -59,7 +59,7 @@
                         </select>
                     </div>
                     <div class="col-md-4">
-                        <label>Select Plan 2:</label>
+                        <label>Chọn Gói 2:</label>
                         <select name="plan2" class="form-select">
                             @foreach (var p in Model)
                             {
@@ -68,7 +68,7 @@
                         </select>
                     </div>
                     <div class="col-md-4">
-                        <button type="submit" class="btn btn-success w-100">Compare</button>
+                        <button type="submit" class="btn btn-success w-100">So Sánh</button>
                     </div>
                 </form>
             </div>

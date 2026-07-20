@@ -1,12 +1,12 @@
 @model IEnumerable<WebMed_HeathCare_System.Models.CartItem>
 
 @{
-    ViewData["Title"] = "Shopping Cart - WebMed";
+    ViewData["Title"] = "Giỏ Hàng - WebMed";
     decimal subtotal = Model?.Sum(i => i.Price * i.Quantity) ?? 0;
 }
 
 <div class="container mt-5">
-    <h1 class="fw-extrabold mb-4"><i class="bi bi-cart3"></i> Your Shopping Cart</h1>
+    <h1 class="fw-extrabold mb-4"><i class="bi bi-cart3"></i> Giỏ Hàng Của Bạn</h1>
 
     @if (TempData["ErrorMessage"] != null)
     {
@@ -26,10 +26,10 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="p-3">Product</th>
-                                    <th class="p-3">Price</th>
-                                    <th class="p-3 text-center" style="width: 150px;">Quantity</th>
-                                    <th class="p-3 text-end">Total</th>
+                                    <th class="p-3">Sản phẩm</th>
+                                    <th class="p-3">Giá</th>
+                                    <th class="p-3 text-center" style="width: 150px;">Số lượng</th>
+                                    <th class="p-3 text-end">Tổng cộng</th>
                                     <th class="p-3 text-center" style="width: 80px;"></th>
                                 </tr>
                             </thead>
@@ -44,7 +44,7 @@
                                                     <h6 class="fw-bold mb-0">@item.Name</h6>
                                                     @if (item.IsPrescriptionRequired)
                                                     {
-                                                        <span class="badge bg-danger-subtle text-danger px-2 py-0.5 rounded-pill fs-8"><i class="bi bi-file-earmark-medical"></i> Requires Rx</span>
+                                                        <span class="badge bg-danger-subtle text-danger px-2 py-0.5 rounded-pill fs-8"><i class="bi bi-file-earmark-medical"></i> Cần đơn thuốc</span>
                                                     }
                                                 </div>
                                             </div>
@@ -71,7 +71,7 @@
                 </div>
                 
                 <div class="mt-4">
-                    <a asp-action="Index" class="btn btn-outline-primary rounded-pill px-4"><i class="bi bi-arrow-left"></i> Continue Shopping</a>
+                    <a asp-action="Index" class="btn btn-outline-primary rounded-pill px-4"><i class="bi bi-arrow-left"></i> Tiếp tục mua hàng</a>
                 </div>
             }
             else
@@ -79,9 +79,9 @@
                 <div class="card border-0 shadow-sm rounded-4 py-5 text-center">
                     <div class="card-body">
                         <i class="bi bi-cart-x text-muted" style="font-size: 4rem;"></i>
-                        <h3 class="fw-bold mt-3">Your cart is empty</h3>
-                        <p class="text-muted">You haven't added any medicines yet.</p>
-                        <a asp-action="Index" class="btn btn-primary rounded-pill px-4 mt-2">Go to Pharmacy Shop</a>
+                        <h3 class="fw-bold mt-3">Giỏ hàng của bạn đang trống</h3>
+                        <p class="text-muted">Bạn chưa thêm sản phẩm thuốc nào.</p>
+                        <a asp-action="Index" class="btn btn-primary rounded-pill px-4 mt-2">Đến cửa hàng thuốc</a>
                     </div>
                 </div>
             }
@@ -92,30 +92,30 @@
         {
             <div class="col-lg-4">
                 <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
-                    <h4 class="fw-bold text-dark border-bottom pb-3 mb-3">Order Summary</h4>
+                    <h4 class="fw-bold text-dark border-bottom pb-3 mb-3">Tóm tắt đơn hàng</h4>
                     
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="text-muted">Subtotal</span>
+                        <span class="text-muted">Tạm tính</span>
                         <span class="fw-bold">@subtotal.ToString("N0") VND</span>
                     </div>
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <span class="text-muted">Shipping</span>
-                        <span class="text-success fw-bold">FREE</span>
+                        <span class="text-muted">Phí giao hàng</span>
+                        <span class="text-success fw-bold">MIỄN PHÍ</span>
                     </div>
                     
                     <hr class="my-3" />
                     
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <span class="fs-5 fw-bold text-dark">Total</span>
+                        <span class="fs-5 fw-bold text-dark">Tổng tiền</span>
                         <span class="fs-4 fw-extrabold text-success">@subtotal.ToString("N0") VND</span>
                     </div>
 
-                    <a asp-controller="Checkout" asp-action="Index" class="btn btn-primary btn-lg w-100 rounded-3 fw-bold py-3"><i class="bi bi-credit-card-fill me-2"></i> Proceed to Checkout</a>
+                    <a asp-controller="Checkout" asp-action="Index" class="btn btn-primary btn-lg w-100 rounded-3 fw-bold py-3"><i class="bi bi-credit-card-fill me-2"></i> Tiến hành thanh toán</a>
                     
                     @if (Model.Any(i => i.IsPrescriptionRequired))
                     {
                         <div class="alert alert-warning mt-3 rounded-3 fs-7" role="alert">
-                            <i class="bi bi-info-circle-fill"></i> Some item(s) in your cart require a doctor prescription. You must provide it during checkout.
+                            <i class="bi bi-info-circle-fill"></i> Một số sản phẩm trong giỏ hàng yêu cầu đơn thuốc của bác sĩ. Bạn phải chuẩn bị đơn thuốc khi thanh toán.
                         </div>
                     }
                 </div>

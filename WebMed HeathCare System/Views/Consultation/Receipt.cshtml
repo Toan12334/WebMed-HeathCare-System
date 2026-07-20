@@ -3,14 +3,14 @@
 @using System.Linq
 
 @{
-    ViewData["Title"] = "Clinical Outcome Record";
+    ViewData["Title"] = "Hồ Sơ Kết Quả Khám Lâm Sàng";
     var consult = (WebMed_HeathCare_System.Models.Consultation)ViewBag.Consultation;
     var prescription = (WebMed_HeathCare_System.Models.Prescription?)ViewBag.Prescription;
 }
 
 <div class="container mt-5 mb-5">
     <!-- Navigation Back -->
-    <a asp-controller="Appointment" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 mb-4"><i class="bi bi-arrow-left"></i> Back to Appointments</a>
+    <a asp-controller="Appointment" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 mb-4"><i class="bi bi-arrow-left"></i> Quay lại Lịch Hẹn</a>
 
     <div class="row justify-content-center">
         <div class="col-md-9">
@@ -18,32 +18,32 @@
                 <!-- Receipt Header -->
                 <div class="bg-gradient text-white p-5 text-center" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
                     <i class="bi bi-file-earmark-medical-fill" style="font-size: 4rem;"></i>
-                    <h1 class="fw-extrabold mt-3">Consultation Record</h1>
-                    <p class="lead mb-0">Official Electronic Medical Document</p>
+                    <h1 class="fw-extrabold mt-3">Hồ Sơ Khám Bệnh</h1>
+                    <p class="lead mb-0">Tài Liệu Y Khoa Điện Tử Chính Thức</p>
                 </div>
 
                 <div class="card-body p-5">
                     <!-- Session Metadata -->
                     <div class="row mb-5 border-bottom pb-4 g-3">
                         <div class="col-sm-6">
-                            <h6 class="text-muted text-uppercase fw-bold fs-8">Patient Information</h6>
+                            <h6 class="text-muted text-uppercase fw-bold fs-8">Thông tin Bệnh nhân</h6>
                             <h5 class="fw-bold mb-1 text-dark">@Model.Patient.PatientNavigation.FullName</h5>
-                            <p class="mb-0 text-muted fs-7">Patient ID: #@Model.PatientId</p>
+                            <p class="mb-0 text-muted fs-7">Mã bệnh nhân: #@Model.PatientId</p>
                         </div>
                         <div class="col-sm-6 text-sm-end">
-                            <h6 class="text-muted text-uppercase fw-bold fs-8">Medical Specialist</h6>
+                            <h6 class="text-muted text-uppercase fw-bold fs-8">Chuyên gia Y tế (Bác sĩ)</h6>
                             <h5 class="fw-bold mb-1 text-emerald">@Model.Doctor.DoctorNavigation.FullName</h5>
-                            <p class="mb-0 text-muted fs-7">Specialty: @Model.Doctor.Specialty</p>
+                            <p class="mb-0 text-muted fs-7">Chuyên khoa: @Model.Doctor.Specialty</p>
                         </div>
                         <div class="col-12 mt-3 bg-light p-3 rounded-3 d-flex justify-content-between align-items-center fs-7">
-                            <span><strong>Session Date:</strong> @consult.ConductedAt.ToString("f")</span>
-                            <span><strong>Status:</strong> <span class="badge bg-success-subtle text-success border border-success-subtle">Finalized</span></span>
+                            <span><strong>Ngày khám:</strong> @consult.ConductedAt.ToString("f")</span>
+                            <span><strong>Trạng thái:</strong> <span class="badge bg-success-subtle text-success border border-success-subtle">Đã hoàn thành</span></span>
                         </div>
                     </div>
 
                     <!-- Diagnosis -->
                     <div class="mb-4">
-                        <h4 class="fw-bold text-dark mb-2"><i class="bi bi-activity text-emerald"></i> Clinical Diagnosis</h4>
+                        <h4 class="fw-bold text-dark mb-2"><i class="bi bi-activity text-emerald"></i> Chẩn đoán lâm sàng</h4>
                         <div class="bg-light p-3 rounded-3" style="line-height: 1.6;">
                             @consult.Diagnosis
                         </div>
@@ -53,7 +53,7 @@
                     @if (!string.IsNullOrEmpty(consult.TreatmentPlan))
                     {
                         <div class="mb-4">
-                            <h4 class="fw-bold text-dark mb-2"><i class="bi bi-card-checklist text-emerald"></i> Treatment Plan & Recommendations</h4>
+                            <h4 class="fw-bold text-dark mb-2"><i class="bi bi-card-checklist text-emerald"></i> Kế hoạch điều trị & Khuyến nghị</h4>
                             <div class="bg-light p-3 rounded-3" style="line-height: 1.6;">
                                 @consult.TreatmentPlan
                             </div>
@@ -65,18 +65,18 @@
                     {
                         <div class="mb-4 mt-5">
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h4 class="fw-bold text-dark m-0"><i class="bi bi-prescription text-danger"></i> Digital Prescription</h4>
-                                <span class="text-muted fs-8">Rx ID: #@prescription.PrescriptionId</span>
+                                <h4 class="fw-bold text-dark m-0"><i class="bi bi-prescription text-danger"></i> Đơn thuốc điện tử</h4>
+                                <span class="text-muted fs-8">Mã đơn thuốc: #@prescription.PrescriptionId</span>
                             </div>
 
                             <div class="table-responsive rounded-3 border mb-4">
                                 <table class="table table-hover align-middle mb-0">
                                     <thead class="table-light">
                                         <tr class="fs-8 text-muted">
-                                            <th>Medicine Name</th>
-                                            <th>Dosage</th>
-                                            <th>Frequency</th>
-                                            <th class="text-center">Duration</th>
+                                            <th>Tên thuốc</th>
+                                            <th>Liều lượng</th>
+                                            <th>Tần suất</th>
+                                            <th class="text-center">Thời gian</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -85,11 +85,11 @@
                                             <tr>
                                                 <td>
                                                     <strong class="text-dark">@item.Medicine.Name</strong>
-                                                    <span class="text-muted d-block fs-8">Price: @item.Medicine.Price.ToString("N0") VND</span>
+                                                    <span class="text-muted d-block fs-8">Giá: @item.Medicine.Price.ToString("N0") VND</span>
                                                 </td>
                                                 <td>@item.Dosage</td>
                                                 <td>@item.Frequency</td>
-                                                <td class="text-center">@item.DurationDays days</td>
+                                                <td class="text-center">@item.DurationDays ngày</td>
                                             </tr>
                                         }
                                     </tbody>
@@ -100,11 +100,11 @@
                             {
                                 <!-- Dynamic integration to order medicines -->
                                 <div class="card bg-success-subtle border-0 rounded-4 p-4 text-center">
-                                    <h5 class="fw-bold text-success mb-2">Need to purchase these prescribed medicines?</h5>
-                                    <p class="text-muted fs-7 mb-3">You can add these items to your cart and order them directly from our Online Pharmacy store.</p>
+                                    <h5 class="fw-bold text-success mb-2">Bạn có cần mua các loại thuốc được kê đơn này không?</h5>
+                                    <p class="text-muted fs-7 mb-3">Bạn có thể thêm các sản phẩm này vào giỏ hàng và đặt hàng trực tiếp từ cửa hàng Nhà Thuốc trực tuyến của chúng tôi.</p>
                                     <div class="d-flex justify-content-center gap-2">
                                         <a asp-controller="Pharmacy" asp-action="Index" class="btn btn-emerald px-4 py-2 fw-bold" style="background-color: #059669; color: white;">
-                                            <i class="bi bi-cart3"></i> Go to Pharmacy Shop
+                                            <i class="bi bi-cart3"></i> Đến cửa hàng thuốc
                                         </a>
                                     </div>
                                 </div>
@@ -113,7 +113,7 @@
                         }
                 
                 <div class="card-footer bg-light border-0 p-4 text-center">
-                    <small class="text-muted"><i class="bi bi-shield-check"></i> Verified and digitally signed by WebMed Health Services</small>
+                    <small class="text-muted"><i class="bi bi-shield-check"></i> Được xác thực và ký điện tử bởi Dịch vụ Y tế WebMed</small>
                 </div>
             </div>
         </div>

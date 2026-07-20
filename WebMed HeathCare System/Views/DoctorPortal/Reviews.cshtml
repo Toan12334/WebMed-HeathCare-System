@@ -1,18 +1,18 @@
 @model IEnumerable<WebMed_HeathCare_System.Models.DoctorReview>
 
 @{
-    ViewData["Title"] = "Patient Reviews Dashboard - Doctor Portal";
+    ViewData["Title"] = "Bảng Điều Khiển Đánh Giá Của Bệnh Nhân - Cổng Bác Sĩ";
     var doctor = (WebMed_HeathCare_System.Models.Doctor)ViewBag.Doctor;
 }
 
 <div class="container mt-5 mb-5">
-    <h1 class="fw-extrabold mb-4"><i class="bi bi-star-fill text-warning"></i> Patient Feedback & Reviews</h1>
+    <h1 class="fw-extrabold mb-4"><i class="bi bi-star-fill text-warning"></i> Phản Hồi & Đánh Giá Của Bệnh Nhân</h1>
 
     <div class="row g-4 mb-5">
         <!-- Summary Stats Card -->
         <div class="col-md-4">
             <div class="card border-0 shadow-sm rounded-4 p-4 text-center h-100">
-                <h6 class="text-muted text-uppercase fw-bold fs-8 mb-2">Average Star Rating</h6>
+                <h6 class="text-muted text-uppercase fw-bold fs-8 mb-2">Đánh Giá Sao Trung Bình</h6>
                 <h1 class="display-3 fw-extrabold text-dark mb-2">@doctor.AverageRating.ToString("F1")</h1>
                 
                 <div class="d-flex justify-content-center text-warning fs-3 mb-3">
@@ -29,14 +29,14 @@
                     }
                 </div>
                 
-                <span class="badge bg-light text-muted border px-3 py-1.5 rounded-pill fw-semibold">Based on @Model.Count() reviews</span>
+                <span class="badge bg-light text-muted border px-3 py-1.5 rounded-pill fw-semibold">Dựa trên @Model.Count() đánh giá</span>
             </div>
         </div>
 
         <!-- Rating details distribution mockup -->
         <div class="col-md-8">
             <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
-                <h5 class="fw-bold mb-3">Rating Breakdown</h5>
+                <h5 class="fw-bold mb-3">Chi Tiết Đánh Giá</h5>
                 
                 <!-- 5 stars -->
                 <div class="d-flex align-items-center mb-2 fs-7">
@@ -88,7 +88,7 @@
 
     <!-- Feedback List -->
     <div class="card border-0 shadow-sm rounded-4 p-4">
-        <h4 class="fw-bold text-dark border-bottom pb-2 mb-4">Patient Reviews</h4>
+        <h4 class="fw-bold text-dark border-bottom pb-2 mb-4">Đánh giá từ bệnh nhân</h4>
         
         @if (Model != null && Model.Any())
         {
@@ -127,7 +127,7 @@
         {
             <div class="text-center py-5">
                 <i class="bi bi-chat-left-dots text-muted" style="font-size: 3rem;"></i>
-                <p class="text-muted mt-2">No patient reviews submitted yet.</p>
+                <p class="text-muted mt-2">Chưa có đánh giá nào từ bệnh nhân.</p>
             </div>
         }
     </div>

@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Request Ambulance";
+    ViewData["Title"] = "Yêu Cầu Xe Cứu Thương";
 }
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -9,7 +9,7 @@
         <div class="col-lg-10">
             <div class="card border-danger shadow-lg rounded-4 overflow-hidden">
                 <div class="card-header bg-danger text-white py-3">
-                    <h3 class="card-title mb-0 fw-bold"><i class="bi bi-ambulance animate-pulse"></i> Emergency Ambulance Dispatch</h3>
+                    <h3 class="card-title mb-0 fw-bold"><i class="bi bi-ambulance animate-pulse"></i> Điều Phối Xe Cứu Thương Khẩn Cấp</h3>
                 </div>
                 <div class="card-body p-4">
                     @if (ViewBag.Error != null)
@@ -25,33 +25,33 @@
                                 <input type="hidden" name="longitude" id="longitudeInput" value="" />
 
                                 <div class="mb-3">
-                                    <label class="form-label fw-bold text-secondary">Pickup Location (Exact Address)</label>
-                                    <textarea name="pickupLocation" id="addressInput" class="form-control rounded-3" rows="3" required placeholder="Enter street name, house number, ward, district..."></textarea>
+                                    <label class="form-label fw-bold text-secondary">Địa điểm đón (Địa chỉ chính xác)</label>
+                                    <textarea name="pickupLocation" id="addressInput" class="form-control rounded-3" rows="3" required placeholder="Nhập số nhà, tên đường, phường/xã, quận/huyện..."></textarea>
                                 </div>
                                 <div class="mb-4">
-                                    <label class="form-label fw-bold text-secondary">Emergency Details (Optional)</label>
-                                    <textarea name="emergencyDetails" class="form-control rounded-3" rows="2" placeholder="Briefly describe the emergency condition..."></textarea>
+                                    <label class="form-label fw-bold text-secondary">Chi tiết tình trạng khẩn cấp (Không bắt buộc)</label>
+                                    <textarea name="emergencyDetails" class="form-control rounded-3" rows="2" placeholder="Mô tả ngắn gọn về tình trạng nguy kịch..."></textarea>
                                 </div>
 
                                 <div class="alert alert-warning rounded-3 fs-7 py-2 px-3">
-                                    <i class="bi bi-info-circle-fill me-1"></i> Tip: Use the map on the right to select your exact location for faster ambulance routing.
+                                    <i class="bi bi-info-circle-fill me-1"></i> Mẹo: Sử dụng bản đồ bên phải để chọn vị trí chính xác của bạn giúp xe cứu thương định vị nhanh hơn.
                                 </div>
 
                                 <div class="d-grid">
-                                    <button type="submit" class="btn btn-danger btn-lg rounded-pill py-3 fw-bold"><i class="bi bi-exclamation-triangle"></i> REQUEST AMBULANCE NOW</button>
+                                    <button type="submit" class="btn btn-danger btn-lg rounded-pill py-3 fw-bold"><i class="bi bi-exclamation-triangle"></i> YÊU CẦU XE CỨU THƯƠNG NGAY</button>
                                 </div>
                             </form>
                         </div>
 
                         <!-- Right Map Column -->
                         <div class="col-md-7">
-                            <label class="form-label fw-bold text-secondary">Pin Point Your Location on Map</label>
+                            <label class="form-label fw-bold text-secondary">Định vị vị trí của bạn trên bản đồ</label>
                             <div class="border rounded-4 overflow-hidden shadow-sm" style="height: 350px; position: relative;">
                                 <div id="selectMap" style="height: 100%; width: 100%; z-index: 1;"></div>
                             </div>
                             <div class="d-flex justify-content-between mt-2 fs-8 text-muted">
-                                <span>Selected Lat: <strong id="latText">N/A</strong></span>
-                                <span>Selected Lng: <strong id="lngText">N/A</strong></span>
+                                <span>Vĩ độ đã chọn: <strong id="latText">N/A</strong></span>
+                                <span>Kinh độ đã chọn: <strong id="lngText">N/A</strong></span>
                             </div>
                         </div>
                     </div>
@@ -76,7 +76,7 @@
             }).addTo(map);
 
             let marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map)
-                .bindPopup('<b>Drag me</b> to your exact location.').openPopup();
+                .bindPopup('<b>Kéo tôi</b> đến vị trí chính xác của bạn.').openPopup();
 
             // Set initial hidden inputs
             updateCoordinates(defaultLat, defaultLng);

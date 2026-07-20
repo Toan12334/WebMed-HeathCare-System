@@ -1,20 +1,20 @@
 @model IEnumerable<WebMed_HeathCare_System.Models.DoctorReview>
 
 @{
-    ViewData["Title"] = "Moderate Reviews - Admin Panel";
+    ViewData["Title"] = "Kiểm Duyệt Đánh Giá - Bảng Điều Khiển Admin";
 }
 
 <div class="container-fluid mt-4 px-4 mb-5">
     <!-- Header Block -->
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 border-bottom pb-3">
-        <h1 class="fw-extrabold mb-0 text-dark"><i class="bi bi-star-fill text-warning animate-pulse"></i> Patient Reviews</h1>
+        <h1 class="fw-extrabold mb-0 text-dark"><i class="bi bi-star-fill text-warning animate-pulse"></i> Đánh Giá Từ Bệnh Nhân</h1>
         <div class="btn-group shadow-sm">
-            <a asp-action="Users" class="btn btn-outline-primary">Users</a>
-            <a asp-action="Doctors" class="btn btn-outline-primary">Doctor Verification</a>
-            <a asp-action="Reviews" class="btn btn-primary active">Review Moderation</a>
-            <a asp-action="News" class="btn btn-outline-primary">Health News</a>
-            <a asp-action="Roles" class="btn btn-outline-primary">System Roles</a>
-            <a asp-action="Emergencies" class="btn btn-outline-primary">Emergency Dispatch</a>
+            <a asp-action="Users" class="btn btn-outline-primary">Người dùng</a>
+            <a asp-action="Doctors" class="btn btn-outline-primary">Xác thực bác sĩ</a>
+            <a asp-action="Reviews" class="btn btn-primary active">Kiểm duyệt đánh giá</a>
+            <a asp-action="News" class="btn btn-outline-primary">Tin tức sức khỏe</a>
+            <a asp-action="Roles" class="btn btn-outline-primary">Vai trò hệ thống</a>
+            <a asp-action="Emergencies" class="btn btn-outline-primary">Điều phối cấp cứu</a>
         </div>
     </div>
 
@@ -35,13 +35,13 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
-                                <th class="p-3">Review ID</th>
-                                <th class="p-3">Patient</th>
-                                <th class="p-3">Doctor Name</th>
-                                <th class="p-3 text-center">Rating</th>
-                                <th class="p-3">Comment / Content</th>
-                                <th class="p-3 text-center">Status</th>
-                                <th class="p-3 text-center" style="width: 250px;">Actions</th>
+                                <th class="p-3">Mã đánh giá</th>
+                                <th class="p-3">Bệnh nhân</th>
+                                <th class="p-3">Tên bác sĩ</th>
+                                <th class="p-3 text-center">Điểm đánh giá</th>
+                                <th class="p-3">Nhận xét / Nội dung</th>
+                                <th class="p-3 text-center">Trạng thái</th>
+                                <th class="p-3 text-center" style="width: 250px;">Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -68,11 +68,11 @@
                                     <td class="p-3 text-center">
                                         @if (review.ModerationStatus == "Approved")
                                         {
-                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill fw-bold">Approved</span>
+                                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill fw-bold">Đã duyệt</span>
                                         }
                                         else if (review.ModerationStatus == "Rejected")
                                         {
-                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 rounded-pill fw-bold">Hidden</span>
+                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 rounded-pill fw-bold">Đã ẩn</span>
                                         }
                                         else
                                         {
@@ -85,7 +85,7 @@
                                             <form asp-action="ModerateReview" method="post" class="w-100">
                                                 <input type="hidden" name="id" value="@review.ReviewId" />
                                                 <input type="hidden" name="status" value="Rejected" />
-                                                <button type="submit" class="btn btn-outline-danger btn-sm w-100 rounded-3 fw-bold"><i class="bi bi-eye-slash-fill"></i> Hide Review</button>
+                                                <button type="submit" class="btn btn-outline-danger btn-sm w-100 rounded-3 fw-bold"><i class="bi bi-eye-slash-fill"></i> Ẩn đánh giá</button>
                                             </form>
                                         }
                                         else
@@ -93,7 +93,7 @@
                                             <form asp-action="ModerateReview" method="post" class="w-100">
                                                 <input type="hidden" name="id" value="@review.ReviewId" />
                                                 <input type="hidden" name="status" value="Approved" />
-                                                <button type="submit" class="btn btn-outline-success btn-sm w-100 rounded-3 fw-bold"><i class="bi bi-eye-fill"></i> Unhide Review</button>
+                                                <button type="submit" class="btn btn-outline-success btn-sm w-100 rounded-3 fw-bold"><i class="bi bi-eye-fill"></i> Hiện đánh giá</button>
                                             </form>
                                         }
                                     </td>
@@ -107,8 +107,8 @@
             {
                 <div class="py-5 text-center">
                     <i class="bi bi-chat-square-text text-muted" style="font-size: 4rem;"></i>
-                    <h3 class="fw-bold mt-3">No patient reviews</h3>
-                    <p class="text-muted">There are no reviews left by patients yet.</p>
+                    <h3 class="fw-bold mt-3">Chưa có đánh giá nào từ bệnh nhân</h3>
+                    <p class="text-muted">Hiện chưa có đánh giá nào do bệnh nhân gửi.</p>
                 </div>
             }
         </div>

@@ -1,5 +1,5 @@
 @{
-    ViewData["Title"] = "Health Calculator";
+    ViewData["Title"] = "Công Cụ Tính Chỉ Số Sức Khỏe";
 }
 
 <div class="container mt-4">
@@ -7,7 +7,7 @@
         <div class="col-md-8">
             <div class="card shadow-sm">
                 <div class="card-body">
-                    <h2 class="card-title text-center text-primary mb-4">Health Calculator</h2>
+                    <h2 class="card-title text-center text-primary mb-4">Tính Toán Chỉ Số Sức Khỏe</h2>
                     
                     @if (ViewBag.Error != null)
                     {
@@ -17,34 +17,34 @@
                     <form asp-action="Calculate" method="post">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label class="form-label">Height (cm)</label>
+                                <label class="form-label">Chiều cao (cm)</label>
                                 <input type="number" step="0.1" name="height" class="form-control" value="@ViewBag.Height" required />
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">Weight (kg)</label>
+                                <label class="form-label">Cân nặng (kg)</label>
                                 <input type="number" step="0.1" name="weight" class="form-control" value="@ViewBag.Weight" required />
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-4">
-                                <label class="form-label">Age</label>
+                                <label class="form-label">Tuổi</label>
                                 <input type="number" name="age" class="form-control" value="@ViewBag.Age" required />
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Gender</label>
+                                <label class="form-label">Giới tính</label>
                                 <select name="gender" class="form-select">
-                                    <option value="Male" selected="@(ViewBag.Gender == "Male")">Male</option>
-                                    <option value="Female" selected="@(ViewBag.Gender == "Female")">Female</option>
+                                    <option value="Male" selected="@(ViewBag.Gender == "Male")">Nam</option>
+                                    <option value="Female" selected="@(ViewBag.Gender == "Female")">Nữ</option>
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">Activity Level</label>
+                                <label class="form-label">Mức độ hoạt động</label>
                                 <select name="activityLevel" class="form-select">
-                                    <option value="sedentary" selected="@(ViewBag.ActivityLevel == "sedentary")">Sedentary</option>
-                                    <option value="light" selected="@(ViewBag.ActivityLevel == "light")">Light Activity</option>
-                                    <option value="moderate" selected="@(ViewBag.ActivityLevel == "moderate")">Moderate Activity</option>
-                                    <option value="active" selected="@(ViewBag.ActivityLevel == "active")">Very Active</option>
+                                    <option value="sedentary" selected="@(ViewBag.ActivityLevel == "sedentary")">Ít vận động</option>
+                                    <option value="light" selected="@(ViewBag.ActivityLevel == "light")">Vận động nhẹ</option>
+                                    <option value="moderate" selected="@(ViewBag.ActivityLevel == "moderate")">Vận động vừa phải</option>
+                                    <option value="active" selected="@(ViewBag.ActivityLevel == "active")">Vận động nhiều</option>
                                 </select>
                             </div>
                         </div>
@@ -52,33 +52,33 @@
                         <div class="mb-4 text-center">
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="calcType" id="calcBMI" value="BMI" checked="@(ViewBag.CalcType == null || ViewBag.CalcType == "BMI")">
-                                <label class="form-check-label" for="calcBMI">Calculate BMI</label>
+                                <label class="form-check-label" for="calcBMI">Tính chỉ số BMI</label>
                             </div>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" name="calcType" id="calcCalories" value="Calories" checked="@(ViewBag.CalcType == "Calories")">
-                                <label class="form-check-label" for="calcCalories">Calculate Daily Calories</label>
+                                <label class="form-check-label" for="calcCalories">Tính lượng Calo hàng ngày</label>
                             </div>
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg">Calculate</button>
+                            <button type="submit" class="btn btn-primary btn-lg">Tính toán</button>
                         </div>
                     </form>
 
                     @if (ViewBag.BMI != null)
                     {
                         <div class="alert alert-info mt-4 text-center">
-                            <h4>Your BMI: <strong>@ViewBag.BMI</strong></h4>
-                            <h5>Category: <span class="badge bg-secondary">@ViewBag.BMICategory</span></h5>
-                            <p class="mb-0 mt-2">A healthy BMI is between 18.5 and 24.9.</p>
+                            <h4>Chỉ số BMI của bạn: <strong>@ViewBag.BMI</strong></h4>
+                            <h5>Phân loại: <span class="badge bg-secondary">@ViewBag.BMICategory</span></h5>
+                            <p class="mb-0 mt-2">Chỉ số BMI lành mạnh là từ 18.5 đến 24.9.</p>
                         </div>
                     }
                     else if (ViewBag.Calories != null)
                     {
                         <div class="alert alert-success mt-4 text-center">
-                            <h4>Estimated Daily Calorie Needs:</h4>
-                            <h2 class="display-6 fw-bold">@ViewBag.Calories <small class="fs-5 fw-normal">kcal/day</small></h2>
-                            <p class="mb-0 mt-2">This is an estimate to maintain your current weight based on your activity level.</p>
+                            <h4>Lượng Calo hàng ngày ước tính cần thiết:</h4>
+                            <h2 class="display-6 fw-bold">@ViewBag.Calories <small class="fs-5 fw-normal">kcal/ngày</small></h2>
+                            <p class="mb-0 mt-2">Đây là mức ước tính để duy trì cân nặng hiện tại của bạn dựa trên mức độ hoạt động.</p>
                         </div>
                     }
                 </div>

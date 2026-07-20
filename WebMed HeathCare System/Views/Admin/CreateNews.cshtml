@@ -1,9 +1,9 @@
 @{
-    ViewData["Title"] = "Write News Article - Admin Panel";
+    ViewData["Title"] = "Soạn Thảo Bài Viết Tin Tức - Ban Quản Trị";
 }
 
 <div class="container mt-5 mb-5">
-    <a asp-action="News" class="btn btn-outline-secondary rounded-pill px-4 mb-4"><i class="bi bi-arrow-left"></i> Back to News Management</a>
+    <a asp-action="News" class="btn btn-outline-secondary rounded-pill px-4 mb-4"><i class="bi bi-arrow-left"></i> Quay lại Quản lý Tin tức</a>
 
     @if (TempData["ErrorMessage"] != null)
     {
@@ -16,47 +16,47 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card border-0 shadow-lg rounded-4 p-4">
-                <h3 class="fw-bold text-dark border-bottom pb-2 mb-4"><i class="bi bi-file-earmark-medical-fill"></i> Write Health News Article</h3>
+                <h3 class="fw-bold text-dark border-bottom pb-2 mb-4"><i class="bi bi-file-earmark-medical-fill"></i> Soạn Thảo Bài Viết Tin Tức Sức Khỏe</h3>
 
                 <form asp-action="CreateNews" method="post">
                     <!-- Title -->
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-secondary">Article Title</label>
-                        <input type="text" name="title" class="form-control rounded-3 form-control-lg" required placeholder="e.g. 5 Benefits of Daily Morning Workouts" />
+                        <label class="form-label fw-bold text-secondary">Tiêu đề Bài viết</label>
+                        <input type="text" name="title" class="form-control rounded-3 form-control-lg" required placeholder="Ví dụ: 5 Lợi ích của việc Tập thể dục Buổi sáng Hàng ngày" />
                     </div>
 
                     <!-- Category -->
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-secondary">Category</label>
+                        <label class="form-label fw-bold text-secondary">Chuyên mục</label>
                         <select name="category" class="form-select rounded-3">
-                            <option value="News">Tin Tức (News)</option>
-                            <option value="Notifications">Thông Báo (Notifications)</option>
-                            <option value="Hospital Activities">Hoạt Động Bệnh Viện (Hospital Activities)</option>
-                            <option value="Research">Nghiên Cứu Khoa Học (Research)</option>
-                            <option value="Events">Hội Thảo & Sự Kiện (Events)</option>
-                            <option value="Cooperation">Hợp Tác (Cooperation)</option>
-                            <option value="Training">Đào Tạo (Training)</option>
-                            <option value="Community">Hoạt Động Cộng Đồng (Community)</option>
-                            <option value="Pharma Info">Thông Tin Dược (Pharma Info)</option>
-                            <option value="Recruitment">Tuyển Dụng (Recruitment)</option>
-                            <option value="Success Stories">Câu Chuyện Thành Công (Success Stories)</option>
+                            <option value="News">Tin Tức</option>
+                            <option value="Notifications">Thông Báo</option>
+                            <option value="Hospital Activities">Hoạt Động Bệnh Viện</option>
+                            <option value="Research">Nghiên Cứu Khoa Học</option>
+                            <option value="Events">Hội Thảo & Sự Kiện</option>
+                            <option value="Cooperation">Hợp Tác</option>
+                            <option value="Training">Đào Tạo</option>
+                            <option value="Community">Hoạt Động Cộng Đồng</option>
+                            <option value="Pharma Info">Thông Tin Dược</option>
+                            <option value="Recruitment">Tuyển Dụng</option>
+                            <option value="Success Stories">Câu Chuyện Thành Công</option>
                         </select>
                     </div>
 
                     <!-- Image URL -->
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-secondary">Article Image URL</label>
-                        <input type="url" name="imageUrl" class="form-control rounded-3" placeholder="e.g. https://images.unsplash.com/photo-..." />
+                        <label class="form-label fw-bold text-secondary">Đường dẫn Ảnh Bài viết (URL)</label>
+                        <input type="url" name="imageUrl" class="form-control rounded-3" placeholder="Ví dụ: https://images.unsplash.com/photo-..." />
                         <div class="form-text text-muted">Cung cấp liên kết ảnh trực tuyến. Nếu để trống, hệ thống sẽ sử dụng ảnh mặc định theo danh mục.</div>
                     </div>
 
                     <!-- Content -->
                     <div class="mb-4">
-                        <label class="form-label fw-bold text-secondary">Article Content</label>
-                        <textarea name="content" class="form-control rounded-3" rows="8" required placeholder="Write the main article body content here..."></textarea>
+                        <label class="form-label fw-bold text-secondary">Nội dung Bài viết</label>
+                        <textarea name="content" class="form-control rounded-3" rows="8" required placeholder="Viết nội dung chính của bài viết tại đây..."></textarea>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 fw-bold py-3"><i class="bi bi-send-fill"></i> Publish News Article</button>
+                    <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3 fw-bold py-3"><i class="bi bi-send-fill"></i> Đăng Bài Viết</button>
                 </form>
             </div>
         </div>

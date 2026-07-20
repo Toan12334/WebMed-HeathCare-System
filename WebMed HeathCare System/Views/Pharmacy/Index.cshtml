@@ -1,21 +1,21 @@
 @model IEnumerable<WebMed_HeathCare_System.Models.Medicine>
 
 @{
-    ViewData["Title"] = "Online Pharmacy - Browse Medicines";
+    ViewData["Title"] = "Nhà Thuốc Trực Tuyến - Tìm Thuốc";
 }
 
 <div class="container mt-4">
     <!-- Premium Header Area -->
     <div class="bg-gradient bg-primary text-white p-5 rounded-4 shadow-sm mb-5 text-center position-relative overflow-hidden" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
-        <h1 class="display-5 fw-bold mb-2">WebMed Digital Pharmacy</h1>
-        <p class="lead mb-4">Browse and order high-quality, verified medical products online.</p>
+        <h1 class="display-5 fw-bold mb-2">Nhà Thuốc Số WebMed</h1>
+        <p class="lead mb-4">Tìm kiếm và mua trực tuyến các loại thuốc, dược phẩm chất lượng cao đã xác thực.</p>
         
         <!-- Search bar -->
         <div class="row justify-content-center">
             <div class="col-md-8 col-lg-6">
                 <form asp-action="Index" method="get" class="d-flex shadow-sm rounded-pill overflow-hidden bg-white p-1">
-                    <input type="text" name="keyword" class="form-control border-0 px-4 py-2 rounded-pill" style="box-shadow: none;" placeholder="Search medicines, category, or symptoms..." value="@ViewBag.Keyword" />
-                    <button type="submit" class="btn btn-primary px-4 rounded-pill fw-semibold ms-1"><i class="bi bi-search"></i> Search</button>
+                    <input type="text" name="keyword" class="form-control border-0 px-4 py-2 rounded-pill" style="box-shadow: none;" placeholder="Tìm kiếm thuốc, danh mục hoặc triệu chứng..." value="@ViewBag.Keyword" />
+                    <button type="submit" class="btn btn-primary px-4 rounded-pill fw-semibold ms-1"><i class="bi bi-search"></i> Tìm kiếm</button>
                 </form>
             </div>
         </div>
@@ -26,7 +26,7 @@
     {
         <div class="alert alert-success alert-dismissible fade show rounded-3" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
@@ -42,7 +42,7 @@
                         @if (item.IsPrescriptionRequired)
                         {
                             <span class="position-absolute top-0 end-0 bg-danger text-white px-3 py-1 m-3 rounded-pill fs-7 fw-bold shadow-sm">
-                                <i class="bi bi-file-earmark-medical-fill"></i> Prescription Required
+                                <i class="bi bi-file-earmark-medical-fill"></i> Cần Đơn Thuốc
                             </span>
                         }
                         
@@ -55,33 +55,33 @@
                             
                             <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top border-light">
                                 <div>
-                                    <small class="text-muted d-block">Price</small>
+                                    <small class="text-muted d-block">Giá bán</small>
                                     <span class="fs-4 fw-extrabold text-success">@item.Price.ToString("N0") <span class="fs-6 fw-normal">VND</span></span>
                                 </div>
                                 @if (item.StockQuantity > 0)
                                 {
-                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill">In Stock (@item.StockQuantity)</span>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1 rounded-pill">Còn hàng (@item.StockQuantity)</span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill">Out of Stock</span>
+                                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded-pill">Hết hàng</span>
                                 }
                             </div>
                         </div>
                         
                         <div class="card-footer bg-light border-0 p-4 pt-0 d-flex gap-2">
-                            <a asp-action="Details" asp-route-id="@item.MedicineId" class="btn btn-outline-secondary rounded-3 w-50 fw-semibold">Details</a>
+                            <a asp-action="Details" asp-route-id="@item.MedicineId" class="btn btn-outline-secondary rounded-3 w-50 fw-semibold">Chi tiết</a>
                             @if (item.StockQuantity > 0)
                             {
                                 <form asp-action="AddToCart" method="post" class="w-50">
                                     <input type="hidden" name="medicineId" value="@item.MedicineId" />
                                     <input type="hidden" name="quantity" value="1" />
-                                    <button type="submit" class="btn btn-primary rounded-3 w-100 fw-semibold"><i class="bi bi-cart-plus-fill"></i> Add to Cart</button>
+                                    <button type="submit" class="btn btn-primary rounded-3 w-100 fw-semibold"><i class="bi bi-cart-plus-fill"></i> Thêm vào giỏ</button>
                                 </form>
                             }
                             else
                             {
-                                <button class="btn btn-secondary rounded-3 w-50 fw-semibold" disabled>Out of Stock</button>
+                                <button class="btn btn-secondary rounded-3 w-50 fw-semibold" disabled>Hết hàng</button>
                             }
                         </div>
                     </div>
@@ -92,9 +92,9 @@
         {
             <div class="col-12 text-center py-5">
                 <i class="bi bi-clipboard-x text-muted mb-3" style="font-size: 3rem;"></i>
-                <h3 class="fw-bold">No medicines found</h3>
-                <p class="text-muted">Try modifying your keyword search or filter by different categories.</p>
-                <a asp-action="Index" class="btn btn-primary rounded-pill px-4 mt-2">Clear Search</a>
+                <h3 class="fw-bold">Không tìm thấy sản phẩm nào</h3>
+                <p class="text-muted">Vui lòng thay đổi từ khóa tìm kiếm hoặc danh mục của bạn.</p>
+                <a asp-action="Index" class="btn btn-primary rounded-pill px-4 mt-2">Xóa Tìm Kiếm</a>
             </div>
         }
     </div>

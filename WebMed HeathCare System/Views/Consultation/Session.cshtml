@@ -1,7 +1,7 @@
 @model WebMed_HeathCare_System.Models.Appointment
 
 @{
-    ViewData["Title"] = "Consultation Session";
+    ViewData["Title"] = "Phiên Tư Vấn";
     var role = ViewBag.Role;
 }
 
@@ -11,8 +11,8 @@
         <div class="col-lg-7">
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-dark text-white">
                 <div class="card-header bg-dark border-0 p-3 d-flex justify-content-between align-items-center">
-                    <h5 class="m-0 fw-bold"><i class="bi bi-camera-video"></i> Live Consultation Room</h5>
-                    <span class="badge bg-danger animate-pulse"><i class="bi bi-circle-fill fs-8"></i> LIVE</span>
+                    <h5 class="m-0 fw-bold"><i class="bi bi-camera-video"></i> Phòng Tư Vấn Trực Tuyến</h5>
+                    <span class="badge bg-danger animate-pulse"><i class="bi bi-circle-fill fs-8"></i> TRỰC TIẾP</span>
                 </div>
                 
                 <!-- Simulated Video Stream -->
@@ -25,14 +25,14 @@
                         <h4 class="fw-bold">
                             @(role == "Doctor" ? Model.Patient.PatientNavigation.FullName : Model.Doctor.DoctorNavigation.FullName)
                         </h4>
-                        <p class="text-muted fs-7">Connected via Secure Video Link</p>
+                        <p class="text-muted fs-7">Đã kết nối qua Đường truyền Video Bảo mật</p>
                     </div>
 
                     <!-- Local participant preview picture-in-picture -->
                     <div class="position-absolute bottom-0 end-0 m-3 rounded-3 overflow-hidden shadow-lg border border-secondary" style="width: 160px; height: 120px; background-color: #2b3035;">
                         <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-center">
                             <i class="bi bi-person-video" style="font-size: 2rem;"></i>
-                            <small class="fs-8 text-light mt-1">You</small>
+                            <small class="fs-8 text-light mt-1">Bạn</small>
                         </div>
                     </div>
                 </div>
@@ -41,7 +41,7 @@
                 <div class="card-footer bg-dark border-0 p-3 d-flex justify-content-center gap-3">
                     <button class="btn btn-outline-light rounded-circle p-3"><i class="bi bi-mic-fill fs-5"></i></button>
                     <button class="btn btn-outline-light rounded-circle p-3"><i class="bi bi-camera-video-fill fs-5"></i></button>
-                    <a asp-controller="Appointment" asp-action="Index" class="btn btn-danger rounded-pill px-4 py-3 fw-bold"><i class="bi bi-telephone-x-fill"></i> End Consultation</a>
+                    <a asp-controller="Appointment" asp-action="Index" class="btn btn-danger rounded-pill px-4 py-3 fw-bold"><i class="bi bi-telephone-x-fill"></i> Kết thúc Tư vấn</a>
                 </div>
             </div>
         </div>
@@ -51,7 +51,7 @@
             <div class="card border-0 shadow-lg rounded-4 p-4 h-100">
                 @if (role == "Doctor")
                 {
-                    <h3 class="fw-bold text-dark border-bottom pb-2 mb-4"><i class="bi bi-journal-medical text-emerald"></i> Clinical Outcome Form</h3>
+                    <h3 class="fw-bold text-dark border-bottom pb-2 mb-4"><i class="bi bi-journal-medical text-emerald"></i> Hồ sơ kết quả khám lâm sàng</h3>
                     
                     <form asp-action="SubmitConsultation" method="post" id="consultForm">
                         <input type="hidden" name="appointmentId" value="@Model.AppointmentId" />
@@ -59,23 +59,23 @@
 
                         <!-- Diagnosis -->
                         <div class="mb-3">
-                            <label class="form-label fw-bold text-secondary">Clinical Diagnosis</label>
-                            <textarea name="diagnosis" class="form-control rounded-3" rows="3" required placeholder="Enter clinical diagnosis details..."></textarea>
+                            <label class="form-label fw-bold text-secondary">Chẩn đoán lâm sàng</label>
+                            <textarea name="diagnosis" class="form-control rounded-3" rows="3" required placeholder="Nhập chi tiết chẩn đoán lâm sàng..."></textarea>
                         </div>
 
                         <!-- Treatment Plan -->
                         <div class="mb-4">
-                            <label class="form-label fw-bold text-secondary">Treatment Plan / Recommendations</label>
-                            <textarea name="treatmentPlan" class="form-control rounded-3" rows="3" placeholder="Enter treatment guidelines, diet, and rest notes..."></textarea>
+                            <label class="form-label fw-bold text-secondary">Kế hoạch điều trị / Khuyến nghị</label>
+                            <textarea name="treatmentPlan" class="form-control rounded-3" rows="3" placeholder="Nhập hướng dẫn điều trị, chế độ ăn uống, nghỉ ngơi..."></textarea>
                         </div>
 
                         <!-- Prescription Builder -->
-                        <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Prescription Items</h5>
+                        <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">Danh mục đơn thuốc</h5>
                         
                         <div class="mb-3 position-relative">
                             <div class="input-group">
                                 <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-                                <input type="text" id="medicineSearch" class="form-control border-start-0" placeholder="Search medicine catalogue..." autocomplete="off" />
+                                <input type="text" id="medicineSearch" class="form-control border-start-0" placeholder="Tìm kiếm trong danh mục thuốc..." autocomplete="off" />
                             </div>
                             <div id="searchResults" class="list-group position-absolute w-100 shadow-sm z-3 d-none"></div>
                         </div>
@@ -85,10 +85,10 @@
                             <table class="table table-sm align-middle" id="prescriptionTable">
                                 <thead>
                                     <tr class="fs-8 text-muted">
-                                        <th>Medicine</th>
-                                        <th>Dosage</th>
-                                        <th>Freq</th>
-                                        <th>Days</th>
+                                        <th>Thuốc</th>
+                                        <th>Liều lượng</th>
+                                        <th>Tần suất</th>
+                                        <th>Ngày</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -99,24 +99,23 @@
                         </div>
 
                         <button type="submit" class="btn btn-emerald btn-lg w-100 rounded-3 fw-bold py-3" style="background-color: #059669; color: white;">
-                            <i class="bi bi-check-circle-fill"></i> Complete & Issue Prescription
+                            <i class="bi bi-check-circle-fill"></i> Hoàn thành & Kê đơn thuốc
                         </button>
                     </form>
                 }
                 else
                 {
-                    <h3 class="fw-bold text-dark border-bottom pb-2 mb-4"><i class="bi bi-clipboard2-pulse"></i> Appointment Info</h3>
+                    <h3 class="fw-bold text-dark border-bottom pb-2 mb-4"><i class="bi bi-clipboard2-pulse"></i> Thông tin Lịch Hẹn</h3>
                     <div class="mb-4">
-                        <p class="mb-1 text-muted">You are in consultation with:</p>
+                        <p class="mb-1 text-muted">Bạn đang tư vấn với:</p>
                         <h4 class="fw-bold text-dark">@Model.Doctor.DoctorNavigation.FullName</h4>
                         <span class="badge bg-emerald-subtle text-emerald border px-3 py-1.5 rounded-pill fw-bold text-uppercase">@Model.Doctor.Specialty</span>
                     </div>
 
                     <div class="bg-light p-4 rounded-4 mb-4">
-                        <h5 class="fw-bold"><i class="bi bi-info-circle"></i> Instructions</h5>
+                        <h5 class="fw-bold"><i class="bi bi-info-circle"></i> Hướng dẫn</h5>
                         <p class="text-muted fs-7 mb-0" style="line-height: 1.6;">
-                            Please remain in the consultation room. The doctor is conducting the session and will write up your diagnosis and prescription here. 
-                            Once the doctor finishes, you will be redirected to view your clinical summary and prescription details.
+                            Vui lòng ở lại phòng tư vấn. Bác sĩ đang thực hiện phiên khám và sẽ ghi chẩn đoán cùng đơn thuốc của bạn tại đây. Khi bác sĩ hoàn thành, bạn sẽ được tự động chuyển hướng để xem tóm tắt kết quả khám và chi tiết đơn thuốc.
                         </p>
                     </div>
                 }
@@ -152,7 +151,7 @@
                                     html += `<button type="button" class="list-group-item list-group-item-action" onclick="addMedicine(${item.medicineId}, '${item.name}')">${item.name}</button>`;
                                 });
                             } else {
-                                html += `<div class="list-group-item text-muted">No medicines found</div>`;
+                                html += `<div class="list-group-item text-muted">Không tìm thấy loại thuốc nào</div>`;
                             }
                             $('#searchResults').html(html).removeClass('d-none');
                         }
@@ -197,8 +196,8 @@
                 let row = `
                     <tr id="med-row-${id}" data-med-id="${id}">
                         <td><span class="fw-semibold text-dark fs-7">${name}</span></td>
-                        <td><input type="text" class="form-control form-control-sm med-dosage" value="500mg" placeholder="Dosage" required /></td>
-                        <td><input type="text" class="form-control form-control-sm med-freq" value="Twice daily" placeholder="Frequency" required /></td>
+                        <td><input type="text" class="form-control form-control-sm med-dosage" value="500mg" placeholder="Liều lượng" required /></td>
+                        <td><input type="text" class="form-control form-control-sm med-freq" value="2 lần / ngày" placeholder="Tần suất" required /></td>
                         <td><input type="number" class="form-control form-control-sm med-days" value="7" min="1" style="width: 60px;" required /></td>
                         <td><button type="button" class="btn btn-outline-danger btn-sm border-0" onclick="removeRow(${id})"><i class="bi bi-trash"></i></button></td>
                     </tr>
