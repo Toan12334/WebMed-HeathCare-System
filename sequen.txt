@@ -1,0 +1,445 @@
+1. Kịch bản 1: Gửi yêu cầu cấp cứu (Submit Emergency Request)
+Kịch bản này mô tả luồng khi một Bệnh nhân/Người dùng gửi một yêu cầu cấp cứu lên hệ thống. Hệ thống sẽ tạo một yêu cầu mới với trạng thái ban đầu là Pending.
+Code snippet
+sequenceDiagram
+    autonumber
+    actor User as Patient / User
+    participant Controller as EmergencyRequestController
+    participant Service as EmergencyRequestService
+    participant DB as WebMedDbContext
+    
+    User->>Controller: SubmitRequest(pickupLocation, details, lat, lng)
+    activate Controller
+    
+    Note over Controller: Hệ thống lấy PatientId từ session/auth
+    Controller->>Service: CreateRequestAsync(patientId, pickupLocation, details, lat, lng)
+    activate Service
+    
+    Note over Service: Khởi tạo AmbulanceRequest<br/>sets Status = "Pending"
+    
+    Service->>DB: AmbulanceRequests.Add(request)
+    Service->>DB: SaveChangesAsync()
+    activate DB
+    DB-->>Service: Xác nhận lưu thành công
+    deactivate DB
+    
+    Service-->>Controller: Trả về thông tin Request (gồm RequestId)
+    deactivate Service
+    
+    Controller-->>User: Trả về chuỗi JSON tracking thông tin
+    deactivate Controller
+
+
+2. Kịch bản 2: Admin điều phối xe cấp cứu (Dispatch Ambulance)
+Kịch bản này mô tả luồng khi Admin xem danh sách và thực hiện gán xe cấp cứu cho một yêu cầu cụ thể. Trạng thái của yêu cầu sẽ chuyển sang Assigned.
+Code snippet
+sequenceDiagram
+    autonumber
+    actor Admin as Admin / Dispatcher
+    participant Controller as AdminController
+    participant Service as AdminService
+    participant DB as WebMedDbContext
+
+
+    Admin->>Controller: DispatchAmbulance(requestId, vehicleNumber)
+    activate Controller
+    
+    Controller->>Service: DispatchAmbulanceAsync(requestId, vehicleNumber)
+    activate Service
+    
+    Service->>DB: FindAsync(requestId)
+    activate DB
+    DB-->>Service: Trả về đối tượng AmbulanceRequest
+    deactivate DB
+    
+    Note over Service: Cập nhật thông tin:<br/>sets Status = "Assigned"<br/>sets vehicle, ambulance location, ETA
+    
+    Service->>DB: SaveChangesAsync()
+    activate DB
+    DB-->>Service: Xác nhận cập nhật thành công
+    deactivate DB
+    
+    Service-->>Controller: Trả về kết quả xử lý thành công
+    deactivate Service
+    
+    Controller-->>Admin: Hiển thị thông báo điều xe thành công
+    deactivate Controller
+
+
+3. Kịch bản 3: Theo dõi xe cấp cứu (Track Emergency Request)
+Kịch bản này mô tả luồng Người dùng liên tục lấy dữ liệu định vị của xe cấp cứu (Real-time tracking). Hệ thống sẽ cập nhật tọa độ xe liên tục và tự động chuyển trạng thái thành Arrived khi xe đến nơi.
+Code snippet
+sequenceDiagram
+    autonumber
+    actor User as Patient / User
+    participant Controller as EmergencyRequestController
+    participant Service as EmergencyRequestService
+    participant DB as WebMedDbContext
+
+
+    User->>Controller: Track(requestId) / GetTrackingData(requestId)
+    activate Controller
+    
+    Controller->>Service: GetTrackingDataAsync(requestId)
+    activate Service
+    
+    Service->>DB: FindAsync(requestId)
+    activate DB
+    DB-->>Service: Trả về dữ liệu AmbulanceRequest
+    deactivate DB
+    
+    Note over Service: updates ambulance coordinates while tracking<br/>Nếu xe đã đến nơi: sets Status = "Arrived"
+    
+    Service->>DB: SaveChangesAsync()
+    activate DB
+    DB-->>Service: Xác nhận cập nhật tọa độ/trạng thái
+    deactivate DB
+    
+    Service-->>Controller: Trả về Tracking Data (Tọa độ, ETA, Status)
+    deactivate Service
+    
+    Controller-->>User: Trả về tracking JSON cho Client hiển thị lên bản đồ
+    deactivate Controller
+
+
+
+Biểu đồ 1: Tìm Bác sĩ & Xem Chi tiết
+Kịch bản này mô tả cách một người dùng tìm kiếm bác sĩ dựa trên các tiêu chí (ví dụ: chuyên khoa, địa điểm) và sau đó xem chi tiết đầy đủ của một bác sĩ cụ thể, dựa trên các lớp FindDoctorController và IFindDoctorService từ image_3bfe7e.png.
+Code snippet
+sequenceDiagram
+    autonumber
+    actor User as Bệnh nhân/Người dùng
+    participant Controller as FindDoctorController
+    participant Service as IFindDoctorService
+    participant DB as WebMedDbContext
+    
+    User->>Controller: Index(specialty, location)
+    activate Controller
+    Note right of Controller: Tải các khung giờ khả dụng
+    Controller->>Service: SearchDoctorsAsync(...)
+    activate Service
+    Service->>DB: Truy vấn Doctors, Specialities, Locations
+    activate DB
+    DB-->>Service: Trả về danh sách Doctors phù hợp
+    deactivate DB
+    Service-->>Controller: Danh sách Doctors
+    deactivate Service
+    Controller-->>User: Hiển thị danh sách
+    deactivate Controller
+    
+    User->>Controller: Details(id)
+    activate Controller
+    Note right of Controller: Tải các bác sĩ đã xác minh,<br/>tải các khung giờ khả dụng
+    Controller->>Service: GetDoctorDetailsAsync(id)
+    activate Service
+    Service->>DB: Truy vấn Doctor theo ID
+    activate DB
+    DB-->>Service: Trả về thực thể Doctor
+    deactivate DB
+    Service-->>Controller: Chi tiết Doctor
+    deactivate Service
+    Controller-->>User: Hiển thị chi tiết
+    deactivate Controller
+
+Biểu đồ 2: Đặt Lịch hẹn
+Kịch bản này dựa trên hành vi cụ thể được mô tả trong các ghi chú của AppointmentService trong image_3bfe7e.png, trong đó một khung giờ khả dụng được đánh dấu là đã đặt và một cuộc hẹn được tạo.
+Code snippet
+sequenceDiagram
+    autonumber
+    actor User as Bệnh nhân
+    participant Controller as AppointmentController
+    participant ServiceInterface as IAppointmentService
+    participant ServiceImpl as AppointmentService
+    participant DB as WebMedDbContext
+    
+    User->>Controller: Book(slotId)
+    activate Controller
+    Note right of Controller: Kiểm tra tài khoản bệnh nhân
+    Controller->>ServiceInterface: BookAppointmentAsync(patientId, slotId)
+    activate ServiceInterface
+    ServiceInterface->>ServiceImpl: BookAppointmentAsync(...)
+    activate ServiceImpl
+    ServiceImpl->>DB: Tìm AvailabilitySlot theo slotId
+    activate DB
+    DB-->>ServiceImpl: Thực thể AvailabilitySlot
+    deactivate DB
+    
+    Note over ServiceImpl: đặt slot.isBooked = true<br/>tạo Appointment
+    
+    ServiceImpl->>DB: Tạo thực thể Appointment
+    activate DB
+    DB-->>ServiceImpl: ID Cuộc hẹn
+    deactivate DB
+    
+    ServiceImpl->>DB: SaveChangesAsync()
+    activate DB
+    DB-->>ServiceImpl: Thành công
+    deactivate DB
+    
+    ServiceImpl-->>ServiceInterface: Thành công, ID Cuộc hẹn
+    deactivate ServiceImpl
+    ServiceInterface-->>Controller: Thành công, ID Cuộc hẹn
+    deactivate ServiceInterface
+    Controller-->>User: Xác nhận
+    deactivate Controller
+
+Biểu đồ 3: Tư vấn & Cấp Đơn thuốc
+Kịch bản này chi tiết hóa luồng công việc được mô tả trong các ghi chú của ConsultationService trong image_3bfe7e.png. Nó liên quan đến việc cập nhật trạng thái cuộc hẹn thành "Hoàn tất" và tạo các thực thể liên quan cho tư vấn và đơn thuốc.
+Code snippet
+sequenceDiagram
+    autonumber
+    actor User as Bác sĩ
+    participant Controller as ConsultationController
+    participant Service as IConsultationService
+    participant DB as WebMedDbContext
+    
+    User->>Controller: SubmitConsultation(appointmentId, diagnosis, medicines)
+    activate Controller
+    Controller->>Service: SubmitConsultationAsync(...)
+    activate Service
+    
+    Service->>DB: Tìm Appointment theo ID
+    activate DB
+    DB-->>Service: Thực thể Appointment
+    deactivate DB
+    
+    Note over Service: đặt appointment.Status = Completed<br/>tạo Consultation, Prescription,<br/>PrescriptionItems
+    
+    Service->>DB: Tạo thực thể Consultation
+    activate DB
+    DB-->>Service: ID Tư vấn
+    deactivate DB
+    
+    Service->>DB: Tạo thực thể Prescription
+    activate DB
+    DB-->>Service: ID Đơn thuốc
+    deactivate DB
+    
+    loop cho mỗi Medicine trong yêu cầu
+        Service->>DB: Tìm Medicine theo medicineId
+        activate DB
+        DB-->>Service: Thực thể Medicine
+        deactivate DB
+        Note right of DB: (Cập nhật StockQuantity?)
+        Service->>DB: Tạo thực thể PrescriptionItem
+        activate DB
+        DB-->>Service: ID PrescriptionItem
+        deactivate DB
+    end
+    
+    Service->>DB: SaveChangesAsync()
+    activate DB
+    DB-->>Service: Thành công
+    deactivate DB
+    
+    Service-->>Controller: Thành công
+    deactivate Service
+    Controller-->>User: Xác nhận
+    deactivate Controller
+
+1. Kịch bản 1: Xem danh sách tồn kho thuốc (View Inventory)
+Kịch bản này mô tả luồng Dược sĩ truy cập vào trang quản lý kho để kiểm tra danh sách thuốc, số lượng tồn kho (StockQuantity), và trạng thái yêu cầu kê đơn (IsPrescriptionRequired).
+Code snippet
+sequenceDiagram
+    autonumber
+    actor Pharmacist as Dược sĩ
+    participant Controller as PharmacistController
+    participant Service as IPharmacistService
+    participant DB as WebMedDbContext
+
+    Pharmacist->>Controller: Inventory()
+    activate Controller
+    
+    Controller->>Service: GetInventoryAsync()
+    activate Service
+    
+    Service->>DB: Lấy danh sách thuốc từ bảng Medicines
+    activate DB
+    DB-->>Service: Trả về danh sách thực thể Medicine
+    deactivate DB
+    
+    Service-->>Controller: Trả về danh sách Medicines dữ liệu thô
+    deactivate Service
+    
+    Controller-->>Pharmacist: Hiển thị danh sách tồn kho lên giao diện (Tên, Số lượng, Giá,...)
+    deactivate Controller
+
+2. Kịch bản 2: Nhập thêm thuốc vào kho (Restock Medicine)
+Kịch bản này mô tả nghiệp vụ Dược sĩ tiến hành bổ sung số lượng cho một loại thuốc cụ thể trong kho. Số lượng mới nhập sẽ được cộng dồn trực tiếp vào thuộc tính StockQuantity.
+Code snippet
+sequenceDiagram
+    autonumber
+    actor Pharmacist as Dược sĩ
+    participant Controller as PharmacistController
+    participant Service as IPharmacistService
+    participant DB as WebMedDbContext
+
+    Pharmacist->>Controller: Restock(medicineId, quantityToAdd)
+    activate Controller
+    
+    Controller->>Service: RestockAsync(medicineId, quantityToAdd)
+    activate Service
+    
+    Service->>DB: Tìm thuốc theo ID (Medicines.FindAsync)
+    activate DB
+    DB-->>Service: Trả về thực thể Medicine tương ứng
+    deactivate DB
+    
+    Note over Service: reads / updates stock<br/>Cập nhật số lượng:<br/>medicine.StockQuantity += quantityToAdd
+    
+    Service->>DB: SaveChangesAsync()
+    activate DB
+    DB-->>Service: Xác nhận lưu thay đổi vào Database thành công
+    deactivate DB
+    
+    Service-->>Controller: Trả về trạng thái xử lý thành công
+    deactivate Service
+    
+    Controller-->>Pharmacist: Hiển thị thông báo bổ sung số lượng thuốc thành công
+    deactivate Controller
+
+3. Kịch bản 3: Xem và Cập nhật trạng thái Đơn hàng thuốc (View & Update Order Status)
+Kịch bản này kết hợp luồng Dược sĩ lọc tìm kiếm đơn hàng (Index(statusFilter)) và thực hiện cập nhật trạng thái đơn hàng thông qua hàm UpdateOrderStatusAsync().
+Code snippet
+sequenceDiagram
+    autonumber
+    actor Pharmacist as Dược sĩ
+    participant Controller as PharmacistController
+    participant Service as IPharmacistService
+    participant DB as WebMedDbContext
+
+    Pharmacist->>Controller: Index(statusFilter)
+    activate Controller
+    
+    Controller->>Service: GetOrdersAsync(statusFilter)
+    activate Service
+    
+    Service->>DB: Truy vấn danh sách đơn hàng theo trạng thái bộ lọc
+    activate DB
+    DB-->>Service: Danh sách đơn hàng thỏa mãn
+    deactivate DB
+    
+    Service-->>Controller: Trả về danh sách đơn hàng
+    deactivate Service
+    
+    Controller-->>Pharmacist: Hiển thị danh sách đơn hàng thuốc cần xử lý
+    deactivate Controller
+
+    Note over Pharmacist, DB: ---- Dược sĩ tiến hành duyệt / cập nhật đơn hàng ----
+    
+    Pharmacist->>Controller: Tiến hành xử lý/duyệt đơn hàng
+    activate Controller
+    
+    Controller->>Service: UpdateOrderStatusAsync(...)
+    activate Service
+    
+    Note over Service: Cập nhật trạng thái mới của đơn hàng<br/>(ví dụ: Đang chuẩn bị, Đã giao,...)
+    
+    Service->>DB: SaveChangesAsync()
+    activate DB
+    DB-->>Service: Xác nhận cập nhật trạng thái thành công
+    deactivate DB
+    
+    Service-->>Controller: Trả về kết quả thành công
+    deactivate Service
+    
+    Controller-->>Pharmacist: Hiển thị thông báo đơn hàng đã cập nhật thành công
+    deactivate Controller
+1. Kịch bản 1: Bác sĩ nộp chứng chỉ & Thanh toán phí (Submit & Pay License Fee)
+Kịch bản này mô tả luồng Bác sĩ tải chứng chỉ lên hệ thống (trạng thái ban đầu là Pending), sau đó tiến hành thanh toán chi phí xét duyệt để chuyển trạng thái thanh toán sang Paid.
+Code snippet
+sequenceDiagram
+    autonumber
+    actor Doctor as Bác sĩ
+    participant Controller as DoctorPortalController
+    participant Service as DoctorPortalService
+    participant DB as WebMedDbContext
+
+    Doctor->>Controller: SubmitLicense(licenseNumber, feeAmount, file)
+    activate Controller
+    
+    Controller->>Service: SubmitLicenseAsync(...)
+    activate Service
+    
+    Note over Service: Khởi tạo DoctorLicense mới<br/>VerificationStatus = "Pending"<br/>PaymentStatus = "Pending"<br/>SubmittedAt = DateTime.Now
+    
+    Service->>DB: DoctorLicenses.Add(license)
+    Service->>DB: SaveChangesAsync()
+    activate DB
+    DB-->>Service: Xác nhận lưu thành công
+    deactivate DB
+    
+    Service-->>Controller: Trả về thông tin License kèm ID
+    deactivate Service
+    Controller-->>Doctor: Xác nhận đã nhận hồ sơ (Yêu cầu thanh toán phí)
+    deactivate Controller
+
+    Note over Doctor, DB: ---- Bác sĩ thực hiện thanh toán phí cấp phép ----
+    
+    Doctor->>Controller: PayLicense(licenseId)
+    activate Controller
+    
+    Controller->>Service: PayLicenseAsync(licenseId)
+    activate Service
+    
+    Service->>DB: Tìm License theo licenseId
+    activate DB
+    DB-->>Service: Đối tượng DoctorLicense
+    deactivate DB
+    
+    Note over Service: Cập nhật trạng thái thanh toán:<br/>PaymentStatus = "Paid"
+    
+    Service->>DB: SaveChangesAsync()
+    activate DB
+    DB-->>Service: Xác nhận thanh toán thành công vào DB
+    deactivate DB
+    
+    Service-->>Controller: Trả về kết quả thành công
+    deactivate Service
+    Controller-->>Doctor: Hiển thị thông báo đã thanh toán, hồ sơ chuyển vào hàng đợi duyệt
+    deactivate Controller
+
+2. Kịch bản 2: Admin phê duyệt chứng chỉ & Kích hoạt tài khoản Bác sĩ (Verify Doctor License)
+Kịch bản này mô tả quy trình Admin kiểm tra danh sách chứng chỉ và tiến hành Phê duyệt (Approved) hoặc Từ chối (Rejected). Nếu được phê duyệt, hệ thống sẽ tự động cập nhật thuộc tính IsVerified = true cho Bác sĩ đó.
+Code snippet
+sequenceDiagram
+    autonumber
+    actor Admin as Admin / Người kiểm duyệt
+    participant Controller as AdminController
+    participant Service as AdminService
+    participant DB as WebMedDbContext
+
+    Admin->>Controller: VerifyDoctor(licenseId, status)
+    activate Controller
+    
+    Controller->>Service: VerifyDoctorAsync(licenseId, status, adminId)
+    activate Service
+    
+    Service->>DB: Tìm DoctorLicense theo licenseId
+    activate DB
+    DB-->>Service: Đối tượng DoctorLicense
+    deactivate DB
+    
+    Note over Service: Cập nhật thông tin duyệt chứng chỉ:<br/>VerificationStatus = status (Approved/Rejected)<br/>ReviewedBy = adminId<br/>ReviewedAt = DateTime.Now
+    
+    alt Nếu status == "Approved" (Chứng chỉ hợp lệ)
+        Service->>DB: Tìm Doctor tương ứng theo DoctorId
+        activate DB
+        DB-->>Service: Đối tượng Doctor
+        deactivate DB
+        
+        Note over Service: Kích hoạt trạng thái xác thực bác sĩ:<br/>Doctor.IsVerified = true
+    end
+
+    Service->>DB: SaveChangesAsync()
+    activate DB
+    DB-->>Service: Xác nhận lưu mọi thay đổi thành công
+    deactivate DB
+    
+    Service-->>Controller: Trả về kết quả xác thực thành công
+    deactivate Service
+    
+    Controller-->>Admin: Cập nhật giao diện, hiển thị thông báo duyệt thành công
+    deactivate Controller
+
+

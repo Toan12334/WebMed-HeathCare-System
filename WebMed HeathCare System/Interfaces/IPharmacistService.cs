@@ -11,5 +11,7 @@ namespace WebMed_HeathCare_System.Interfaces
         Task<bool> UpdateOrderStatusAsync(int id, string status);
         Task<List<Medicine>> GetInventoryAsync();
         Task<bool> RestockAsync(int medicineId, int quantityToAdd);
+        Task<bool> AddMedicineAsync(string name, string category, string? description, decimal price, int stockQuantity, bool isPrescriptionRequired);
+        Task<bool> UpdateMedicineAsync(int medicineId, string name, string category, string? description, decimal price, int stockQuantity, bool isPrescriptionRequired);
     }
 }

@@ -61,8 +61,7 @@
                             var isDoctorVerified = false;
                             if (int.TryParse(userIdString, out int userId))
                             {
-                                var doctor = await DoctorPortalService.GetDoctorAsync(userId);
-                                isDoctorVerified = doctor?.IsVerified == true;
+                                isDoctorVerified = !(await DoctorPortalService.IsUnverifiedDoctorAsync(userId));
                             }
 
                             if (isDoctorVerified)

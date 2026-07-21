@@ -139,5 +139,42 @@ namespace WebMed_HeathCare_System.Services
 
             return true;
         }
+
+        public async Task<bool> AddMedicineAsync(string name, string category, string? description, decimal price, int stockQuantity, bool isPrescriptionRequired)
+        {
+            var medicine = new Medicine
+            {
+                Name = name,
+                Category = category,
+                Description = description,
+                Price = price,
+                StockQuantity = stockQuantity,
+                IsPrescriptionRequired = isPrescriptionRequired,
+                IsActive = true
+            };
+
+            _context.Medicines.Add(medicine);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> UpdateMedicineAsync(int medicineId, string name, string category, string? description, decimal price, int stockQuantity, bool isPrescriptionRequired)
+        {
+            var medicine = await _context.Medicines.FindAsync(medicineId);
+            if (medicine == null)
+            {
+                return false;
+            }
+
+            medicine.Name = name;
+            medicine.Category = category;
+            medicine.Description = description;
+            medicine.Price = price;
+            medicine.StockQuantity = stockQuantity;
+            medicine.IsPrescriptionRequired = isPrescriptionRequired;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

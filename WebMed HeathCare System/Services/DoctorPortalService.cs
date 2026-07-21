@@ -16,7 +16,13 @@ namespace WebMed_HeathCare_System.Services
         public async Task<bool> IsUnverifiedDoctorAsync(int userId)
         {
             var doctor = await _context.Doctors.FindAsync(userId);
-            return doctor != null && !doctor.IsVerified;
+            if (doctor == null) return true;
+
+            // Doctor is verified if the flag is true OR they have at least one approved license
+            if (doctor.IsVerified) return false;
+
+            var hasApprovedLicense = await _context.DoctorLicenses.AnyAsync(l => l.DoctorId == userId && l.VerificationStatus == "Approved");
+            return !hasApprovedLicense;
         }
 
         public async Task<Doctor?> GetDoctorAsync(int userId)
@@ -72,12 +78,6 @@ namespace WebMed_HeathCare_System.Services
 
             license.PaymentStatus = "Paid";
             license.VerificationStatus = "Pending";
-
-            var doctor = await _context.Doctors.FindAsync(doctorId);
-            if (doctor != null)
-            {
-                doctor.IsVerified = false;
-            }
 
             await _context.SaveChangesAsync();
             return true;

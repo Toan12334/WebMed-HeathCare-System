@@ -127,5 +127,51 @@ namespace WebMed_HeathCare_System.Controllers
             TempData["SuccessMessage"] = $"Successfully restocked {quantityToAdd} units.";
             return RedirectToAction("Inventory");
         }
+
+        // POST: /Pharmacist/AddMedicine
+        [HttpPost]
+        public async Task<IActionResult> AddMedicine(string name, string category, string? description, decimal price, int stockQuantity, bool isPrescriptionRequired)
+        {
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(category) || price < 0 || stockQuantity < 0)
+            {
+                TempData["ErrorMessage"] = "Invalid medicine details provided.";
+                return RedirectToAction("Inventory");
+            }
+
+            var success = await _pharmacistService.AddMedicineAsync(name, category, description, price, stockQuantity, isPrescriptionRequired);
+            if (success)
+            {
+                TempData["SuccessMessage"] = $"Successfully added medicine '{name}'.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Failed to add new medicine.";
+            }
+
+            return RedirectToAction("Inventory");
+        }
+
+        // POST: /Pharmacist/UpdateMedicine
+        [HttpPost]
+        public async Task<IActionResult> UpdateMedicine(int medicineId, string name, string category, string? description, decimal price, int stockQuantity, bool isPrescriptionRequired)
+        {
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(category) || price < 0 || stockQuantity < 0)
+            {
+                TempData["ErrorMessage"] = "Invalid medicine details provided.";
+                return RedirectToAction("Inventory");
+            }
+
+            var success = await _pharmacistService.UpdateMedicineAsync(medicineId, name, category, description, price, stockQuantity, isPrescriptionRequired);
+            if (success)
+            {
+                TempData["SuccessMessage"] = $"Successfully updated medicine '{name}'.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Failed to update medicine.";
+            }
+
+            return RedirectToAction("Inventory");
+        }
     }
 }
