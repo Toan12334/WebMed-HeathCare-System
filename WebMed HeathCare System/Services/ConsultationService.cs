@@ -58,7 +58,8 @@ namespace WebMed_HeathCare_System.Services
 
                 if (!string.IsNullOrWhiteSpace(prescriptionJson))
                 {
-                    var items = JsonSerializer.Deserialize<List<PrescriptionInputItem>>(prescriptionJson);
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var items = JsonSerializer.Deserialize<List<PrescriptionInputItem>>(prescriptionJson, options);
                     if (items != null && items.Any())
                     {
                         var prescription = new Prescription
